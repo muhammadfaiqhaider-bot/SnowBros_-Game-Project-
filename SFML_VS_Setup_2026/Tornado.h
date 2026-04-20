@@ -6,25 +6,37 @@ class Knives
 {
 private:
     float x;
+    float y;
     float velocityX;
+    float velocityY;
     bool inAir;
-    float screenSizeLimit;
+    float screenLimit;
 
 public:
-    Knives(float startX, float playerPos, float lim)
+    Knives(float startX, float startY, float targetX, float targetY, float limit)
     {
         x = startX;
+        y = startY;
         inAir = true;
-        screenSizeLimit = lim;
+        screenLimit = limit;
 
-        if (playerPos > startX)
+        
+        float diffX = targetX - startX;           // Calculate direction toward player position..x-axis
+        float diffY = targetY - startY;           // Calculate direction toward player position..y-axis
+
+        
+        float distance = sqrt(diffX * diffX + diffY * diffY);  // Using Distance Formula..
+                                                  // s=(x^2 +y^2)^1/2
+
+        
+        if (distance == 0)                        // Avoid division by zero error.....
         {
-            velocityX = 2;
+            distance = 1;
         }
-        else
-        {
-            velocityX = -2;
-        }
+
+        // Normalize direction and set speed to 4
+        velocityX = (diffX / distance) * 4.0f;
+        velocityY = (diffY / distance) * 4.0f;
     }
 
     void update()
@@ -32,8 +44,11 @@ public:
         if (inAir)
         {
             x = x + velocityX;
+            y = y + velocityY;
         }
-        if (x < 0 || x > screenSizeLimit)
+
+        
+        if (x < 0 || x > screenLimit || y < 0 || y > screenLimit)// Check for screen Limit.....
         {
             inAir = false;
         }
@@ -44,16 +59,38 @@ public:
         return inAir;
     }
 
+    float getX()
+    {
+        return x;
+    }
+
+    float getY()
+    {
+        return y;
+    }
+
     void deactivate()
     {
         inAir = false;
     }
 
-    void draw()
+    void draw(sf::RenderWindow& window)
     {
-        // SFML work cheema knive drawing type shyt
+        if (inAir)
+        {
+            // Yellow small rectangle for knife
+            sf::RectangleShape knifeShape(sf::Vector2f(15.f, 5.f));
+            knifeShape.setFillColor(sf::Color::Yellow);
+            knifeShape.setPosition(x, y);
+            window.draw(knifeShape);
+        }
+    }
+
+    ~Knives()
+    {
     }
 };
+
 
 class Tornado : public FlyingFoogaFoog
 {
@@ -61,9 +98,10 @@ private:
     bool isTeleporting;
     int teleportTimer;
     int teleportDuration;
-    bool throwKnife;
     int attackTimer;
     int attackDuration;
+    float playerX;         // This variable is use to store Player x-axis position for knife throwing..
+    float playerY;
     Knives* churi;
 
 public:
@@ -71,27 +109,64 @@ public:
     {
         isTeleporting = false;
         teleportTimer = 0;
-        teleportDuration = 60;
+        teleportDuration = 60;     // time = Frames/FPS -
 
-        throwKnife = false;
         attackTimer = 0;
-        attackDuration = 120;
+        attackDuration = 180;     // Throw knife after every 3 seconds......
+
+        playerX = 0;
+        playerY = 0;
+
         churi = nullptr;
+
+        name = "Tornado";
     }
+
+    
+    void setPlayerPosition(float pX, float pY)
+    {                           // Cheema Use this function for updating player position in every 
+        playerX = pX;           // Frame.......
+        playerY = pY;
+    }
+
+
+
+
 
     void movementsUpdate() override
     {
-
+      
         teleportTimer++;
-        attackTimer++;
 
         if (isTeleporting)
         {
-
-            if (teleportTimer >= teleportDuration)
+            if (teleportTimer >= teleportDuration)             // Teleport Logic
             {
-                x = x + rand() % 31 - 15;
-                y = y + rand() % 31 - 15;
+                
+                float newX = x + (rand() % 200) - 100;         // X coordinate teleportation Point
+                float newY = y + (rand() % 200) - 100;         // Y coordinate telepotation Point
+
+            
+                if (newX < 0)
+                {
+                    newX = 0;
+                }
+                if (newX > 560)
+                {
+                    newX = 560;                             // Checker for teleportation points
+                }                                           // So that telepotation point won't 
+                                                            // come out of the screen
+                if (newY < 0)
+                {
+                    newY = 0;
+                }
+                if (newY > 560)
+                {
+                    newY = 560;
+                }
+
+                x = newX;
+                y = newY;
 
                 isTeleporting = false;
                 teleportTimer = 0;
@@ -99,28 +174,40 @@ public:
         }
         else
         {
-            FlyingFoogaFoog::movementsUpdate();
-        }
+           
+            FlyingFoogaFoog::movementsUpdate();      // This is the same inheritated movements by FlyingFooga
+                                                     // When Not teleporting
+            
 
-        if (!isTeleporting && teleportTimer > 15) 
-        {
-            if (rand() % 4 == 0)
+
+            if (teleportTimer > 60)
             {
-                isTeleporting = true;
-                teleportTimer = 0; 
+                if (rand() % 4 == 0)
+                {
+                    isTeleporting = true;
+                    teleportTimer = 0;
+                }
             }
         }
 
+        
+
+
+        // Knife Thrwing Thing
+
+        attackTimer++;
 
         if (attackTimer >= attackDuration)
         {
             attackTimer = 0;
 
+            
             if (churi == nullptr)
             {
-                churi = new Knives(x, y, 200);
-            }
+                churi = new Knives(x, y, playerX, playerY, 600.0f);   // Calling Knife class for creating an
+            }                                                         // an Object.......
         }
+
 
         if (churi != nullptr)
         {
@@ -134,28 +221,27 @@ public:
         }
     }
 
-
-    
-
-
-
-
-
-
-    void DisplayEnemy() override
+    void DisplayEnemy(sf::RenderWindow& window) override
     {
-        // Cheeem ayour work for tornadooo making and all stuff
+        // Tornado is cyan colored rectangle
+        sf::RectangleShape tornadoShape(sf::Vector2f(40.f, 40.f));
+        tornadoShape.setFillColor(sf::Color::Cyan);
+        tornadoShape.setPosition(x, y);
+        window.draw(tornadoShape);
 
+        // Draw Knives Sprite shyt implementation
         if (churi != nullptr)
         {
-            churi->draw();
+            churi->draw(window);
         }
     }
 
-
     ~Tornado()
     {
-        delete churi;
+        if (churi != nullptr)
+        {
+            delete churi;
+            churi = nullptr;
+        }
     }
-
 };

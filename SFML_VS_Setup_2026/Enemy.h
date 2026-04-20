@@ -30,6 +30,7 @@ public:
     virtual void movementsUpdate() = 0;
     virtual void DisplayEnemy(sf::RenderWindow& window) = 0;
 
+
     // Reducing Health Logic
     virtual void reduceHealth()
     {
@@ -76,7 +77,7 @@ public:
         return name;
     }
 
-    // Hitbox for collision (Student A needs this)
+    // HitBox thing  CHEEMA u'll need this for making collision  physics..........
     sf::FloatRect getHitBox()
     {
         return enemySprite.getGlobalBounds();

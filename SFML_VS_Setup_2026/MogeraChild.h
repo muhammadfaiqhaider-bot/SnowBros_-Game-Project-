@@ -90,6 +90,9 @@ public:
         onGround = value;
     }
 
+
+  
+
     void deactivate()
     {
         active = false;

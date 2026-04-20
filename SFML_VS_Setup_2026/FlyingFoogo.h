@@ -18,7 +18,7 @@ public:
         flyingTimer = 0;
         flyingDuration = 120;          // time=frame/FPS -> which mkes this 2 seconds of flight
         walkingTimer = 0;
-        walkingDuration = 240;  
+        walkingDuration = 360;  
 
         
         name = "FlyingFoogaFoog";      //name Changed in Botom to FlyingFoogaFoog
@@ -44,9 +44,9 @@ public:
                 velocityX = -velocityX;
             }
 
-            if (y < 0)
+            if (y < 10)
             {
-                y = 0;
+                y = 10;
                 velocityY = -velocityY;
             }
 
@@ -124,14 +124,14 @@ public:
     {
         if (isFlying)
         {
-            sf::RectangleShape tempShape(sf::Vector2f(40.f, 40.f));
+            sf::RectangleShape tempShape(sf::Vector2f(30.f, 30.f));
             tempShape.setFillColor(sf::Color::Blue);
             tempShape.setPosition(x, y);
             window.draw(tempShape);
         }
         else
         {
-            sf::RectangleShape tempShape(sf::Vector2f(40.f, 40.f));
+            sf::RectangleShape tempShape(sf::Vector2f(30.f, 30.f));
             tempShape.setFillColor(sf::Color::Green);
             tempShape.setPosition(x, y);
             window.draw(tempShape);

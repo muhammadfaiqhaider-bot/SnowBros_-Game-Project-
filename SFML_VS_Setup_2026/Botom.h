@@ -76,6 +76,10 @@ public:
         window.draw(tempShape);
     }
 
+
+    
+
+
     
     void setHitWall(bool value)              // Cheema  calls this when Botom hits a wall or some edges.......
     {

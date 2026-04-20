@@ -211,11 +211,13 @@ int main()
         // --- Boss toggle update ---
         if (testMogera)
         {
+
             // MogeraChild collision check
             for (int i = 0; i < mogera.getNumberOfChilds(); i++)
             {
                 if (mogera.getChildX(i) >= 0)
                 {
+                    mogera.setChildOnGround(i, false); //Added reset here
                     for (int j = 0; j < 6; j++)
                     {
                         sf::FloatRect childBounds(mogera.getChildX(i), mogera.getChildY(i), 20.f, 20.f);

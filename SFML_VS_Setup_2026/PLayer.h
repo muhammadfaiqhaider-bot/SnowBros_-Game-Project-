@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "SnowBall.h"
 #include <SFML/Graphics.hpp>
 
 class Player
@@ -33,6 +34,8 @@ protected:
     bool hasBalloonMode;
     int powerUpTimer;           
 
+
+    Snowball* snowball;
  
     sf::Sprite playerSprite;
     sf::Texture playerTexture;
@@ -70,6 +73,10 @@ public:
         distanceIncreaseStatus = false;
         hasBalloonMode = false;
         powerUpTimer = 0;
+
+
+        snowball = nullptr;
+
     }
 
     // Pure virtual - every character must implement these
@@ -365,7 +372,63 @@ public:
         updatePowerUps();
     }
 
+
+
+
+    void throwSnowball()
+    {
+        if (snowball == nullptr)
+        {
+            snowball = new Snowball(
+                x,
+                y,
+                direction,
+                snowballDistance,
+                snowballPower,
+                600.f,
+                600.f
+            );
+        }
+    }
+
+    void updateSnowball()
+    {
+        if (snowball != nullptr)
+        {
+            snowball->update();
+
+            if (!snowball->isActive())
+            {
+                delete snowball;
+                snowball = nullptr;
+            }
+        }
+    }
+
+    void drawSnowball(sf::RenderWindow& window)
+    {
+        if (snowball != nullptr)
+        {
+            snowball->draw(window);
+        }
+    }
+
+    Snowball* getSnowball()
+    {
+        return snowball;
+    }
+
+
+
+
+
+
     virtual ~Player()
     {
+        if (snowball != nullptr)
+        {
+            delete snowball;
+            snowball = nullptr;
+        }
     }
 };

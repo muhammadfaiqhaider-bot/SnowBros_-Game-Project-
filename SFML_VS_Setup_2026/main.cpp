@@ -1,14 +1,11 @@
 #include <SFML/Graphics.hpp>
-#include "Gamakichi.h"
-#include "Mogera.h"
-#include "Tornado.h"
-#include "FlyingFoogo.h"
+#include "Nick.h"
 #include "Botom.h"
 
 int main()
 {
     // Window 600x600
-    sf::RenderWindow window(sf::VideoMode(600, 600), "Snow Bros - Enemy Test");
+    sf::RenderWindow window(sf::VideoMode(600, 600), "Snow Bros - Snowball Test");
     window.setFramerateLimit(60);
 
     // ---- PLATFORMS ----
@@ -44,32 +41,22 @@ int main()
     platforms[5].setFillColor(sf::Color(128, 0, 128));
     platforms[5].setPosition(400.f, 140.f);
 
+    // ---- PLAYER ----
+    Nick nick(100.f, 520.f);
+
     // ---- ENEMIES ----
-    Botom botom(100.f, 520.f);
-    FlyingFoogaFoog foogaFoog(300.f, 240.f);
-    Tornado tornado(50.f, 100.f);
+    Botom botom1(300.f, 520.f);
+    Botom botom2(450.f, 520.f);
+    Botom botom3(200.f, 380.f);
 
-    // Bosses spawn center screen separately
-    Mogera mogera(390.f, 340.f);
-    Gamakichi gamakichi(220.f, 380.f);
+    // ---- LIVES DISPLAY ----
+    sf::RectangleShape life1(sf::Vector2f(20.f, 20.f));
+    life1.setFillColor(sf::Color::Blue);
+    life1.setPosition(10.f, 5.f);
 
-    // ---- DUMMY PLAYER ----
-    float playerX = 100.f;
-    float playerY = 520.f;
-
-    sf::RectangleShape playerShape(sf::Vector2f(40.f, 40.f));
-    playerShape.setFillColor(sf::Color::White);
-    playerShape.setPosition(playerX, playerY);
-
-    // ---- TOGGLE FLAG ----
-    // true  = testing Mogera
-    // false = testing Gamakichi
-    bool testMogera = true;
-
-    // ---- INSTRUCTIONS PANEL ----
-    sf::RectangleShape instructionPanel(sf::Vector2f(600.f, 25.f));
-    instructionPanel.setFillColor(sf::Color(0, 0, 0, 180));
-    instructionPanel.setPosition(0.f, 0.f);
+    sf::RectangleShape life2(sf::Vector2f(20.f, 20.f));
+    life2.setFillColor(sf::Color::Blue);
+    life2.setPosition(35.f, 5.f);
 
     // ---- GAME LOOP ----
     while (window.isOpen())
@@ -85,157 +72,187 @@ int main()
 
             if (event.type == sf::Event::KeyPressed)
             {
-                // Move dummy player with arrow keys
-                if (event.key.code == sf::Keyboard::Left)
+                // Space - throw snowball
+                if (event.key.code == sf::Keyboard::Space)
                 {
-                    playerX -= 10.f;
-                }
-                if (event.key.code == sf::Keyboard::Right)
-                {
-                    playerX += 10.f;
-                }
-                if (event.key.code == sf::Keyboard::Up)
-                {
-                    playerY -= 10.f;
-                }
-                if (event.key.code == sf::Keyboard::Down)
-                {
-                    playerY += 10.f;
+                    nick.throwSnowball();
                 }
 
-                // Keep player inside screen
-                if (playerX < 0)
+                // L - test lose life
+                if (event.key.code == sf::Keyboard::L)
                 {
-                    playerX = 0;
+                    nick.loseLife();
                 }
-                if (playerX > 560)
-                {
-                    playerX = 560;
-                }
-                if (playerY < 0)
-                {
-                    playerY = 0;
-                }
-                if (playerY > 560)
-                {
-                    playerY = 560;
-                }
-
-                // TAB - switch between bosses
-                if (event.key.code == sf::Keyboard::Tab)
-                {
-                    testMogera = !testMogera;
-                }
-
-                // H - hit Mogera
-                if (event.key.code == sf::Keyboard::H)
-                {
-                    if (testMogera)
-                    {
-                        mogera.reduceHealth();
-                    }
-                }
-
-                // G - hit Gamakichi
-                if (event.key.code == sf::Keyboard::G)
-                {
-                    if (!testMogera)
-                    {
-                        gamakichi.reduceHealth();
-                    }
-                }
-
-                playerShape.setPosition(playerX, playerY);
             }
         }
 
         // 2. UPDATE
 
-        // --- Always update standard enemies ---
-
-        // Botom collision check
-        botom.setOnGround(false);
+        // --- Player platform collision FIRST ---
+        nick.setOnGround(false);
         for (int i = 0; i < 6; i++)
         {
-            sf::FloatRect botomBounds(botom.getPositionX(), botom.getPositionY(), 40.f, 40.f);
+            sf::FloatRect nickBounds(nick.getPositionX(), nick.getPositionY(), 40.f, 40.f);
+            sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
+
+            if (nickBounds.intersects(platformBounds))
+            {
+                float platformTop = platforms[i].getPosition().y;
+
+                if (nick.getPositionY() + 40.f <= platformTop + 10.f)
+                {
+                    nick.setOnGround(true);
+                    nick.snapToGround(platformTop - 40.f);
+
+                }
+            }
+        }
+
+        // --- Botom1 platform collision ---
+        botom1.setOnGround(false);
+        for (int i = 0; i < 6; i++)
+        {
+            sf::FloatRect botomBounds(botom1.getPositionX(), botom1.getPositionY(), 40.f, 40.f);
             sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
 
             if (botomBounds.intersects(platformBounds))
             {
-                botom.setOnGround(true);
-            }
-        }
+                float platformTop = platforms[i].getPosition().y;
 
-        if (botom.getPositionX() <= 0 || botom.getPositionX() >= 560)
-        {
-            botom.setHitWall(true);
-        }
-
-        // FlyingFoogo collision check
-        foogaFoog.setOnGround(false);
-        for (int i = 0; i < 6; i++)
-        {
-            sf::FloatRect foogBounds(foogaFoog.getPositionX(), foogaFoog.getPositionY(), 40.f, 40.f);
-            sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
-
-            if (foogBounds.intersects(platformBounds))
-            {
-                foogaFoog.setOnGround(true);
-            }
-        }
-
-        // Tornado collision check
-        tornado.setOnGround(false);
-        for (int i = 0; i < 6; i++)
-        {
-            sf::FloatRect tornadoBounds(tornado.getPositionX(), tornado.getPositionY(), 40.f, 40.f);
-            sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
-
-            if (tornadoBounds.intersects(platformBounds))
-            {
-                tornado.setOnGround(true);
-            }
-        }
-
-        if (tornado.getPositionX() <= 0 || tornado.getPositionX() >= 560)
-        {
-            tornado.setHitWall(true);
-        }
-
-        // Update standard enemies
-        botom.movementsUpdate();
-        foogaFoog.movementsUpdate();
-        tornado.setPlayerPosition(playerX, playerY);
-        tornado.movementsUpdate();
-
-        // --- Boss toggle update ---
-        if (testMogera)
-        {
-            // MogeraChild collision check
-            for (int i = 0; i < mogera.getNumberOfChilds(); i++)
-            {
-                if (mogera.getChildX(i) >= 0)
+                if (botom1.getPositionY() + 40.f <= platformTop + 10.f)
                 {
-                    for (int j = 0; j < 6; j++)
-                    {
-                        sf::FloatRect childBounds(mogera.getChildX(i), mogera.getChildY(i), 20.f, 20.f);
-                        sf::FloatRect platformBounds = platforms[j].getGlobalBounds();
+                    botom1.setOnGround(true);
 
-                        if (childBounds.intersects(platformBounds))
-                        {
-                            mogera.setChildOnGround(i, true);
-                        }
-                    }
                 }
             }
+        }
 
-            mogera.setPlayerPosition(playerX, playerY);
-            mogera.movementsUpdate();
+        if (botom1.getPositionX() <= 0 || botom1.getPositionX() >= 560)
+        {
+            botom1.setHitWall(true);
+        }
+
+        // --- Botom2 platform collision ---
+        botom2.setOnGround(false);
+        for (int i = 0; i < 6; i++)
+        {
+            sf::FloatRect botomBounds(botom2.getPositionX(), botom2.getPositionY(), 40.f, 40.f);
+            sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
+
+            if (botomBounds.intersects(platformBounds))
+            {
+                float platformTop = platforms[i].getPosition().y;
+
+                if (botom2.getPositionY() + 40.f <= platformTop + 10.f)
+                {
+                    botom2.setOnGround(true);
+
+                }
+            }
+        }
+
+        if (botom2.getPositionX() <= 0 || botom2.getPositionX() >= 560)
+        {
+            botom2.setHitWall(true);
+        }
+
+        // --- Botom3 platform collision ---
+        botom3.setOnGround(false);
+        for (int i = 0; i < 6; i++)
+        {
+            sf::FloatRect botomBounds(botom3.getPositionX(), botom3.getPositionY(), 40.f, 40.f);
+            sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
+
+            if (botomBounds.intersects(platformBounds))
+            {
+                float platformTop = platforms[i].getPosition().y;
+
+                if (botom3.getPositionY() + 40.f <= platformTop + 10.f)
+                {
+                    botom3.setOnGround(true);
+
+                }
+            }
+        }
+
+        if (botom3.getPositionX() <= 0 || botom3.getPositionX() >= 560)
+        {
+            botom3.setHitWall(true);
+        }
+
+        // --- Snowball collision with all 3 botoms ---
+        if (nick.getSnowball() != nullptr)
+        {
+            sf::FloatRect snowballBounds = nick.getSnowball()->getHitBox();
+
+            // Check botom1
+            sf::FloatRect botom1Bounds(botom1.getPositionX(), botom1.getPositionY(), 40.f, 40.f);
+            if (snowballBounds.intersects(botom1Bounds))
+            {
+                nick.getSnowball()->onHitEnemy(&botom1);
+            }
+
+            // Check botom2
+            sf::FloatRect botom2Bounds(botom2.getPositionX(), botom2.getPositionY(), 40.f, 40.f);
+            if (snowballBounds.intersects(botom2Bounds))
+            {
+                nick.getSnowball()->onHitEnemy(&botom2);
+            }
+
+            // Check botom3
+            sf::FloatRect botom3Bounds(botom3.getPositionX(), botom3.getPositionY(), 40.f, 40.f);
+            if (snowballBounds.intersects(botom3Bounds))
+            {
+                nick.getSnowball()->onHitEnemy(&botom3);
+            }
+        }
+
+        // --- Player touches Botom - lose life ---
+        sf::FloatRect nickBounds(nick.getPositionX(), nick.getPositionY(), 40.f, 40.f);
+
+        sf::FloatRect botom1Bounds(botom1.getPositionX(), botom1.getPositionY(), 40.f, 40.f);
+        sf::FloatRect botom2Bounds(botom2.getPositionX(), botom2.getPositionY(), 40.f, 40.f);
+        sf::FloatRect botom3Bounds(botom3.getPositionX(), botom3.getPositionY(), 40.f, 40.f);
+
+        if (nickBounds.intersects(botom1Bounds))
+        {
+            nick.loseLife();
+        }
+        if (nickBounds.intersects(botom2Bounds))
+        {
+            nick.loseLife();
+        }
+        if (nickBounds.intersects(botom3Bounds))
+        {
+            nick.loseLife();
+        }
+
+        // --- Update snowball ---
+        nick.updateSnowball();
+
+        // --- Update all ---
+        nick.movementsUpdate();
+        botom1.movementsUpdate();
+        botom2.movementsUpdate();
+        botom3.movementsUpdate();
+
+        // --- Update lives display ---
+        if (nick.getLives() >= 1)
+        {
+            life1.setFillColor(sf::Color::Blue);
         }
         else
         {
-            gamakichi.setPlayerPosition(playerX, playerY);
-            gamakichi.movementsUpdate();
+            life1.setFillColor(sf::Color(50, 50, 50));
+        }
+
+        if (nick.getLives() >= 2)
+        {
+            life2.setFillColor(sf::Color::Blue);
+        }
+        else
+        {
+            life2.setFillColor(sf::Color(50, 50, 50));
         }
 
         // 3. DRAW
@@ -247,26 +264,20 @@ int main()
             window.draw(platforms[i]);
         }
 
+        // Draw enemies
+        botom1.DisplayEnemy(window);
+        botom2.DisplayEnemy(window);
+        botom3.DisplayEnemy(window);
+
+        // Draw snowball
+        nick.drawSnowball(window);
+
         // Draw player
-        window.draw(playerShape);
+        nick.displayPlayer(window);
 
-        // Draw standard enemies
-        botom.DisplayEnemy(window);
-        foogaFoog.DisplayEnemy(window);
-        tornado.DisplayEnemy(window);
-
-        // Draw active boss only
-        if (testMogera)
-        {
-            mogera.DisplayEnemy(window);
-        }
-        else
-        {
-            gamakichi.DisplayEnemy(window);
-        }
-
-        // Draw instruction panel on top
-        window.draw(instructionPanel);
+        // Draw lives
+        window.draw(life1);
+        window.draw(life2);
 
         window.display();
     }

@@ -13,21 +13,18 @@ public:
         calculateDirection(playerX, playerY, 4.0f);
     }
 
-    void update() override
+    void updateTrajactory() override
     {
         if (!active)
-        {
+        {                                            
             return;
         }
-
         x = x + velocityX;
         y = y + velocityY;
-
-        // Use parent's boundary check
-        checkScreenBoundary();
+        checkScreenBoundary();            // Check for is my projectile inside the game solution range or not....
     }
 
-    void draw(sf::RenderWindow& window) override
+    void drawProjectiles(sf::RenderWindow& window) override
     {
         if (!active)
         {

@@ -68,7 +68,7 @@ public:
                 int direction;
                 if (rand() % 2 == 0)     // Now lands to the ground and attain its old speed.....
                 {
-                    direction = 1;
+                    direction = 1;          // This is the same Botom ground moving Logic
                 }
                 else
                 {
@@ -96,9 +96,10 @@ public:
 
                 if (rand() % 2 == 0)
                 {
-                    dirX = 1;
-                }
-                else
+                    dirX = 1;                    //         \ | /
+                }                                //        <- . ->         These are the possible direction where flyings happens
+                else                             //         / | \
+
                 {
                     dirX = -1;
                 }
@@ -113,12 +114,14 @@ public:
                 }
 
 
-                float speed = 2.0f + (rand() % 3);   // For making speed unpredictable I applied rand%3 and add
-                velocityX = speed * dirX;            // to 2 which make it unique velociy...
-                velocityY = speed * dirY;
+                float speed = 1.8f ;  
+                velocityX = speed * dirX;            // Velocity = 1.8 * direction X ..
+                velocityY = speed * dirY;            
             }
         }
     }
+
+
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
@@ -127,8 +130,8 @@ public:
             sf::RectangleShape tempShape(sf::Vector2f(30.f, 30.f));
             tempShape.setFillColor(sf::Color::Blue);
             tempShape.setPosition(x, y);
-            window.draw(tempShape);
-        }
+            window.draw(tempShape);                                           // To show a contrast when Flying fooga flies it is BLUE
+        }                                                                     //when on ground its Green......
         else
         {
             sf::RectangleShape tempShape(sf::Vector2f(30.f, 30.f));

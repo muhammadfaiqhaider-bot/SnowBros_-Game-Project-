@@ -9,27 +9,29 @@ protected:
     bool onGround;
 
 public:
-    Botom(float xPos, float yPos) : Enemy(xPos, yPos, "Botom")
-    {
+    Botom(float xPos, float yPos) : Enemy(xPos, yPos, "Botom")   // This is parametrized Function whenever in main my Botom is created it 
+    {                                                            // Does demand its X and Y coordinate for object creation 
+        
         health = 1;
         hitWall = false;
         onGround = false;
-
-
-        int direction;
-        if (rand() % 2 == 0)
-        {
+        int direction;                              
+        if (rand() % 2 == 0)                                 // Randomly direction Assigned 1 for right 
+        {                                                    // -1 for left...........
             direction = 1;
         } 
         else
         {
             direction = -1;
         }
-        velocityX = 2.0 * direction;
-        velocityY = 0;
-    }
+        velocityX = 1.3 * direction;                    // Velocity is setted to 1.3 by testing...Some physics applied here like my game is setted
+        velocityY = 0;                                  // to 60 frames and direction is either 1 or -1 so  (1x1.3x60) that much pixels are moved along 
+    }                                                   // X-axis......
 
-    void movementsUpdate() override
+
+
+
+    void movementsUpdate() override // Ovverriden Function........
     {
 
         if (hitWall)
@@ -41,8 +43,8 @@ public:
         
         if (!onGround)                         // Gravity logic If not on ground so pull's down until touches the ground.....
         {
-            velocityY = velocityY + 0.5f;      // Gravity Applied
-        }
+            velocityY = velocityY + 0.5f;      // Gravity Applied here +0.5 is bcz scrren resolutions are not like normal graphs it works a bit 
+        }                                      // Different...top left is (0,0) and +y means u move downwards...
         else
         {
             velocityY = 0;                     // Stop falling when on ground
@@ -88,7 +90,7 @@ public:
 
     
     void setOnGround(bool value)    
-    {                                        // Cheema use this  when Botom lands on flat surfa
+    {                                        // Cheema use this  when Botom lands on flat surfaxe
         onGround = value;
     }
 

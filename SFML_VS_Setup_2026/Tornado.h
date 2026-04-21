@@ -37,7 +37,7 @@ public:
 
     void setPlayerPosition(float pX, float pY)
     {                           // Cheema Use this function for updating player position in every
-        playerX = pX;           // Frame.......
+        playerX = pX;           // Frame.......bcz churi will sent according to it 
         playerY = pY;
     }
 
@@ -73,6 +73,8 @@ public:
             {
                 float newX = x + (rand() % 400) - 200;         // X coordinate teleportation Point
                 float newY = y + (rand() % 400) - 200;         // Y coordinate telepotation Point
+
+                
 
                 if (newX < 0)
                 {

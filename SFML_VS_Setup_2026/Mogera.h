@@ -18,13 +18,13 @@ public:
     Mogera(float posX, float posY) : Enemy(posX, posY, "Mogera")
     {
         
-        health = 10;                // Health Increased
+        health = 10;           // Health Increased
 
         spawnTimer = 0;
-        childSpawnInterval = 180;    // Spawn child every 3 seconds simple Maths time= frames(180)/fps(60)..
+        childSpawnInterval = 180;      // Spawn child every 3 seconds simple Maths time= frames(180)/fps(60)..
 
-        playerX = 0;               // 0 bcz Mogera is stationary ......
-        playerY = 0;               //
+        playerX = 0;     // 0 bcz Mogera is stationary ......
+        playerY = 0;              
 
         isDefeated = false;
     }
@@ -44,12 +44,9 @@ public:
             return;
         }
 
-
-       
-
         
         spawnTimer++;
-        if (spawnTimer >= childSpawnInterval)  // This is the child Mogera spawn logic
+        if (spawnTimer >= childSpawnInterval)    // This is the child Mogera spawn logic
         {
             for (int i = 0; i < numberOfChilds; i++)
             {
@@ -79,27 +76,27 @@ public:
             return;
         }
 
-        // Mogera - large green rectangle (boss takes more space)
-        sf::RectangleShape mogeraShape(sf::Vector2f(80.f, 80.f));
-        mogeraShape.setFillColor(sf::Color(0, 180, 0));     // Dark green
+        
+        sf::RectangleShape mogeraShape(sf::Vector2f(60.f, 60.0f)); // Mogera Displayed With large green rectangle
+        mogeraShape.setFillColor(sf::Color(0, 180, 0));           // Dark green
         mogeraShape.setPosition(x, y);
         window.draw(mogeraShape);
 
-        // Draw health bar above Mogera
-        // Background of health bar (red)
-        sf::RectangleShape healthBarBackground(sf::Vector2f(80.f, 10.f));
-        healthBarBackground.setFillColor(sf::Color::Red);
-        healthBarBackground.setPosition(x, y - 15.f);
+
+        sf::RectangleShape healthBarBackground(sf::Vector2f(80.0f, 10.0f));         // Red Bar on the Top of Mogera indicating his health 
+        healthBarBackground.setFillColor(sf::Color::Red);                           // Decreasing Health........which is overlapped by 
+        healthBarBackground.setPosition(x, y - 15.0f);                              // Green bar which is shring with the health decreasing
         window.draw(healthBarBackground);
 
-        // Foreground of health bar (green) - shrinks as health decreases
+      
         float healthPercent = (float)health / 10.0f;
         sf::RectangleShape healthBarForeground(sf::Vector2f(80.f * healthPercent, 10.f));
         healthBarForeground.setFillColor(sf::Color::Green);
         healthBarForeground.setPosition(x, y - 15.f);
         window.draw(healthBarForeground);
 
-        // Draw all active children
+     
+
         for (int i = 0; i < numberOfChilds; i++)
         {
             if (child[i].isActive())

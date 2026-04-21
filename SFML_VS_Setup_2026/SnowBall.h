@@ -31,7 +31,7 @@ public:
         shape.setPosition(x, y);
     }
 
-    void update() override
+    void updateTrajactory() override
     {
         if (!active)
         {
@@ -64,7 +64,7 @@ public:
         shape.setPosition(x, y);
     }
 
-    void draw(sf::RenderWindow& window) override
+    void drawProjectiles(sf::RenderWindow& window) override
     {
         if (!active)
         {

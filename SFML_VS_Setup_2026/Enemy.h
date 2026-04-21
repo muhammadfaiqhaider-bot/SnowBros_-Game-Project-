@@ -12,8 +12,8 @@ protected:
     float velocityY;
     int health;
     bool snowCovered;
-    sf::Sprite enemySprite;
-    sf::Texture enemyTexture;
+    sf::Sprite enemySprite;             // these two variables are for storing actual Images / also they are classes indide 
+    sf::Texture enemyTexture;           // sfml library
 
 public:
     Enemy(float posX, float posY, std::string n)
@@ -32,7 +32,7 @@ public:
 
 
     // Reducing Health Logic
-    virtual void reduceHealth()
+    virtual void reduceHealth()      
     {
         health--;
 
@@ -44,40 +44,43 @@ public:
         }
     }
 
-    // Check if fully encased (ready to be rolled)
+    // Check if Fully encased means is enemy covered with snow if YES means now it will be ready to roll...
     bool isFullyEncased()
     {
         return snowCovered;
     }
 
-    // Getters for Retrieving positions
+    // Getter for retrinving position  both x and y coordinate (our game resolution is 600x600 so its according to that 
     float getPositionX()
     {
         return x;
     }
-
     float getPositionY()
     {
         return y;
     }
 
+    
     bool getSnowCoveredStatus()
     {
         return snowCovered;
     }
 
-    // Health getter (Student A needs this)
+    // Getter for Health..
     int getHealth()
     {
         return health;
     }
 
+    // Getname Getter,,,
     std::string getName()
     {
         return name;
     }
 
-    // HitBox thing  CHEEMA u'll need this for making collision  physics..........
+
+
+    // CHEEEMA This is a hitbox function that returns the invisible rectangular boundary around my sprite which is used for collision detection.
     sf::FloatRect getHitBox()
     {
         return enemySprite.getGlobalBounds();

@@ -4,28 +4,26 @@
 class Knives : public Projectile
 {
 public:
-    Knives(float startX, float startY, float targetX, float targetY, float limit)
-        : Projectile(startX, startY, limit, limit)
+    Knives(float startX, float startY, float targetX, float targetY, float limit) : Projectile(startX, startY, limit, limit)
     {
-        // Use parent's calculateDirection method
-        calculateDirection(targetX, targetY, 4.0f);
+        
+        calculateDirection(targetX, targetY, 4.0f);      // Use Projectile's Class calculateDirection method
     }
 
-    void update() override
+    void updateTrajactory() override
     {
         if (!active)
         {
             return;
         }
 
-        x = x + velocityX;
-        y = y + velocityY;
+        x = x + velocityX;                         // Update Positions along x-axis
+        y = y + velocityY;                         // Update Positions along y-axis
 
-        // Use parent's boundary check
-        checkScreenBoundary();               // Check for screen Limit.....
+        checkScreenBoundary();                     // Check for screen Limit.....Either satisfy resolutionso of game that is 600x600
     }
 
-    void draw(sf::RenderWindow& window) override
+    void drawProjectiles(sf::RenderWindow& window) override
     {
         if (!active)
         {

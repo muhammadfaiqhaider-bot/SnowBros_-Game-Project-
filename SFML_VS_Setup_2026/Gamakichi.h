@@ -13,7 +13,7 @@ private:
     int attackDuration;
     int phaseTimer;
     bool isDefeated;
-    bool phaseChanged;      // Flag to prevent phase reset every frame
+    bool phaseChanged;                                // Flag to prevent phase reset every frame
 
     static const int MAX_ROCKETS = 5;
     Rocket* rockets[MAX_ROCKETS];
@@ -23,13 +23,11 @@ private:
 
 public:
     Gamakichi(float posX, float posY) : Enemy(posX, posY, "Gamakichi")
-    {
-        // Use parent health directly
+    {                                                              // Gamakichi He is the final boss so he ll  have zada power
         health = 35;
-
         phase = 1;
-        attackTimer = 0;
-        attackDuration = 100;
+        attackTimer = 0;                                          // diffeence in firing rockets......
+        attackDuration = 100;                                     // 100 frames means 1.6 something seconds gap
         phaseTimer = 0;
         isDefeated = false;
         phaseChanged = false;
@@ -43,10 +41,10 @@ public:
         }
     }
 
-    void setPlayerPosition(float px, float py)
+    void setPlayerPosition(float playerPosX, float playerPosY)
     {
-        playerX = px;
-        playerY = py;
+        playerX = playerPosX;
+        playerY = playerPosY;
     }
 
     void movementsUpdate() override
@@ -56,8 +54,7 @@ public:
         {
             return;
         }
-
-        // Keep Gamakichi fixed on screen
+                                            // Gamakichi is fixed Enemy and its x y coordinate can't be changed
         if (x < 0)
         {
             x = 0;

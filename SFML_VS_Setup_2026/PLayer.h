@@ -395,7 +395,7 @@ public:
     {
         if (snowball != nullptr)
         {
-            snowball->update();
+            snowball->updateTrajactory();
 
             if (!snowball->isActive())
             {
@@ -409,7 +409,7 @@ public:
     {
         if (snowball != nullptr)
         {
-            snowball->draw(window);
+            snowball->drawProjectiles(window);
         }
     }
 

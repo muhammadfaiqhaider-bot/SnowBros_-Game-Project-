@@ -18,18 +18,18 @@ public:
 
     void spawn(float startX, float startY, float playerX)
     {
-        x = startX;
-        y = startY;
+        x = startX;                                                    // This is the Important function to realease Child Mogera's in the the direction 
+        y = startY;                                                    // where our person is and set velocity according to it 
         active = true;
         onGround = false;
 
         if (playerX > x)
         {
-            velocityX = 2.0f;
+            velocityX = 1.3f;
         }
         else
         {
-            velocityX = -2.0f;
+            velocityX = -1.3f;
         }
 
         velocityY = 0;
@@ -43,7 +43,7 @@ public:
         }
         if (!onGround)
         {
-            velocityY = velocityY + 0.5f;
+            velocityY = velocityY + 0.5f;                   // This function is used to bring mogera childs to ground
         }
         else
         {
@@ -74,8 +74,8 @@ public:
             return;
         }
 
-        sf::RectangleShape childShape(sf::Vector2f(20.f, 20.f));
-        childShape.setFillColor(sf::Color(255, 165, 0));    // Orange color
+        sf::RectangleShape childShape(sf::Vector2f(20.f, 20.f));   // Orange Rectangle is used to denote Child Mogera's 
+        childShape.setFillColor(sf::Color(255, 165, 0));    
         childShape.setPosition(x, y);
         window.draw(childShape);
     }

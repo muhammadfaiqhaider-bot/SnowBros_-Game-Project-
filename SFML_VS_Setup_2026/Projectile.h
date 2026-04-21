@@ -25,7 +25,7 @@ public:
         screenHeight = sHeight;
     }
 
-    // Pure virtual - every projectile must implement these
+    // Pure virtual 
     virtual void update() = 0;
     virtual void draw(sf::RenderWindow& window) = 0;
 

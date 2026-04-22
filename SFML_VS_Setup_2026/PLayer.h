@@ -40,6 +40,8 @@ protected:
     sf::Sprite playerSprite;
     sf::Texture playerTexture;
 
+
+
 public:
     Player(float posX, float posY, std::string n)
     {
@@ -297,7 +299,10 @@ public:
         return playerSprite.getGlobalBounds();
     }
 
-
+    void setJump(bool val) //Added this so i could call in main when coliding - cheema
+    {
+        isJumping = val;
+    }
 
 
 
@@ -321,9 +326,9 @@ public:
             direction = 1;
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && isJumping==0 ) //added ts jumping conditition so that bro doesn't infinite jump -Cheema 
         {
-            velocityY = -12.0f;
+            velocityY = -13.0f; //increased jump velo - Cheema
             onGround = false;
             isJumping = true;
         }
@@ -334,9 +339,9 @@ public:
             velocityY += 0.5f;
 
             // Cap falling speed
-            if (velocityY > 15.0f)
+            if (velocityY > 8.0f) //decreased cap - Cheema
             {
-                velocityY = 15.0f;
+                velocityY = 8.0f;
             }
         }
         else

@@ -17,8 +17,8 @@ protected:
 
 
     int frameWidth;     //alright so this is like the shyt we need for animations
-    int frameHeight;
-    int totalFrames;
+    int frameHeight;    
+    int totalFrames;    
     int currentFrame;
     int animTimer;
     int animSpeed;

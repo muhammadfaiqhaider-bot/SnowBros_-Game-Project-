@@ -102,6 +102,7 @@ int main()
                 if (nick.getPositionY() + 40.f <= platformTop + 10.f)
                 {
                     nick.setOnGround(true);
+                    nick.setJump(0); // added this so that jump resets when landing - cheema
                     nick.snapToGround(platformTop - 40.f);
 
                 }
@@ -117,20 +118,26 @@ int main()
 
             if (botomBounds.intersects(platformBounds))
             {
-                float platformTop = platforms[i].getPosition().y;
+                float platformTop = platforms[i].getPosition().y; //Had to change this whole condiiton -Cheema
+                float botomBottom = botom1.getPositionY() + 40.f;
 
-                if (botom1.getPositionY() + 40.f <= platformTop + 10.f)
+                if (botomBottom >= platformTop && botom1.getPositionY() < platformTop && botom1.getVelocityY() >= 0)
                 {
                     botom1.setOnGround(true);
+                    botom1.snapToGround(platformTop - 39.99);   //Same logic as nick but idk why i had to set ts to 39.9 otherwise it glitched -Cheema
 
-                }
+                }   //wese faiqay, imo we should put this kind of code in class and call it here , i think it would be more efficient. -Cheema
             }
         }
 
+
         if (botom1.getPositionX() <= 0 || botom1.getPositionX() >= 560)
         {
-            botom1.setHitWall(true);
+            botom1.setHitWall(true); //I have changed setHitWall function in botom.h -Cheema
+            
+
         }
+
 
         // --- Botom2 platform collision ---
         botom2.setOnGround(false);
@@ -142,19 +149,24 @@ int main()
             if (botomBounds.intersects(platformBounds))
             {
                 float platformTop = platforms[i].getPosition().y;
+                float botomBottom = botom2.getPositionY() + 40.f;
 
-                if (botom2.getPositionY() + 40.f <= platformTop + 10.f)
+                if (botomBottom >= platformTop && botom2.getPositionY() < platformTop && botom2.getVelocityY() >= 0)
                 {
                     botom2.setOnGround(true);
+                    botom2.snapToGround(platformTop - 39.99);
 
                 }
             }
         }
-
         if (botom2.getPositionX() <= 0 || botom2.getPositionX() >= 560)
         {
             botom2.setHitWall(true);
+
+
         }
+
+
 
         // --- Botom3 platform collision ---
         botom3.setOnGround(false);
@@ -166,10 +178,12 @@ int main()
             if (botomBounds.intersects(platformBounds))
             {
                 float platformTop = platforms[i].getPosition().y;
+                float botomBottom = botom3.getPositionY() + 40.f;
 
-                if (botom3.getPositionY() + 40.f <= platformTop + 10.f)
+                if (botomBottom >= platformTop && botom3.getPositionY() < platformTop && botom3.getVelocityY() >= 0)
                 {
                     botom3.setOnGround(true);
+                    botom3.snapToGround(platformTop - 39.99);
 
                 }
             }
@@ -178,7 +192,10 @@ int main()
         if (botom3.getPositionX() <= 0 || botom3.getPositionX() >= 560)
         {
             botom3.setHitWall(true);
+ 
+
         }
+
 
         // --- Snowball collision with all 3 botoms ---
         if (nick.getSnowball() != nullptr)

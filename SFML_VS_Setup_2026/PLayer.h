@@ -326,7 +326,10 @@ public:
             direction = 1;
         }
 
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && isJumping == 0) //added ts jumping conditition so that bro doesn't infinite jump -Cheema 
+
+
         {
             velocityY = -13.0f; //increased jump velo - Cheema
             onGround = false;

@@ -15,6 +15,18 @@ protected:
     sf::Sprite enemySprite;             // these two variables are for storing actual Images / also they are classes indide 
     sf::Texture enemyTexture;           // sfml library
 
+
+    int frameWidth;     //alright so this is like the shyt we need for animations
+    int frameHeight;
+    int totalFrames;
+    int currentFrame;
+    int animTimer;
+    int animSpeed;
+    bool facingRight;
+    bool textureLoaded;
+
+
+
 public:
     Enemy(float posX, float posY, std::string n)
     {
@@ -25,6 +37,16 @@ public:
         velocityY = 0;
         health = 1;
         snowCovered = false;
+
+        frameWidth = 88;
+        frameHeight = 88;
+        totalFrames = 1;
+        currentFrame = 0;
+        animTimer = 0;
+        animSpeed = 10;
+        facingRight = true;
+        textureLoaded = false;
+
     }
 
     virtual void movementsUpdate() = 0;
@@ -32,7 +54,7 @@ public:
 
 
     // Reducing Health Logic
-    virtual void reduceHealth()      
+    virtual void reduceHealth()
     {
         health--;
 
@@ -60,7 +82,7 @@ public:
         return y;
     }
 
-    
+
     bool getSnowCoveredStatus()
     {
         return snowCovered;
@@ -78,9 +100,15 @@ public:
         return name;
     }
 
+    //Needed ts getter for collision checks in main. - cheema 
+    float getVelocityY()
+    {
+        return velocityY;
+    }
 
 
     // CHEEEMA This is a hitbox function that returns the invisible rectangular boundary around my sprite which is used for collision detection.
+    // Nilla i aint blind - Cheema
     sf::FloatRect getHitBox()
     {
         return enemySprite.getGlobalBounds();
@@ -90,12 +118,3 @@ public:
     {
     }
 };
-
-
-
-
-
-
-
-
-

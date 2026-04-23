@@ -19,8 +19,8 @@ public:
         {                                            
             return;
         }
-        x = x + velocityX;
-        y = y + velocityY;
+        x = x + velocityX;                // Update Position of the Rocket thrown by gamakichi
+        y = y + velocityY;                
         checkScreenBoundary();            // Check for is my projectile inside the game solution range or not....
     }
 

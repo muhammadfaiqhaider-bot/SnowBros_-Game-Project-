@@ -125,15 +125,15 @@ public:
 
             if (churi == nullptr)
             {
-                // Only throw knife if player position is valid
-                // playerY must be different from tornado Y for diagonal throw
-                churi = new Knives(x, y, playerX, playerY, 600.0f);   // Calling Knife class for creating an
-            }                                                           // an Object.......
+                                                                           // Only throw knife if player position is valid
+                                                                           // playerY must be different from tornado Y for diagonal throw
+                churi = new Knives(x, y, playerX, playerY, 600.0f);        // Calling Knife class for creating an
+            }                                                              // an Object.......
         }
 
         if (churi != nullptr)
         {
-            churi->update();
+            churi->updateTrajactory();
 
             if (!churi->isActive())
             {
@@ -154,7 +154,7 @@ public:
         // Draw Knives Sprite shyt implementation
         if (churi != nullptr)
         {
-            churi->draw(window);
+            churi->drawProjectiles(window);
         }
     }
 

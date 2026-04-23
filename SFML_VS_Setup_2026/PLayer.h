@@ -6,39 +6,41 @@
 class Player
 {
 protected:
-    
+
     std::string name;
     float x;
     float y;
     float velocityX;
     float velocityY;
-    int direction;             
+    int direction;
     bool onGround;
     bool isJumping;
 
-    int lives;                  
-    float speed;                
-    float snowballPower;        
-    float snowballDistance;    
-   
+    int lives;
+    float speed;
+    float snowballPower;
+    float snowballDistance;
+
     int score;
     int gemsCount;
 
     bool lifeStatus;
-    bool isInvincible;          
-    int invincibleTimer;        
+    bool isInvincible;
+    int invincibleTimer;
 
     bool SpeedBoostStatus;
     bool powerBallactiveStatus;
     bool distanceIncreaseStatus;
     bool hasBalloonMode;
-    int powerUpTimer;           
+    int powerUpTimer;
 
 
     Snowball* snowball;
- 
+
     sf::Sprite playerSprite;
     sf::Texture playerTexture;
+
+
 
 public:
     Player(float posX, float posY, std::string n)
@@ -47,7 +49,7 @@ public:
         y = posY;
         velocityX = 0;
         velocityY = 0;
-        direction = 1;          
+        direction = 1;
         onGround = false;
         isJumping = false;
 
@@ -100,7 +102,7 @@ public:
         }
         else
         {
-           
+
             isInvincible = true;
             invincibleTimer = 120;  // 2 seconds at 60 FPS
         }
@@ -192,7 +194,7 @@ public:
         }
     }
 
-   
+
     void applyGravity()
     {
         float gravity = 0.5f;
@@ -297,7 +299,10 @@ public:
         return playerSprite.getGlobalBounds();
     }
 
-
+    void setJump(bool val) //Added this so i could call in main when coliding - cheema
+    {
+        isJumping = val;
+    }
 
 
 
@@ -321,9 +326,9 @@ public:
             direction = 1;
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && isJumping == 0) //added ts jumping conditition so that bro doesn't infinite jump -Cheema 
         {
-            velocityY = -12.0f;
+            velocityY = -13.0f; //increased jump velo - Cheema
             onGround = false;
             isJumping = true;
         }
@@ -334,9 +339,9 @@ public:
             velocityY += 0.5f;
 
             // Cap falling speed
-            if (velocityY > 15.0f)
+            if (velocityY > 8.0f) //decreased cap - Cheema
             {
-                velocityY = 15.0f;
+                velocityY = 8.0f;
             }
         }
         else

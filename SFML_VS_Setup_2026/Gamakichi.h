@@ -82,19 +82,19 @@ public:
 
     void phaseChanger()
     {
-        // Phase 2 - only trigger once when health drops to 25
-        if (health <= 25 && phase == 1)
+                                           // In start Phase 1 of Gamkichi is running through as its helath hits 25 phase 2 triggers where the Speed or intervals
+        if (health <= 25 && phase == 1)    // of gamakichi attacks increased.......less than a 1.5 sec 
         {
             phase = 2;
-            attackDuration = 80;    // Faster attacks in phase 2
+            attackDuration = 80;    
             phaseTimer = 0;
         }
 
-        // Phase 3 - only trigger once when health drops to 15
-        if (health <= 15 && phase == 2)
+                                           // When health reaches 15 phase 3 triggers where attack seep is very fast rockets are thown on u drastically 
+        if (health <= 15 && phase == 2)    // Difficult to dodge them 
         {
             phase = 3;
-            attackDuration = 40;    // Even faster in phase 3
+            attackDuration = 40;    
             phaseTimer = 0;
         }
     }
@@ -104,24 +104,24 @@ public:
         if (attackTimer >= attackDuration)
         {
             attackTimer = 0;
-
-            // Phase 1 - fire 1 rocket
+                                                        // Launching Rockets logic at phase 1 Rockets 
+            
             if (phase == 1)
             {
                 fireRocket();
             }
 
-            // Phase 2 - fire 2 rockets
+            
             if (phase == 2)
-            {
+            {                                            // Two rockets are lauched at stage 2 
                 fireRocket();
                 fireRocket();
             }
 
-            // Phase 3 - fire 3 rockets
+            
             if (phase == 3)
             {
-                fireRocket();
+                fireRocket();                            // Three rockets are luanched at phase 3
                 fireRocket();
                 fireRocket();
             }

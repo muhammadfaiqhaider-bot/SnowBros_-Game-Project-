@@ -13,8 +13,7 @@ private:
     sf::CircleShape shape;
 
 public:
-    Snowball(float startX, float startY, int dir, float maxDist, int power, float sWidth, float sHeight)
-        : Projectile(startX, startY, sWidth, sHeight)
+    Snowball(float startX, float startY, int dir, float maxDist, int power, float sWidth, float sHeight) : Projectile(startX, startY, sWidth, sHeight)
     {
         direction = dir;
         maxDistance = maxDist;

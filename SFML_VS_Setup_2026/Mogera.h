@@ -17,19 +17,19 @@ private:
 public:
     Mogera(float posX, float posY) : Enemy(posX, posY, "Mogera")
     {
-        
+
         health = 10;           // Health Increased
 
         spawnTimer = 0;
         childSpawnInterval = 180;      // Spawn child every 3 seconds simple Maths time= frames(180)/fps(60)..
 
         playerX = 0;     // 0 bcz Mogera is stationary ......
-        playerY = 0;              
+        playerY = 0;
 
         isDefeated = false;
     }
 
-    
+
     void setPlayerPosition(float pX, float pY) // every frame this function is called and 
     {                                          // player coordinates are passed........
         playerX = pX;
@@ -39,12 +39,12 @@ public:
     void movementsUpdate() override
     {
 
-        if (isDefeated)                      // Kinda base condition if it is defeated we ll be instantly 
+        if (isDefeated)                      // base condition if it is defeated we ll be instantly 
         {                                    // backed from the function..........
             return;
         }
 
-        
+
         spawnTimer++;
         if (spawnTimer >= childSpawnInterval)    // This is the child Mogera spawn logic
         {
@@ -76,7 +76,7 @@ public:
             return;
         }
 
-        
+
         sf::RectangleShape mogeraShape(sf::Vector2f(60.f, 60.0f)); // Mogera Displayed With large green rectangle
         mogeraShape.setFillColor(sf::Color(0, 180, 0));           // Dark green
         mogeraShape.setPosition(x, y);
@@ -88,14 +88,14 @@ public:
         healthBarBackground.setPosition(x, y - 15.0f);                              // Green bar which is shring with the health decreasing
         window.draw(healthBarBackground);
 
-      
+
         float healthPercent = (float)health / 10.0f;
         sf::RectangleShape healthBarForeground(sf::Vector2f(80.f * healthPercent, 10.f));
         healthBarForeground.setFillColor(sf::Color::Green);
         healthBarForeground.setPosition(x, y - 15.f);
         window.draw(healthBarForeground);
 
-     
+
 
         for (int i = 0; i < numberOfChilds; i++)
         {
@@ -123,8 +123,8 @@ public:
         return isDefeated;
     }
 
-    
-    
+
+
     void setChildOnGround(int index, bool value)
     {
         if (index >= 0 && index < numberOfChilds)
@@ -149,7 +149,7 @@ public:
 
 
 
-  
+
 
     float getChildY(int index)
     {

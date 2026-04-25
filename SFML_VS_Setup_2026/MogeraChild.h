@@ -75,7 +75,7 @@ public:
         }
 
         sf::RectangleShape childShape(sf::Vector2f(20.f, 20.f));   // Orange Rectangle is used to denote Child Mogera's 
-        childShape.setFillColor(sf::Color(255, 165, 0));    
+        childShape.setFillColor(sf::Color(255, 165, 0));
         childShape.setPosition(x, y);
         window.draw(childShape);
     }
@@ -91,7 +91,7 @@ public:
     }
 
 
-  
+
 
     void deactivate()
     {

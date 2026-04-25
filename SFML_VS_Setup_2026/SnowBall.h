@@ -13,10 +13,10 @@ private:
     sf::CircleShape shape;
 
 public:
-    Snowball(float startX, float startY, int dir, float maxDist, int power, float sWidth, float sHeight) : Projectile(startX, startY, sWidth, sHeight)
+    Snowball(float startX, float startY, int direc, float maximumDist, int power, float sWidth, float sHeight) : Projectile(startX, startY, sWidth, sHeight)
     {
-        direction = dir;
-        maxDistance = maxDist;
+        direction = direc;
+        maxDistance = maximumDist;
         snowPower = power;
 
         velocityX = 6.0f * direction;
@@ -24,8 +24,8 @@ public:
 
         distanceTravelled = 0;
 
-        // White circle for snowball
-        shape.setRadius(15.f);
+
+        shape.setRadius(13.f);
         shape.setFillColor(sf::Color::White);
         shape.setPosition(x, y);
     }
@@ -37,11 +37,9 @@ public:
             return;
         }
 
-        // Move horizontally
-        x = x + velocityX;
+        x = x + velocityX;    // As snow ball only moves left right so we just need x -axix...
 
-        // Track distance travelled
-        distanceTravelled = distanceTravelled + abs(velocityX);
+        distanceTravelled = distanceTravelled + abs(velocityX);  // For traking distance coverage......
 
         // Deactivate when max distance reached
         if (distanceTravelled >= maxDistance)
@@ -50,14 +48,16 @@ public:
             return;
         }
 
-        // Screen wrap logic
+
         if (x > screenWidth)
         {
-            x = 0;          // Exit right enter left
+            x = 0;
+            deactivate();
         }
         else if (x < 0)
         {
-            x = screenWidth; // Exit left enter right
+            x = screenWidth; 
+            deactivate();
         }
 
         shape.setPosition(x, y);

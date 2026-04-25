@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include <fstream>      // For file handling
 #include <sstream>      // For parsing file lines
+
 
 struct User                                             // Created this separate Structure that has some attributes to hold for the creation
 {                                                       // of user.............
@@ -29,7 +31,7 @@ private:
     User users[MAX_USERS];
     PlayerProgress progress[MAX_PROGRESS];
 
-    int userCount;
+    int userCont;
     int progressCount;
 
     // File names
@@ -38,33 +40,33 @@ private:
     std::string leaderboardFile;
 
 public:
-    DatabaseManager()
-    {
-        userCount = 0;
+    DatabaseManager()            // Data base Manager that has following role 
+    {                            // 1- take user data and store it 
+                                 // 2- keep track of progress and rank them to make leaderboard.........
+    
+        userCont = 0;
         progressCount = 0;
 
         usersFile = "users.txt";
         progressFile = "progress.txt";
         leaderboardFile = "leaderboard.txt";
 
-        // Load existing data from files on startup
-        loadUsersFromFile();
+        
+        loadUsersFromFile();    // Load existing data from files on start of the gamee......
         loadProgressFromFile();
     }
 
-    // ==================
-    // USER OPERATIONS
-    // ==================
-
-    // ADD USER (REGISTER)
+ 
+    // THis function is use to create an  account for the user assign there username
+    // Set password and save to the file......
     bool addUser(std::string username, std::string passwordHash, std::string email)
     {
-        if (userCount >= MAX_USERS)                          // Check for the max user limits means the number of accounts can be formed that is 100
+        if (userCont >= MAX_USERS)                          // Check for the max user limits means the number of accounts can be formed that is 100
         {
             return false;
         }
 
-        for (int i = 0; i < userCount; i++)
+        for (int i = 0; i < userCont; i++)
         {
             if (users[i].username == username)               // Check for the User already exists
             {
@@ -72,37 +74,56 @@ public:
             }
         }
 
-        users[userCount].user_id = userCount + 1;
-        users[userCount].username = username;
-        users[userCount].password_hash = passwordHash;
-        users[userCount].email = email;
+        users[userCont].user_id = userCont + 1;             // Incremnet upon user added
+        users[userCont].username = username;
+        users[userCont].password_hash = passwordHash;
+        users[userCont].email = email;
 
-        userCount++;
-
-        // Save to file immediately after adding
-        saveUsersToFile();
+        userCont++;
+        saveUsersToFile();       // New Account created now add this data into file.....
 
         return true;
     }
 
-    // GET USER BY USERNAME
-    User* getUser(std::string username)
-    {
-        for (int i = 0; i < userCount; i++)
+
+
+
+
+
+
+
+
+
+
+
+    // This is getter for whole user and we retrive user by user name..........
+    User* getUser(std::string username)   /// We'll pass user name in parameter and it search for similar name 
+    {                                      // and get ser data of that....
+        for (int i = 0; i < userCont; i++)
         {
             if (users[i].username == username)
             {
                 return &users[i];
             }
         }
-
-        return nullptr;
+        return nullptr;                // If that user isn't present soo null pointer will resturn .....
     }
 
-    // CHECK IF USER EXISTS
+
+
+
+
+
+
+
+
+
+
+
+ // Chek if user exsist or not........
     bool userExists(std::string username)
     {
-        for (int i = 0; i < userCount; i++)
+        for (int i = 0; i < userCont; i++)
         {
             if (users[i].username == username)
             {
@@ -113,23 +134,22 @@ public:
         return false;
     }
 
-    // =====================
-    // PROGRESS OPERATIONS
-    // =====================
 
-    // SAVE PLAYER PROGRESS
-    bool saveProgress(int userId, int level, int lives, int gems, int highScore)
+
+    // SAVE player / user progresss if he left game in between or some thing.....
+    // when he comeback he have save data and he should continue.......
+    bool saveProgress(int Id, int lvl, int lives, int gems, int hiScore)
     {
         // Check if progress already exists for this user
         for (int i = 0; i < progressCount; i++)
         {
-            if (progress[i].user_id == userId)
+            if (progress[i].user_id == Id)
             {
                 // Update existing progress
-                progress[i].current_level = level;
+                progress[i].current_level = lvl;
                 progress[i].lives_remaining = lives;
                 progress[i].gem_count = gems;
-                progress[i].high_score = highScore;
+                progress[i].high_score = hiScore;
 
                 // Save to file
                 saveProgressToFile();
@@ -138,21 +158,20 @@ public:
             }
         }
 
-        // New progress entry
+
         if (progressCount >= MAX_PROGRESS)
         {
             return false;
         }
 
-        progress[progressCount].user_id = userId;
-        progress[progressCount].current_level = level;
+        progress[progressCount].user_id = Id;
+        progress[progressCount].current_level = lvl;
         progress[progressCount].lives_remaining = lives;
         progress[progressCount].gem_count = gems;
-        progress[progressCount].high_score = highScore;
+        progress[progressCount].high_score = hiScore;
 
         progressCount++;
 
-        // Save to file
         saveProgressToFile();
 
         return true;
@@ -172,32 +191,58 @@ public:
         return nullptr;     // No progress found for this user
     }
 
-    // ====================
-    // LEADERBOARD (LATER)
-    // ====================
+
+
+
+
+
 
     void saveLeaderboard(int userId, int score, int levelReached)
     {
-        // File handling - implement later
+        // NILL not implemented yet
     }
 
     void loadLeaderboard()
     {
-        // File handling - implement later
+        // NILL not implemented yet 
     }
 
-    // Getter
+
+
+
+    // Getters
     int getUserCount()
     {
-        return userCount;
+        return userCont;
     }
+    int getprogresscount()
+    {
+        return progressCount;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 private:
 
-    // ========================
-    // FILE HANDLING FUNCTIONS
-    // ========================
 
+    // FILE HANDLING STUFF IN PRIAVTE
     // SAVE ALL USERS TO FILE
     void saveUsersToFile()
     {
@@ -205,13 +250,13 @@ private:
 
         if (!file.is_open())
         {
-            return;     // Could not open file
+            std::cout << "Sorry BRAT there is some error while opening THIS SHYT....... /n";
+            return;    
         }
 
-        for (int i = 0; i < userCount; i++)
+        for (int i = 0; i < userCont; i++)
         {
-            // Format: user_id,username,password_hash,email
-            file << users[i].user_id << ","
+            file << users[i].user_id << ","       // Save these info's in file..
                 << users[i].username << ","
                 << users[i].password_hash << ","
                 << users[i].email << "\n";
@@ -220,55 +265,61 @@ private:
         file.close();
     }
 
-    // LOAD ALL USERS FROM FILE
+    // Retrive all the save stuff from the file..
     void loadUsersFromFile()
     {
         std::ifstream file(usersFile);
 
         if (!file.is_open())
         {
-            return;     // File doesnt exist yet - first run
+            std::cout << "File doesnot exsist first create it N";
+            return;     
         }
 
         std::string line;
 
-        while (std::getline(file, line) && userCount < MAX_USERS)
+        while (std::getline(file, line) && userCont < MAX_USERS)
         {
             std::stringstream ss(line);
             std::string token;
 
             // Parse: user_id,username,password_hash,email
             std::getline(ss, token, ',');
-            users[userCount].user_id = std::stoi(token);
+            users[userCont].user_id = std::stoi(token);
 
             std::getline(ss, token, ',');
-            users[userCount].username = token;
+            users[userCont].username = token;
 
             std::getline(ss, token, ',');
-            users[userCount].password_hash = token;
+            users[userCont].password_hash = token;
 
             std::getline(ss, token, ',');
-            users[userCount].email = token;
+            users[userCont].email = token;
 
-            userCount++;
+            userCont++;
         }
 
         file.close();
     }
+    
 
-    // SAVE ALL PROGRESS TO FILE
+
+
+
+    // File handling Stuff to save all the progrss in filee
     void saveProgressToFile()
     {
         std::ofstream file(progressFile);
 
         if (!file.is_open())
         {
+            std::cout << "Progress Is not saved... there is some error(error 404)/n";
             return;
         }
 
         for (int i = 0; i < progressCount; i++)
         {
-            // Format: user_id,current_level,lives_remaining,gem_count,high_score
+            // 
             file << progress[i].user_id << ","
                 << progress[i].current_level << ","
                 << progress[i].lives_remaining << ","
@@ -279,14 +330,15 @@ private:
         file.close();
     }
 
-    // LOAD ALL PROGRESS FROM FILE
+
+
     void loadProgressFromFile()
     {
         std::ifstream file(progressFile);
 
         if (!file.is_open())
         {
-            return;     // File doesnt exist yet - first run
+            return;     
         }
 
         std::string line;
@@ -298,7 +350,7 @@ private:
 
             // Parse: user_id,current_level,lives_remaining,gem_count,high_score
             std::getline(ss, token, ',');
-            progress[progressCount].user_id = std::stoi(token);
+            progress[progressCount].user_id = std::stoi(token); // stoi is inbuild function for string to int conversion
 
             std::getline(ss, token, ',');
             progress[progressCount].current_level = std::stoi(token);

@@ -9,15 +9,15 @@ class PowerUps
 protected:
     float x;                       // X - axis position
     float y;                       // y - axis position
-    bool isActive;                 // Is power up there on screen or not ??
-    bool isCollected;              // is the Powerup is collected or not ????
-    std::string powerupName;       // what's the name of the power up....
+    bool isActive;                 // Is power up there available ont the screen screen or not.......
+    bool isCollected;              // is the Powerup is being colected............ 
+    std::string powerupName;       // what is the name of the power up....
 
     sf::Sprite powerupSprite;
     sf::Texture powerupTexture;
 
 public:
-    PowerUps(float posX, float posY, std::string name)     // Default constructor
+    PowerUps(float posX, float posY, std::string name)   
     {
         x = posX;
         y = posY;
@@ -33,14 +33,14 @@ public:
     // Called when player touches powerup
     void collect()
     {
-        isCollected = true;
+        isCollected = true;                                   // is being collected and than
         isActive = false;                                         // Disappears from screen
     }
 
     // Getters
     sf::FloatRect getHitBox()
     {
-        return sf::FloatRect(x, y, 30.f, 30.f);    // Fixed size hitbox
+        return sf::FloatRect(x, y, 20.f, 20.f);    // Fixed size hitbox
     }
 
     float getX()

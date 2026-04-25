@@ -58,20 +58,20 @@ public:
         lives = 2;
         speed = 3.0f;
         snowballPower = 1.0f;
-        snowballDistance = 300.0f;  // Medium range
+        snowballDistance = 200.0f;  // Medium range
 
         // Economy
         score = 0;
         gemsCount = 0;
 
-        // State
-        lifeStatus = true;
-        isInvincible = false;
-        invincibleTimer = 0;
+        
+        lifeStatus = true; 
+        isInvincible = false;              // Invinsible is Important status when player got hit by some enemy so there
+        invincibleTimer = 0;               // must be small invinsible status when he don't get's damage further more
 
-        // PowerUps - all off at start
-        SpeedBoostStatus = false;
-        powerBallactiveStatus = false;
+ 
+        SpeedBoostStatus = false;            // These are some powerUps some of em are picked up from the gorund 
+        powerBallactiveStatus = false;       // or some can be bought from the shop...........
         distanceIncreaseStatus = false;
         hasBalloonMode = false;
         powerUpTimer = 0;
@@ -81,28 +81,24 @@ public:
 
     }
 
-    // Pure virtual - every character must implement these
+    // Pure virtual 
     virtual void movementsUpdate() = 0;
     virtual void displayPlayer(sf::RenderWindow& window) = 0;
-
-    // Common to all players - losing a life
     virtual void loseLife()
     {
-        if (isInvincible)        // Cant lose life while invincible
+        if (isInvincible)        // During invinsible mode u can't loose more health...or die...
         {
             return;
         }
-
         lives--;
 
         if (lives <= 0)
         {
             lives = 0;
-            lifeStatus = false;    // Game over
+            lifeStatus = false;    // You die game over HUHAHAHA........
         }
         else
         {
-
             isInvincible = true;
             invincibleTimer = 120;  // 2 seconds at 60 FPS
         }
@@ -115,7 +111,7 @@ public:
         {
             invincibleTimer--;
 
-            if (invincibleTimer <= 0)
+            if (invincibleTimer <= 0)        // This Funtion at as two minute timer for invinsible mode..
             {
                 isInvincible = false;
                 invincibleTimer = 0;
@@ -140,7 +136,7 @@ public:
     void applyDistanceIncrease()
     {
         distanceIncreaseStatus = true;
-        snowballDistance = 600.0f;  // Full screen width
+        snowballDistance = 400.0f;  // Full screen width
     }
 
     void applyBalloonMode()
@@ -152,22 +148,33 @@ public:
     // Update powerup timers - called every frame
     void updatePowerUps()
     {
-        if (SpeedBoostStatus || hasBalloonMode)
+        if ( hasBalloonMode)
         {
             powerUpTimer--;
 
             if (powerUpTimer <= 0)
             {
-                // Remove timed powerups
+
+             
+                if (hasBalloonMode)
+                {
+                    hasBalloonMode = false;
+                }
+
+                powerUpTimer = 0;
+            }
+        }
+        if (SpeedBoostStatus )
+        {
+            powerUpTimer--;
+
+            if (powerUpTimer <= 0)
+            {
+                
                 if (SpeedBoostStatus)
                 {
                     SpeedBoostStatus = false;
                     speed = 3.0f;       // Reset to default speed
-                }
-
-                if (hasBalloonMode)
-                {
-                    hasBalloonMode = false;
                 }
 
                 powerUpTimer = 0;
@@ -387,15 +394,7 @@ public:
     {
         if (snowball == nullptr)
         {
-            snowball = new Snowball(
-                x,
-                y,
-                direction,
-                snowballDistance,
-                snowballPower,
-                600.f,
-                600.f
-            );
+            snowball = new Snowball(x, y, direction, snowballDistance, snowballPower, 600.f, 600.f);
         }
     }
 

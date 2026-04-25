@@ -6,9 +6,8 @@ class Knives : public Projectile
 public:
     Knives(float startX, float startY, float targetX, float targetY, float limit) : Projectile(startX, startY, limit, limit)
     {
-        
         calculateDirection(targetX, targetY, 4.0f);      // Use Projectile's Class calculateDirection method
-    }
+    }                                                  // speed is passed, as throables are kinda fast so pass slightly high value
 
     void updateTrajactory() override
     {

@@ -24,7 +24,7 @@ public:
         velocityY = 0;
         active = true;
         screenWidth = sWidth;                          // screen width that is 600 to rmain my throwable inside screen
-        screenHeight = sHeight;                        
+        screenHeight = sHeight;
     }
 
     // Virtual Functions for polimorphism
@@ -66,14 +66,14 @@ public:
         float diffY = targetY - y;                               // Calculate direction toward player position..y-axis
 
         float distance = sqrt(diffX * diffX + diffY * diffY);     // s=(x^2 +y^2)^1/2
-                                                            
+
 
         if (distance == 0)                                      // Avoid division by zero error.....
         {
             distance = 1;
         }
 
-        
+
         velocityX = (diffX / distance) * speed;               // Normalise Speed means : Get speed value for x and y axis so that 
         velocityY = (diffY / distance) * speed;               // speed should be according to frames we have,,......
     }

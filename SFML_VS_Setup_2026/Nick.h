@@ -6,15 +6,15 @@ class Nick : public Player
 public:
     Nick(float x, float y) : Player(x, y, "Nick")
     {
-        lives = 2;
+        lives = 5;
         speed = 3.0f;
         snowballPower = 1.0f;
-        snowballDistance = 300.0f;
+        snowballDistance = 200.0f;
     }
 
     void movementsUpdate() override
-    {
-        baseMovement();
+    {                                         // Movements are the same for player mechanics would be same sao whole 
+        baseMovement();                       // fucntion is called form the base........
     }
 
     void displayPlayer(sf::RenderWindow& window) override

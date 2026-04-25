@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "AuthenticationSystem.h"
+#include "PasswordHidding.h"
+#include "DataBase.h"
 
 class LoginScreen
 {
@@ -12,11 +14,11 @@ private:
     std::string usernameInput;
     std::string passwordInput;
 
-    // Which box is active
-    bool typingUsername;
+   
+    bool typingUsername;          // Which box is active at the moment.....
     bool typingPassword;
 
-    // Message to show (error or success)
+    // Message for error or corret.......
     std::string message;
     sf::Color messageColor;
 
@@ -30,16 +32,13 @@ public:
         typingUsername = false;
         typingPassword = false;
         message = "";
-        messageColor = sf::Color::Red;
+        messageColor = sf::Color::Red;         // Whenever i enter wrong password red colur message pop ups....
     }
 
-    // ==========================================
-    // HANDLE EVENTS
-    // Returns:
-    // 0 = stay on login
-    // 1 = go to main menu
-    // ==========================================
+   
 
+
+    // Event Handling......
     int handleEvents(sf::Event& event, AuthManager& auth)
     {
         // Mouse click
@@ -159,14 +158,14 @@ public:
         background.setFillColor(sf::Color(10, 10, 40));     // Very dark blue
         window.draw(background);
 
-        // ---- SNOW EFFECT (simple dots) ----
-        for (int i = 0; i < 30; i++)
-        {
-            sf::CircleShape snowDot(2.f);
-            snowDot.setFillColor(sf::Color(200, 200, 255, 150));
-            snowDot.setPosition(i * 20.f, (i * 37) % 600);
-            window.draw(snowDot);
-        }
+        //// ---- SNOW EFFECT (simple dots) ----
+        //for (int i = 0; i < 30; i++)
+        //{
+        //    sf::CircleShape snowDot(2.f);
+        //    snowDot.setFillColor(sf::Color(200, 200, 255, 150));
+        //    snowDot.setPosition(i * 20.f, (i * 37) % 600);
+        //    window.draw(snowDot);
+        //}
 
         // ---- TITLE ----
         sf::Text title;

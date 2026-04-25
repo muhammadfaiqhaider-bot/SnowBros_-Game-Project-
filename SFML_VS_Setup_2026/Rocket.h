@@ -16,11 +16,11 @@ public:
     void updateTrajactory() override
     {
         if (!active)
-        {                                            
+        {
             return;
         }
         x = x + velocityX;                // Update Position of the Rocket thrown by gamakichi
-        y = y + velocityY;                
+        y = y + velocityY;
         checkScreenBoundary();            // Check for is my projectile inside the game solution range or not....
     }
 

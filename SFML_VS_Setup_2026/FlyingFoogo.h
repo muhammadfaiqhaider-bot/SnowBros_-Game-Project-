@@ -18,20 +18,20 @@ public:
         flyingTimer = 0;
         flyingDuration = 120;          // time=frame/FPS -> which mkes this 2 seconds of flight
         walkingTimer = 0;
-        walkingDuration = 360;  
+        walkingDuration = 360;
 
-        
+
         name = "FlyingFoogaFoog";      //name Changed in Botom to FlyingFoogaFoog
     }
 
-    void movementsUpdate() override    
+    void movementsUpdate() override
     {
         if (isFlying)
         {
             x = x + velocityX;         // Apply flying movement
             y = y + velocityY;
 
-         
+
             if (x < 0)                 // Screen boundary check during flight
             {
                 x = 0;
@@ -64,7 +64,7 @@ public:
                 isFlying = false;
                 flyingTimer = 0;
 
-                
+
                 int direction;
                 if (rand() % 2 == 0)     // Now lands to the ground and attain its old speed.....
                 {
@@ -80,17 +80,17 @@ public:
         }
         else
         {
-            
+
             Botom::movementsUpdate();        //Inherite all moments from Botom + additional features added
 
-    
+
             walkingTimer++;
             if (walkingTimer > walkingDuration)
             {
                 isFlying = true;
                 walkingTimer = 0;
 
-  
+
                 int dirX;                    //Now as walk time is over so Now i have to assign flying Directions
                 int dirY;
 
@@ -114,9 +114,9 @@ public:
                 }
 
 
-                float speed = 1.8f ;  
+                float speed = 1.8f;
                 velocityX = speed * dirX;            // Velocity = 1.8 * direction X ..
-                velocityY = speed * dirY;            
+                velocityY = speed * dirY;
             }
         }
     }
@@ -144,6 +144,11 @@ public:
     bool getIsFlying()
     {
         return isFlying;
+    }
+
+    bool getEncaedStatusFlying()
+    {
+        return snowCovered;
     }
 
     virtual ~FlyingFoogaFoog()

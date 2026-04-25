@@ -1,53 +1,57 @@
 #pragma once
-#include "LogginSystem.h"
+#include "PasswordHidding.h"
 #include "DataBase.h"
 #include <string>
 
+
+
+// Purpose of this class is to check the authtication of the user 
+// runs in Login phase .......
 class AuthManager
 {
 private:
-    bool isLoggedIn;
-    std::string currentUsername;
-    int currentUserId;
+    bool isLogin;                       
+    std::string currusername;
+    int currentUserId;                  
     PasswordHidding passwordHidding;    // For hashing passwords
     DatabaseManager* dbManager;         // For saving/loading users
 
 public:
-    AuthManager(DatabaseManager* db)
+    AuthManager(DatabaseManager* db)  // Constructor
     {
-        isLoggedIn = false;
-        currentUsername = "";
+        isLogin = false;
+        currusername = "";
         currentUserId = -1;
         dbManager = db;
     }
 
-    // REGISTER NEW USER
+    // Registering new user.......
     bool registerUser(std::string username, std::string password, std::string email)
     {
-        // Check if username already exists
+    // Chek if user of this name exsist ot nott function available in database class......
         if (dbManager->userExists(username))
         {
             return false;               // Username already taken
         }
 
-        // Hash the password before saving
+     // when acount is creating the password must be hashed before it is saved......for protection..
         std::string hashedPassword = passwordHidding.hashingPassword(password);
 
-        // Save to database
+     // now pass these all info to the database so that my data get saved....and all user data is protected......
         bool success = dbManager->addUser(username, hashedPassword, email);
 
         return success;
     }
 
-    // LOGIN EXISTING USER
+    // Loggin Phase only for those who hav signed up already 
     bool loginUser(std::string username, std::string password)
     {
-        // Load user from database
+        
         User* user = dbManager->getUser(username);
 
         if (user == nullptr)
         {
-            return false;               // User not found
+            return false;             // Check bcz if usr doesn't exsit so return at onces...
         }
 
         // Verify password
@@ -55,8 +59,8 @@ public:
 
         if (passwordCorrect)
         {
-            isLoggedIn = true;
-            currentUsername = username;
+            isLogin = true;
+            currusername = username;
             currentUserId = user->user_id;
             return true;                // Login successful
         }
@@ -66,23 +70,29 @@ public:
         }
     }
 
-    // LOGOUT
+    
+
+
+    // Logout phasee 
     void logoutUser()
     {
-        isLoggedIn = false;
-        currentUsername = "";
+        isLogin = false;
+        currusername = "";
         currentUserId = -1;
     }
+
+
+
 
     // Getters
     bool getIsLoggedIn()
     {
-        return isLoggedIn;
+        return isLogin;
     }
 
     std::string getCurrentUsername()
     {
-        return currentUsername;
+        return currusername;
     }
 
     int getCurrentUserId()

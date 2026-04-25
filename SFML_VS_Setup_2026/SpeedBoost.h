@@ -12,7 +12,7 @@ public:
 
     void updatePowerUp() override
     {
-        // No update logic needed for now
+        // No use here bcz in player class there is already function for increaseing speed so we ll just simply use that........
     }
 
     void applyEffect(Player& player) override

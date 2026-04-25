@@ -8,7 +8,7 @@
 class Tornado : public FlyingFoogaFoog
 {
 private:
-    bool isTeleporting;
+    bool isTeleporting;        // Special Feature can teleport 
     int teleportTimer;
     int teleportDuration;
     int attackTimer;
@@ -25,7 +25,7 @@ public:
         teleportDuration = 300;     // time = Frames/FPS
 
         attackTimer = 0;
-        attackDuration = 240;     // Throw knife after every 3 seconds......
+        attackDuration = 240;     // Throw knife after every 4 seconds......
 
         playerX = 0;
         playerY = 0;
@@ -74,7 +74,7 @@ public:
                 float newX = x + (rand() % 400) - 200;         // X coordinate teleportation Point
                 float newY = y + (rand() % 400) - 200;         // Y coordinate telepotation Point
 
-                
+
 
                 if (newX < 0)
                 {
@@ -125,8 +125,8 @@ public:
 
             if (churi == nullptr)
             {
-                                                                           // Only throw knife if player position is valid
-                                                                           // playerY must be different from tornado Y for diagonal throw
+                // Only throw knife if player position is valid
+                // playerY must be different from tornado Y for diagonal throw
                 churi = new Knives(x, y, playerX, playerY, 600.0f);        // Calling Knife class for creating an
             }                                                              // an Object.......
         }
@@ -157,6 +157,13 @@ public:
             churi->drawProjectiles(window);
         }
     }
+
+
+    bool getEncaedStatusTor()
+    {
+        return snowCovered;
+    }
+
 
     ~Tornado()
     {

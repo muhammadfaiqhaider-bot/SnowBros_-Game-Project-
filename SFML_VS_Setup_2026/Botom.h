@@ -17,7 +17,7 @@ protected:
 public:
     Botom(float xPos, float yPos) : Enemy(xPos, yPos, "Botom")   // This is parametrized Function whenever in main my Botom is created it 
     {                                                            // Does demand its X and Y coordinate for object creation 
-        
+
         health = 1;
         hitWall = false;
         onGround = false;
@@ -50,11 +50,11 @@ public:
         }
 
 
-        int direction;                              
+        int direction;
         if (rand() % 2 == 0)                                 // Randomly direction Assigned 1 for right 
         {                                                    // -1 for left...........
             direction = 1;
-        } 
+        }
         else
         {
             direction = -1;
@@ -98,7 +98,7 @@ public:
                 onGround = false;
             }
         }
-        
+
         if (!onGround)                         // Gravity logic If not on ground so pull's down until touches the ground.....
         {
             velocityY = velocityY + 0.5f;      // Gravity Applied here +0.5 is bcz scrren resolutions are not like normal graphs it works a bit 
@@ -112,11 +112,11 @@ public:
 
 
 
-        
-        x = x +  velocityX;                    // Apply movement along x axis
-        y = y +  velocityY;                    // Apply movement along y axis
 
-        
+        x = x + velocityX;                    // Apply movement along x axis
+        y = y + velocityY;                    // Apply movement along y axis
+
+
         if (x < 0)                             // Screen boundary check here MY screen Resolution is 600x600
         {                                      // So i'll try to merge things inside it ........
             x = 0;
@@ -200,16 +200,19 @@ public:
     }
 
 
-    
+    bool getEncaedStatusBot()
+    {
+        return snowCovered;
+    }
 
-    
+
     void setHitWall(bool value)              // Cheema  calls this when Botom hits a wall or some edges.......Sybau lil gigga nilla UwU
     {
         hitWall = value;
     }
 
-    
-    void setOnGround(bool value)    
+
+    void setOnGround(bool value)
     {                                        // Cheema use this  when Botom lands on flat surfaxe
         onGround = value;
     }

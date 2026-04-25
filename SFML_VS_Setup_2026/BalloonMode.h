@@ -12,7 +12,7 @@ public:
 
     void updatePowerUp() override
     {
-        // No update logic needed for now
+        // No update logic needed for now In player calss it's already present there ........
     }
 
     void applyEffect(Player& player) override

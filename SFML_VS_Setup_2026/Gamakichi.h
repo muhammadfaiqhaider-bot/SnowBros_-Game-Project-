@@ -54,7 +54,7 @@ public:
         {
             return;
         }
-                                            // Gamakichi is fixed Enemy and its x y coordinate can't be changed
+        // Gamakichi is fixed Enemy and its x y coordinate can't be changed
         if (x < 0)
         {
             x = 0;
@@ -82,19 +82,19 @@ public:
 
     void phaseChanger()
     {
-                                           // In start Phase 1 of Gamkichi is running through as its helath hits 25 phase 2 triggers where the Speed or intervals
+        // In start Phase 1 of Gamkichi is running through as its helath hits 25 phase 2 triggers where the Speed or intervals
         if (health <= 25 && phase == 1)    // of gamakichi attacks increased.......less than a 1.5 sec 
         {
             phase = 2;
-            attackDuration = 80;    
+            attackDuration = 80;
             phaseTimer = 0;
         }
 
-                                           // When health reaches 15 phase 3 triggers where attack seep is very fast rockets are thown on u drastically 
+        // When health reaches 15 phase 3 triggers where attack seep is very fast rockets are thown on u drastically 
         if (health <= 15 && phase == 2)    // Difficult to dodge them 
         {
             phase = 3;
-            attackDuration = 40;    
+            attackDuration = 40;
             phaseTimer = 0;
         }
     }
@@ -104,21 +104,21 @@ public:
         if (attackTimer >= attackDuration)
         {
             attackTimer = 0;
-                                                        // Launching Rockets logic at phase 1 Rockets 
-            
+            // Launching Rockets logic at phase 1 Rockets 
+
             if (phase == 1)
             {
                 fireRocket();
             }
 
-            
+
             if (phase == 2)
             {                                            // Two rockets are lauched at stage 2 
                 fireRocket();
                 fireRocket();
             }
 
-            
+
             if (phase == 3)
             {
                 fireRocket();                            // Three rockets are luanched at phase 3
@@ -146,7 +146,7 @@ public:
         {
             if (rockets[i] != nullptr)
             {
-                rockets[i]->update();
+                rockets[i]->updateTrajactory();
 
                 if (!rockets[i]->isActive())
                 {
@@ -207,7 +207,7 @@ public:
         {
             if (rockets[i] != nullptr)
             {
-                rockets[i]->draw(window);
+                rockets[i]->drawProjectiles(window);
             }
         }
     }

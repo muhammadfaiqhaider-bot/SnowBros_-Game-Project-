@@ -2,67 +2,42 @@
 #include "LoginScreen.h"
 #include "MainMenu.h"
 #include "CharacterSelecte.h"
-#include "HUD.h"
 #include "PauseMenu.h"
-#include "Nick.h"
-#include "Botom.h"
+#include "GamePlay.h"
 #include "AuthenticationSystem.h"
 #include "DataBase.h"
 
 int main()
 {
+
+    // Resolution is set to 600x600 bcz this is old game soo bursted piexlated asserts
+    // Frames are sett to 60 easy for calculation and ideal for this typa game....
     sf::RenderWindow window(sf::VideoMode(600, 600), "Snow Bros");
     window.setFramerateLimit(60);
 
-    // ---- SYSTEMS ----
-    DatabaseManager dbManager;
-    AuthManager authManager(&dbManager);
-
-    // ---- SCREENS ----
-    LoginScreen loginScreen;
-    MainMenu mainMenu;
-    CharacterSelect charSelect;
-    HUD hud;
-    PauseMenu pauseMenu;
-
-    // ---- FONT for Game Over and Pause ----
+    // Font We Use in Our Game Downloaded from text downloader
     sf::Font font;
     font.loadFromFile("Orbitron-VariableFont_wght.ttf");
 
-    // ---- PLATFORMS ----
-    sf::RectangleShape platforms[6];
+    // These classes are essential for my LOGGIN PHASE 
+    // DataBase Manager Handles all the DATA saving and retrinving things.... Creating user 
+    // verifying user saving game progress leader board (inshort most of the file handling stuff)
+    DatabaseManager dbManager; // Object is created of DataBase class.....
 
-    platforms[0].setSize(sf::Vector2f(600.f, 20.f));
-    platforms[0].setFillColor(sf::Color(128, 0, 128));
-    platforms[0].setPosition(0.f, 560.f);
 
-    platforms[1].setSize(sf::Vector2f(250.f, 20.f));
-    platforms[1].setFillColor(sf::Color(128, 0, 128));
-    platforms[1].setPosition(0.f, 420.f);
+    // Using the data and autorized login during sign up phase........
+    AuthManager authManager(&dbManager);
 
-    platforms[2].setSize(sf::Vector2f(250.f, 20.f));
-    platforms[2].setFillColor(sf::Color(128, 0, 128));
-    platforms[2].setPosition(350.f, 420.f);
 
-    platforms[3].setSize(sf::Vector2f(300.f, 20.f));
-    platforms[3].setFillColor(sf::Color(128, 0, 128));
-    platforms[3].setPosition(150.f, 280.f);
 
-    platforms[4].setSize(sf::Vector2f(200.f, 20.f));
-    platforms[4].setFillColor(sf::Color(128, 0, 128));
-    platforms[4].setPosition(0.f, 140.f);
+    //SCREENS.....
 
-    platforms[5].setSize(sf::Vector2f(200.f, 20.f));
-    platforms[5].setFillColor(sf::Color(128, 0, 128));
-    platforms[5].setPosition(400.f, 140.f);
-
-    // ---- PLAYER ----
-    Nick nick(100.f, 520.f);
-
-    // ---- ENEMIES ----
-    Botom botom1(300.f, 520.f);
-    Botom botom2(450.f, 520.f);
-    Botom botom3(200.f, 380.f);
+    //-00
+    LoginScreen loginScreen;
+    MainMenu mainMenu;
+    CharacterSelect charSelect;
+    PauseMenu pauseMenu;
+    GamePlay gameplay;
 
     // ---- CURRENT SCREEN ----
     // 0 = Login
@@ -71,17 +46,17 @@ int main()
     // 3 = Gameplay
     // 4 = Pause
     // 5 = Game Over
+    // 6 = Level Complete
+    // 7 = Game Complete
     // 9 = Shop (later)
     int currentScreen = 0;
-
-    // ---- SAVE MESSAGE ----
-    std::string saveMessage = "";
-    int saveMessageTimer = 0;
 
     // ---- GAME LOOP ----
     while (window.isOpen())
     {
+        // ==========================================
         // 1. HANDLE EVENTS
+        // ==========================================
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -96,7 +71,7 @@ int main()
                 int result = loginScreen.handleEvents(event, authManager);
                 if (result == 1)
                 {
-                    currentScreen = 1;
+                    currentScreen = 1;      // Go to main menu
                 }
             }
 
@@ -104,13 +79,14 @@ int main()
             else if (currentScreen == 1)
             {
                 int result = mainMenu.handleEvents(event, window);
+
                 if (result == 2)
                 {
-                    currentScreen = 2;
+                    currentScreen = 2;      // Go to character select
                 }
                 else if (result == -1)
                 {
-                    window.close();
+                    window.close();         // Exit game
                 }
             }
 
@@ -118,36 +94,29 @@ int main()
             else if (currentScreen == 2)
             {
                 int result = charSelect.handleEvents(event);
+
                 if (result == 3)
                 {
-                    currentScreen = 3;
+                    currentScreen = 3;      // Go to gameplay
                 }
                 else if (result == 1)
                 {
-                    currentScreen = 1;
+                    currentScreen = 1;      // Back to main menu
                 }
             }
 
             // ---- GAMEPLAY ----
             else if (currentScreen == 3)
             {
-                if (event.type == sf::Event::KeyPressed)
-                {
-                    // Space - throw snowball
-                    if (event.key.code == sf::Keyboard::Space)
-                    {
-                        nick.throwSnowball();
-                    }
+                int result = gameplay.handleEvents(event);
 
-                    // ESC - pause
-                    if (event.key.code == sf::Keyboard::Escape)
-                    {
-                        currentScreen = 4;
-                    }
+                if (result == 4)
+                {
+                    currentScreen = 4;      // Go to pause
                 }
             }
 
-            // ---- PAUSE MENU ----
+            // ---- PAUSE ----
             else if (currentScreen == 4)
             {
                 int result = pauseMenu.handleEvents(event);
@@ -158,21 +127,20 @@ int main()
                 }
                 else if (result == 9)
                 {
-                    currentScreen = 9;      // Go to shop (later)
+                    currentScreen = 9;      // Go to shop
                 }
                 else if (result == 10)
                 {
-                    // Save game
+                    // Save game progress
                     dbManager.saveProgress(
                         authManager.getCurrentUserId(),
-                        1,                      // current level
-                        nick.getLives(),
-                        nick.getGemCount(),
-                        nick.getScore()
+                        gameplay.getLevel(),
+                        gameplay.getLives(),
+                        gameplay.getGems(),
+                        gameplay.getScore()
                     );
-
-                    saveMessage = "Game Saved!";
-                    saveMessageTimer = 180;     // Show for 3 seconds
+                    gameplay.showSaveMessage();
+                    currentScreen = 3;      // Resume after save
                 }
                 else if (result == 1)
                 {
@@ -187,123 +155,78 @@ int main()
                 {
                     if (event.key.code == sf::Keyboard::Return)
                     {
-                        currentScreen = 1;      // Back to main menu
+                        currentScreen = 1;  // Back to main menu
+                    }
+                }
+            }
+
+            // ---- LEVEL COMPLETE ----
+            else if (currentScreen == 6)
+            {
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Return)
+                    {
+                        gameplay.goNextLevel();
+                        currentScreen = 3;  // Back to gameplay next level
+                    }
+                }
+            }
+
+            // ---- GAME COMPLETE ----
+            else if (currentScreen == 7)
+            {
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Return)
+                    {
+                        currentScreen = 1;  // Back to main menu
+                    }
+                }
+            }
+
+            // ---- SHOP ----
+            else if (currentScreen == 9)
+            {
+                if (event.type == sf::Event::KeyPressed)
+                {
+                    if (event.key.code == sf::Keyboard::Escape)
+                    {
+                        currentScreen = 4;  // Back to pause
                     }
                 }
             }
         }
 
-        // 2. UPDATE - only during gameplay
+        // ==========================================
+        // 2. UPDATE - Only during gameplay
+        // ==========================================
+
         if (currentScreen == 3)
         {
-            // --- Player platform collision ---
-            nick.setOnGround(false);
-            for (int i = 0; i < 6; i++)
+            int result = gameplay.update();
+
+            if (result == 5)
             {
-                sf::FloatRect nickBounds(nick.getPositionX(), nick.getPositionY(), 40.f, 40.f);
-                sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
-
-                if (nickBounds.intersects(platformBounds))
+                currentScreen = 5;          // Game over
+            }
+            else if (result == 6)
+            {
+                if (gameplay.isGameComplete())
                 {
-                    float platformTop = platforms[i].getPosition().y;
-
-                    if (nick.getPositionY() + 40.f <= platformTop + 10.f)
-                    {
-                        nick.setOnGround(true);
-                        nick.setJump(0);
-                        nick.snapToGround(platformTop - 40.f);
-                    }
+                    currentScreen = 7;      // Game complete!
+                }
+                else
+                {
+                    currentScreen = 6;      // Level complete
                 }
             }
-
-            // --- Botom array ---
-            Botom* botoms[3] = { &botom1, &botom2, &botom3 };
-
-            // --- Botom platform collision ---
-            for (int b = 0; b < 3; b++)
-            {
-                botoms[b]->setOnGround(false);
-
-                for (int i = 0; i < 6; i++)
-                {
-                    sf::FloatRect botomBounds(botoms[b]->getPositionX(), botoms[b]->getPositionY(), 40.f, 40.f);
-                    sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
-
-                    if (botomBounds.intersects(platformBounds))
-                    {
-                        float platformTop = platforms[i].getPosition().y;
-                        float botomBottom = botoms[b]->getPositionY() + 40.f;
-
-                        if (botomBottom >= platformTop && botoms[b]->getPositionY() < platformTop && botoms[b]->getVelocityY() >= 0)
-                        {
-                            botoms[b]->setOnGround(true);
-                            botoms[b]->snapToGround(platformTop - 39.99f);
-                        }
-                    }
-                }
-
-                // Wall check
-                if (botoms[b]->getPositionX() <= 0 || botoms[b]->getPositionX() >= 560)
-                {
-                    botoms[b]->setHitWall(true);
-                }
-            }
-
-            // --- Snowball collision ---
-            if (nick.getSnowball() != nullptr)
-            {
-                sf::FloatRect snowballBounds = nick.getSnowball()->getHitBox();
-
-                for (int b = 0; b < 3; b++)
-                {
-                    sf::FloatRect botomBounds(botoms[b]->getPositionX(), botoms[b]->getPositionY(), 40.f, 40.f);
-
-                    if (snowballBounds.intersects(botomBounds))
-                    {
-                        nick.getSnowball()->onHitEnemy(botoms[b]);
-                    }
-                }
-            }
-
-            // --- Player enemy collision ---
-            sf::FloatRect nickBounds(nick.getPositionX(), nick.getPositionY(), 40.f, 40.f);
-
-            for (int b = 0; b < 3; b++)
-            {
-                sf::FloatRect botomBounds(botoms[b]->getPositionX(), botoms[b]->getPositionY(), 40.f, 40.f);
-
-                if (nickBounds.intersects(botomBounds))
-                {
-                    nick.loseLife();
-                }
-            }
-
-            // --- Check game over ---
-            if (!nick.getIsAlive())
-            {
-                currentScreen = 5;
-            }
-
-            // --- Update snowball ---
-            nick.updateSnowball();
-
-            // --- Update HUD ---
-            hud.update(nick.getScore(), nick.getLives(), nick.getGemCount(), 1);
-
-            // --- Update save message timer ---
-            if (saveMessageTimer > 0)
-            {
-                saveMessageTimer--;
-            }
-
-            // --- Update all entities ---
-            nick.movementsUpdate();
-            botom1.movementsUpdate();
-            botom2.movementsUpdate();
-            botom3.movementsUpdate();
         }
 
+        // ==========================================
         // 3. DRAW
+        // ==========================================
+
         window.clear();
 
         // ---- LOGIN ----
@@ -327,59 +250,13 @@ int main()
         // ---- GAMEPLAY ----
         else if (currentScreen == 3)
         {
-            window.clear(sf::Color(200, 150, 150));
-
-            // Draw platforms
-            for (int i = 0; i < 6; i++)
-            {
-                window.draw(platforms[i]);
-            }
-
-            // Draw enemies
-            botom1.DisplayEnemy(window);
-            botom2.DisplayEnemy(window);
-            botom3.DisplayEnemy(window);
-
-            // Draw snowball
-            nick.drawSnowball(window);
-
-            // Draw player
-            nick.displayPlayer(window);
-
-            // Draw HUD on top
-            hud.draw(window);
-
-            // Draw save message if active
-            if (saveMessageTimer > 0)
-            {
-                sf::Text saveText;
-                saveText.setFont(font);
-                saveText.setString(saveMessage);
-                saveText.setCharacterSize(16);
-                saveText.setFillColor(sf::Color::Green);
-                saveText.setPosition(220.f, 560.f);
-                window.draw(saveText);
-            }
+            gameplay.draw(window);
         }
 
         // ---- PAUSE ----
         else if (currentScreen == 4)
         {
-            // Draw gameplay behind pause
-            window.clear(sf::Color(200, 150, 150));
-
-            for (int i = 0; i < 6; i++)
-            {
-                window.draw(platforms[i]);
-            }
-
-            botom1.DisplayEnemy(window);
-            botom2.DisplayEnemy(window);
-            botom3.DisplayEnemy(window);
-            nick.displayPlayer(window);
-            hud.draw(window);
-
-            // Draw pause menu on top
+            gameplay.drawOnly(window);      // Frozen game behind pause
             pauseMenu.draw(window);
         }
 
@@ -400,55 +277,153 @@ int main()
 
             sf::Text scoreText;
             scoreText.setFont(font);
-            scoreText.setString("Score: " + std::to_string(nick.getScore()));
+            scoreText.setString("Score: " + std::to_string(gameplay.getScore()));
             scoreText.setCharacterSize(25);
             scoreText.setFillColor(sf::Color::White);
-            scoreText.setPosition(210.f, 280.f);
+            scoreText.setPosition(210.f, 260.f);
             window.draw(scoreText);
+
+            sf::Text levelText;
+            levelText.setFont(font);
+            levelText.setString("Level Reached: " + std::to_string(gameplay.getLevel()));
+            levelText.setCharacterSize(25);
+            levelText.setFillColor(sf::Color::White);
+            levelText.setPosition(165.f, 310.f);
+            window.draw(levelText);
 
             sf::Text continueText;
             continueText.setFont(font);
             continueText.setString("Press ENTER for Main Menu");
             continueText.setCharacterSize(18);
             continueText.setFillColor(sf::Color(180, 180, 180));
-            continueText.setPosition(120.f, 400.f);
+            continueText.setPosition(120.f, 420.f);
             window.draw(continueText);
+        }
+
+        // ---- LEVEL COMPLETE ----
+        else if (currentScreen == 6)
+        {
+            sf::RectangleShape background(sf::Vector2f(600.f, 600.f));
+            background.setFillColor(sf::Color(0, 50, 0));
+            window.draw(background);
+
+            sf::Text levelCompleteText;
+            levelCompleteText.setFont(font);
+            levelCompleteText.setString("LEVEL COMPLETE!");
+            levelCompleteText.setCharacterSize(40);
+            levelCompleteText.setFillColor(sf::Color::Green);
+            levelCompleteText.setPosition(90.f, 150.f);
+            window.draw(levelCompleteText);
+
+            sf::Text scoreText;
+            scoreText.setFont(font);
+            scoreText.setString("Score: " + std::to_string(gameplay.getScore()));
+            scoreText.setCharacterSize(22);
+            scoreText.setFillColor(sf::Color::White);
+            scoreText.setPosition(210.f, 250.f);
+            window.draw(scoreText);
+
+            sf::Text gemsText;
+            gemsText.setFont(font);
+            gemsText.setString("Gems: " + std::to_string(gameplay.getGems()));
+            gemsText.setCharacterSize(22);
+            gemsText.setFillColor(sf::Color::Yellow);
+            gemsText.setPosition(225.f, 300.f);
+            window.draw(gemsText);
+
+            sf::Text nextLevelText;
+            nextLevelText.setFont(font);
+            nextLevelText.setString("Next Level: " + std::to_string(gameplay.getLevel() + 1));
+            nextLevelText.setCharacterSize(22);
+            nextLevelText.setFillColor(sf::Color::Cyan);
+            nextLevelText.setPosition(185.f, 350.f);
+            window.draw(nextLevelText);
+
+            sf::Text pressEnterText;
+            pressEnterText.setFont(font);
+            pressEnterText.setString("Press ENTER to continue");
+            pressEnterText.setCharacterSize(18);
+            pressEnterText.setFillColor(sf::Color(180, 180, 180));
+            pressEnterText.setPosition(145.f, 430.f);
+            window.draw(pressEnterText);
+        }
+
+        // ---- GAME COMPLETE ----
+        else if (currentScreen == 7)
+        {
+            sf::RectangleShape background(sf::Vector2f(600.f, 600.f));
+            background.setFillColor(sf::Color(20, 0, 50));
+            window.draw(background);
+
+            sf::Text completeText;
+            completeText.setFont(font);
+            completeText.setString("YOU WIN!");
+            completeText.setCharacterSize(60);
+            completeText.setFillColor(sf::Color::Yellow);
+            completeText.setPosition(150.f, 100.f);
+            window.draw(completeText);
+
+            sf::Text congratsText;
+            congratsText.setFont(font);
+            congratsText.setString("Congratulations!");
+            congratsText.setCharacterSize(25);
+            congratsText.setFillColor(sf::Color::Cyan);
+            congratsText.setPosition(165.f, 200.f);
+            window.draw(congratsText);
+
+            sf::Text finalScoreText;
+            finalScoreText.setFont(font);
+            finalScoreText.setString("Final Score: " + std::to_string(gameplay.getScore()));
+            finalScoreText.setCharacterSize(22);
+            finalScoreText.setFillColor(sf::Color::White);
+            finalScoreText.setPosition(180.f, 280.f);
+            window.draw(finalScoreText);
+
+            sf::Text finalGemsText;
+            finalGemsText.setFont(font);
+            finalGemsText.setString("Total Gems: " + std::to_string(gameplay.getGems()));
+            finalGemsText.setCharacterSize(22);
+            finalGemsText.setFillColor(sf::Color::Yellow);
+            finalGemsText.setPosition(190.f, 330.f);
+            window.draw(finalGemsText);
+
+            sf::Text returnText;
+            returnText.setFont(font);
+            returnText.setString("Press ENTER for Main Menu");
+            returnText.setCharacterSize(18);
+            returnText.setFillColor(sf::Color(180, 180, 180));
+            returnText.setPosition(120.f, 430.f);
+            window.draw(returnText);
         }
 
         // ---- SHOP PLACEHOLDER ----
         else if (currentScreen == 9)
         {
-            // Shop coming soon placeholder
             window.clear(sf::Color(10, 10, 40));
 
             sf::Text shopText;
             shopText.setFont(font);
-            shopText.setString("SHOP - Coming Soon!");
-            shopText.setCharacterSize(30);
+            shopText.setString("SHOP");
+            shopText.setCharacterSize(50);
             shopText.setFillColor(sf::Color::Yellow);
-            shopText.setPosition(130.f, 250.f);
+            shopText.setPosition(220.f, 150.f);
             window.draw(shopText);
+
+            sf::Text comingSoonText;
+            comingSoonText.setFont(font);
+            comingSoonText.setString("Coming Soon!");
+            comingSoonText.setCharacterSize(25);
+            comingSoonText.setFillColor(sf::Color::White);
+            comingSoonText.setPosition(185.f, 250.f);
+            window.draw(comingSoonText);
 
             sf::Text backText;
             backText.setFont(font);
             backText.setString("Press ESC to go back");
             backText.setCharacterSize(18);
-            backText.setFillColor(sf::Color::White);
-            backText.setPosition(175.f, 330.f);
+            backText.setFillColor(sf::Color(180, 180, 180));
+            backText.setPosition(175.f, 380.f);
             window.draw(backText);
-
-            // ESC from shop goes back to pause
-            sf::Event shopEvent;
-            while (window.pollEvent(shopEvent))
-            {
-                if (shopEvent.type == sf::Event::KeyPressed)
-                {
-                    if (shopEvent.key.code == sf::Keyboard::Escape)
-                    {
-                        currentScreen = 4;
-                    }
-                }
-            }
         }
 
         window.display();

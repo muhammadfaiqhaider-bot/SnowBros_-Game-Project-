@@ -88,6 +88,20 @@ public:
         return shape.getGlobalBounds();
     }
 
+
+
+
+
+
+
+    int getDirection()
+    {
+        return direction;   
+    }
+
+
+
+
     ~Snowball()
     {
     }

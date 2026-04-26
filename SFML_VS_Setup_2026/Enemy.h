@@ -61,8 +61,9 @@ public:
         // When health hits 0 enemy becomes fully encased
         if (health <= 0)
         {
-            snowCovered = true;
             health = 0; // Prevent negative health
+            snowCovered = true;
+            
         }
     }
 

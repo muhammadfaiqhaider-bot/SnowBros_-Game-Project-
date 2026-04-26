@@ -2,28 +2,23 @@
 #include <SFML/Graphics.hpp>
 #include "Nick.h"
 #include "HUD.h"
-#include "LevelManager.h"
+#include "Level1.h"
+#include "Level2.h"
 
 class GamePlay
 {
 private:
-    // ---- Platforms ----
     sf::RectangleShape platforms[6];
-
-    // ---- Player ----
     Nick nick;
-
-    // ---- Level Manager ----
-    LevelManager levelManager;
-
-    // ---- HUD ----
     HUD hud;
+    int currentLevelNumber;
+    Level1* level1;
+    Level2* level2;
 
-    // ---- Save message ----
+
     std::string saveMessage;
     int saveMessageTimer;
 
-    // ---- Font ----
     sf::Font font;
 
 public:
@@ -33,16 +28,15 @@ public:
 
         saveMessage = "";
         saveMessageTimer = 0;
+        currentLevelNumber = 1;
 
         setupPlatforms();
 
-        // Load first level
-        levelManager.loadLevel(0);
-    }
+        // Start with level 1
+        level1 = new Level1();
+        level2 = new Level2();
 
-    // ==========================================
-    // HANDLE EVENTS
-    // ==========================================
+    }
 
     int handleEvents(sf::Event& event)
     {
@@ -55,46 +49,52 @@ public:
 
             if (event.key.code == sf::Keyboard::Escape)
             {
-                return 4;       // Pause
+                return 4;     
             }
         }
 
         return 3;
     }
 
-    // ==========================================
-    // UPDATE
-    // ==========================================
 
     int update()
     {
-        // Player platform collision
+        // Player platform collision - physics stay same as before
         handlePlayerPlatformCollision();
 
-        // Update all enemies via level manager
-        levelManager.updateEnemies(
-            nick.getPositionX(),
-            nick.getPositionY(),
-            platforms,
-            6
-        );
+        // Update current level enemies
+        if (currentLevelNumber == 1 && level1 != nullptr)
+        {
+            level1->update(
+                nick.getPositionX(),
+                nick.getPositionY(),
+                platforms,
+                6
+            );
 
-        // Snowball collision
-        handleSnowballCollision();
+            // Check snowball vs enemies
+            if (nick.getSnowball() != nullptr)
+            {
+                level1->checkSnowballCollision(nick.getSnowball());
+            }
 
-        // Player enemy collision
-        handlePlayerEnemyCollision();
+            // Check player vs enemies
+            if (level1->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
+            {
+                nick.loseLife();
+            }
+
+            // Check level complete
+            if (level1->isLevelComplete())
+            {
+                return 6;       // Level complete
+            }
+        }
 
         // Check game over
         if (!nick.getIsAlive())
         {
             return 5;
-        }
-
-        // Check level complete
-        if (levelManager.isLevelComplete())
-        {
-            return 6;       // Level complete screen
         }
 
         // Update snowball
@@ -105,7 +105,7 @@ public:
             nick.getScore(),
             nick.getLives(),
             nick.getGemCount(),
-            levelManager.getCurrentLevelNumber()
+            currentLevelNumber
         );
 
         // Update save message timer
@@ -117,12 +117,30 @@ public:
         // Update player
         nick.movementsUpdate();
 
+
+        if (currentLevelNumber == 2 && level2 != nullptr)
+        {
+            level2->update(nick.getPositionX(), nick.getPositionY(), platforms, 6);
+
+            if (nick.getSnowball() != nullptr)
+            {
+                level2->checkSnowballCollision(nick.getSnowball());
+            }
+
+            if (level2->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
+            {
+                nick.loseLife();
+            }
+
+            if (level2->isLevelComplete())
+            {
+                return 6;
+            }
+        }
+
+
         return 3;
     }
-
-    // ==========================================
-    // DRAW
-    // ==========================================
 
     void draw(sf::RenderWindow& window)
     {
@@ -134,9 +152,15 @@ public:
             window.draw(platforms[i]);
         }
 
-        // Draw all enemies via level manager
-        levelManager.draw(window);
-
+        // Draw current level enemies
+        if (currentLevelNumber == 1 && level1 != nullptr)
+        {
+            level1->draw(window);
+        }
+        if (currentLevelNumber == 2 && level2 != nullptr)
+        {
+            level2->draw(window);
+        }
         // Draw snowball
         nick.drawSnowball(window);
 
@@ -168,32 +192,34 @@ public:
             window.draw(platforms[i]);
         }
 
-        levelManager.draw(window);
+        if (currentLevelNumber == 1 && level1 != nullptr)
+        {
+            level1->draw(window);
+        }
+
+        if (currentLevelNumber == 2 && level2 != nullptr)
+        {
+            level2->draw(window);
+        }
+
         nick.displayPlayer(window);
         hud.draw(window);
     }
 
-    // ==========================================
-    // LEVEL NAVIGATION
-    // ==========================================
+
 
     void goNextLevel()
     {
-        levelManager.goNextLevel();
-
-        // Reset player position
-        nick.snapToGround(520.f);
+        currentLevelNumber++;
+        nick.snapToGround(520.f);   // Reset player position
     }
 
     bool isGameComplete()
     {
-        return levelManager.getCurrentLevelNumber() == 10 &&
-            levelManager.isLevelComplete();
+        return currentLevelNumber > 10;
     }
 
-    // ==========================================
-    // SAVE
-    // ==========================================
+
 
     void showSaveMessage()
     {
@@ -205,36 +231,58 @@ public:
     int getScore() { return nick.getScore(); }
     int getLives() { return nick.getLives(); }
     int getGems() { return nick.getGemCount(); }
-    int getLevel() { return levelManager.getCurrentLevelNumber(); }
+    int getLevel() { return currentLevelNumber; }
+
+    ~GamePlay()
+    {
+        if (level1 != nullptr)
+        {
+            delete level1;
+            level1 = nullptr;
+        }
+        if (level2 != nullptr)
+        {
+            delete level2;
+            level2 = nullptr;
+        }
+    }
 
 private:
 
+
     void setupPlatforms()
     {
+        // Platform 1 - Ground
         platforms[0].setSize(sf::Vector2f(600.f, 20.f));
         platforms[0].setFillColor(sf::Color(128, 0, 128));
         platforms[0].setPosition(0.f, 560.f);
 
+        // Platform 2 - Middle Left
         platforms[1].setSize(sf::Vector2f(250.f, 20.f));
         platforms[1].setFillColor(sf::Color(128, 0, 128));
         platforms[1].setPosition(0.f, 420.f);
 
+        // Platform 3 - Middle Right
         platforms[2].setSize(sf::Vector2f(250.f, 20.f));
         platforms[2].setFillColor(sf::Color(128, 0, 128));
         platforms[2].setPosition(350.f, 420.f);
 
+        // Platform 4 - Upper Middle
         platforms[3].setSize(sf::Vector2f(300.f, 20.f));
         platforms[3].setFillColor(sf::Color(128, 0, 128));
         platforms[3].setPosition(150.f, 280.f);
 
+        // Platform 5 - Top Left
         platforms[4].setSize(sf::Vector2f(200.f, 20.f));
         platforms[4].setFillColor(sf::Color(128, 0, 128));
         platforms[4].setPosition(0.f, 140.f);
 
+        // Platform 6 - Top Right
         platforms[5].setSize(sf::Vector2f(200.f, 20.f));
         platforms[5].setFillColor(sf::Color(128, 0, 128));
         platforms[5].setPosition(400.f, 140.f);
     }
+
 
     void handlePlayerPlatformCollision()
     {
@@ -257,17 +305,5 @@ private:
                 }
             }
         }
-    }
-
-    void handleSnowballCollision()
-    {
-        // Will be handled through level manager later
-        // For now placeholder
-    }
-
-    void handlePlayerEnemyCollision()
-    {
-        // Will be handled through level manager later
-        // For now placeholder
     }
 };

@@ -7,6 +7,8 @@ class LoginScreen
 {
 private:
     sf::Font font;
+    sf::Font text;
+    sf::Font subTit;
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     bool backgroundLoaded;
@@ -33,7 +35,10 @@ private:
 public:
     LoginScreen()
     {
-        font.loadFromFile("Orbitron-VariableFont_wght.ttf");
+        font.loadFromFile("assets/Title.ttf");
+        text.loadFromFile("assets/Text.ttf");
+        subTit.loadFromFile("asstes/Subtitle.ttf");
+
 
         // Load your starry background image
         backgroundLoaded = backgroundTexture.loadFromFile("assets/login_bg.png");
@@ -290,7 +295,7 @@ public:
 
         // ---- USERNAME LABEL ----
         sf::Text usernameLabel;
-        usernameLabel.setFont(font);
+        usernameLabel.setFont(text);
         usernameLabel.setString("Username");
         usernameLabel.setCharacterSize(13);
         usernameLabel.setFillColor(sf::Color(150, 200, 255));
@@ -316,7 +321,7 @@ public:
 
         // Username content or placeholder
         sf::Text usernameContent;
-        usernameContent.setFont(font);
+        usernameContent.setFont(text);
         usernameContent.setCharacterSize(13);
         if (usernameInput.empty())
         {
@@ -333,7 +338,7 @@ public:
 
         // ---- PASSWORD LABEL ----
         sf::Text passwordLabel;
-        passwordLabel.setFont(font);
+        passwordLabel.setFont(text);
         passwordLabel.setString("Password");
         passwordLabel.setCharacterSize(13);
         passwordLabel.setFillColor(sf::Color(150, 200, 255));
@@ -359,7 +364,7 @@ public:
 
         // Password content or placeholder
         sf::Text passwordContent;
-        passwordContent.setFont(font);
+        passwordContent.setFont(text);
         passwordContent.setCharacterSize(13);
         if (passwordInput.empty())
         {
@@ -381,7 +386,7 @@ public:
 
         // ---- PASSWORD HINT ----
         sf::Text hint;
-        hint.setFont(font);
+        hint.setFont(text);
         hint.setString("Use 6 or more characters");
         hint.setCharacterSize(10);
         hint.setFillColor(sf::Color(60, 100, 150));
@@ -414,7 +419,7 @@ public:
         std::string btnLabel = showingRegister ? "CREATE ACCOUNT" : "LOGIN";
 
         sf::Text mainBtnText;
-        mainBtnText.setFont(font);
+        mainBtnText.setFont(text);
         mainBtnText.setString(btnLabel);
         mainBtnText.setCharacterSize(14);
         mainBtnText.setFillColor(sf::Color(200, 235, 255));
@@ -445,7 +450,7 @@ public:
             "No account? Register here";
 
         sf::Text switchText;
-        switchText.setFont(font);
+        switchText.setFont(text);
         switchText.setString(switchLabel);
         switchText.setCharacterSize(11);
         switchText.setFillColor(sf::Color(100, 170, 230));

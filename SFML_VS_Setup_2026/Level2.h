@@ -104,6 +104,8 @@ public:
                 continue;
             }
 
+
+
             // Platform collision - same as botom
             flyingEnemies[i]->setOnGround(false);
 
@@ -231,8 +233,10 @@ public:
                 continue;
             }
 
+
+
             // Encased stationary - safe to touch
-            if (botoms[i]->getIsEncased() && !botoms[i]->getIsRolling())
+            if (botoms[i]->getIsEncased())
             {
                 continue;
             }
@@ -258,7 +262,7 @@ public:
             }
 
             // Encased stationary - safe to touch
-            if (flyingEnemies[i]->getIsEncased() && !flyingEnemies[i]->getIsRolling())
+            if (flyingEnemies[i]->getIsEncased())
             {
                 continue;
             }

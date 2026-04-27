@@ -24,7 +24,7 @@ private:
 public:
     GamePlay() : nick(100.f, 520.f)
     {
-        font.loadFromFile("Orbitron-VariableFont_wght.ttf");
+        font.loadFromFile("assets/text.ttf");
 
         saveMessage = "";
         saveMessageTimer = 0;
@@ -81,7 +81,9 @@ public:
             // Check player vs enemies
             if (level1->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
             {
-                nick.loseLife();
+
+                    nick.loseLife();
+      
             }
 
             // Check level complete
@@ -129,7 +131,10 @@ public:
 
             if (level2->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
             {
-                nick.loseLife();
+                if (nick.getSnowball() == nullptr)  // Only take damage if snowball isn't active
+                {
+                    nick.loseLife();
+                }
             }
 
             if (level2->isLevelComplete())
@@ -233,6 +238,20 @@ public:
     int getGems() { return nick.getGemCount(); }
     int getLevel() { return currentLevelNumber; }
 
+    void reset()
+    {
+        currentLevelNumber = 1;
+        nick = Nick(100.f, 520.f);   // Re-construct nick at start position (resets lives/score/gems)
+        saveMessage = "";
+        saveMessageTimer = 0;
+
+        // Reset levels too
+        delete level1;
+        delete level2;
+        level1 = new Level1();
+        level2 = new Level2();
+    }
+
     ~GamePlay()
     {
         if (level1 != nullptr)
@@ -306,4 +325,6 @@ private:
             }
         }
     }
+
+
 };

@@ -233,12 +233,11 @@ public:
             {
                 continue;
             }
-
-            // Encased stationary enemy doesn't hurt player
-            if (enemies[i]->getIsEncased() && !enemies[i]->getIsRolling())
-            {
-                continue;
-            }
+                    // Skip encased enemies - they can't hurt the player
+        if (enemies[i]->getIsEncased())
+        {
+            continue;
+        }
 
             sf::FloatRect enemyBounds(
                 enemies[i]->getPositionX(),

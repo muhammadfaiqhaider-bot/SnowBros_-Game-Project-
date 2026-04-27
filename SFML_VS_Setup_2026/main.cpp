@@ -17,7 +17,7 @@ int main()
 
     // Font We Use in Our Game Downloaded from text downloader
     sf::Font font;
-    font.loadFromFile("Orbitron-VariableFont_wght.ttf");
+    font.loadFromFile("assets/Title.ttf");
 
     // These classes are essential for my LOGGIN PHASE 
     // DataBase Manager Handles all the DATA saving and retrinving things.... Creating user 
@@ -97,6 +97,8 @@ int main()
 
                 if (result == 3)
                 {
+                    gameplay.reset();
+                    gameplay.reset();
                     currentScreen = 3;      // Go to gameplay
                 }
                 else if (result == 1)

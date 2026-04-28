@@ -426,7 +426,10 @@ public:
     }
 
 
-
+    void addLife()
+    {
+        lives++;
+    }
 
 
 

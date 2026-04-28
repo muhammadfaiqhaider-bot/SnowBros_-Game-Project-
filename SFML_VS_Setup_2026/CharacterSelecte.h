@@ -19,7 +19,7 @@ private:
 public:
     CharacterSelect()
     {
-        font.loadFromFile("Orbitron-VariableFont_wght.ttf");
+        font.loadFromFile("assets/Text.ttf");
 
         selectedCharacter = 0;      // Nick selected by default
 

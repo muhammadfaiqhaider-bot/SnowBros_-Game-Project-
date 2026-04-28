@@ -6,6 +6,7 @@ class Knives : public Projectile
 public:
     Knives(float startX, float startY, float targetX, float targetY, float limit) : Projectile(startX, startY, limit, limit)
     {
+
         calculateDirection(targetX, targetY, 4.0f);      // Use Projectile's Class calculateDirection method
     }                                                  // speed is passed, as throables are kinda fast so pass slightly high value
 
@@ -17,7 +18,7 @@ public:
         }
 
         x = x + velocityX;                         // Update Positions along x-axis
-        y = y + velocityY;                         // Update Positions along y-axis
+    //    y = y + velocityY;                         // Update Positions along y-axis
 
         checkScreenBoundary();                     // Check for screen Limit.....Either satisfy resolutionso of game that is 600x600
     }
@@ -35,6 +36,10 @@ public:
         knifeShape.setPosition(x, y);
         window.draw(knifeShape);
     }
+
+
+
+
 
     ~Knives()
     {

@@ -49,7 +49,7 @@ public:
         isRolling = false;
         rollVelocityX = 0;
         rollTimer = 0;
-        rollDuration = 240;     // 4 seconds at 60 FPS
+        rollDuration = 180;     // 3 seconds at 60 FPS
         isDead = false;
 
         if (enemyTexture.loadFromFile("assets/Botom_Blue.png")) //Animation shyt, setting texture to the botom png. - cheema
@@ -170,7 +170,7 @@ public:
             rollTimer++;
             if (rollTimer >= rollDuration)
             {
-                isDead = true;      // Vanish after 4 seconds
+                isDead = true;      // Vanish after 3 seconds
             }
 
             return;
@@ -388,8 +388,11 @@ public:
     {
         isDead = true;
         snowCovered = true;
+        isRolling = false;
         velocityX = 0;
         velocityY = 0;
+        health = 0;
+        hitCount = 3;
     }
 
 

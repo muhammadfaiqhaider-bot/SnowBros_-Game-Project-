@@ -4,6 +4,7 @@
 #include "HUD.h"
 #include "Level1.h"
 #include "Level2.h"
+#include "Level3.h"
 
 class GamePlay
 {
@@ -14,6 +15,7 @@ private:
     int currentLevelNumber;
     Level1* level1;
     Level2* level2;
+    Level3* level3;
 
 
     std::string saveMessage;
@@ -35,6 +37,7 @@ public:
         // Start with level 1
         level1 = new Level1();
         level2 = new Level2();
+        level3 = new Level3();
 
     }
 
@@ -139,6 +142,28 @@ public:
         }
 
 
+
+        if (currentLevelNumber == 3 && level3 != nullptr)
+        {
+            level3->update(nick.getPositionX(), nick.getPositionY(), platforms, 6);
+
+            if (nick.getSnowball() != nullptr)
+            {
+                level3->checkSnowballCollision(nick.getSnowball());
+            }
+
+            if (level3->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
+            {
+                nick.loseLife();
+            }
+
+            if (level3->isLevelComplete())
+            {
+                return 6;
+            }
+        }
+
+
         return 3;
     }
 
@@ -160,6 +185,10 @@ public:
         if (currentLevelNumber == 2 && level2 != nullptr)
         {
             level2->draw(window);
+        }
+        if (currentLevelNumber == 3 && level3 != nullptr)
+        {
+            level3->draw(window);
         }
         // Draw snowball
         nick.drawSnowball(window);
@@ -200,6 +229,10 @@ public:
         if (currentLevelNumber == 2 && level2 != nullptr)
         {
             level2->draw(window);
+        }
+        if (currentLevelNumber == 3 && level3 != nullptr)
+        {
+            level3->draw(window);
         }
 
         nick.displayPlayer(window);
@@ -244,6 +277,11 @@ public:
         {
             delete level2;
             level2 = nullptr;
+        }
+        if (level3 != nullptr)
+        {
+            delete level3;
+            level3 = nullptr;
         }
     }
 

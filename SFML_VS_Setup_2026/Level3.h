@@ -2,39 +2,43 @@
 #include <SFML/Graphics.hpp>
 #include "Botom.h"
 #include "FlyingFoogo.h"
+#include "Tornado.h"
 #include "SnowBall.h"
 
-
-class Level2
+class Level3
 {
 private:
-    static const int BOTOM_COUNT = 2;
-    static const int FLYING_COUNT = 3;
+    static const int BOTOM_COUNT = 1;
+    static const int FLYING_COUNT = 1;
+    static const int TORNADO_COUNT = 3;
 
     Botom* botoms[BOTOM_COUNT];
     FlyingFoogaFoog* flyingEnemies[FLYING_COUNT];
+    Tornado* tornados[TORNADO_COUNT];
 
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     bool backgroundLoaded;
 
 public:
-    Level2()
+    Level3()
     {
-        // ---- Spawn 5 Botoms ----
+        // ---- Spawn Botoms ----
         botoms[0] = new Botom(100.f, 520.f);
-        botoms[1] = new Botom(250.f, 520.f);
-        botoms[2] = new Botom(400.f, 520.f);
-        botoms[3] = new Botom(150.f, 380.f);
-        botoms[4] = new Botom(450.f, 380.f);
+        botoms[1] = new Botom(300.f, 520.f);
+        botoms[2] = new Botom(500.f, 380.f);
 
-        // ---- Spawn 3 FlyingFoogo ----
+        // ---- Spawn FlyingFoogo ----
         flyingEnemies[0] = new FlyingFoogaFoog(200.f, 240.f);
-        flyingEnemies[1] = new FlyingFoogaFoog(400.f, 100.f);
-        flyingEnemies[2] = new FlyingFoogaFoog(100.f, 100.f);
+        flyingEnemies[1] = new FlyingFoogaFoog(450.f, 100.f);
+
+        // ---- Spawn Tornados ----
+        tornados[0] = new Tornado(150.f, 100.f);
+        tornados[1] = new Tornado(400.f, 240.f);
+        tornados[2] = new Tornado(300.f, 380.f);
 
         // ---- Load background ----
-        backgroundLoaded = backgroundTexture.loadFromFile("assets/bg_level2.png");
+        backgroundLoaded = backgroundTexture.loadFromFile("assets/bg_level3.png");
         if (backgroundLoaded)
         {
             backgroundSprite.setTexture(backgroundTexture);
@@ -59,7 +63,6 @@ public:
                 continue;
             }
 
-            // Platform collision
             botoms[i]->setOnGround(false);
 
             for (int j = 0; j < platformCount; j++)
@@ -86,7 +89,6 @@ public:
                 }
             }
 
-            // Wall check
             if (botoms[i]->getPositionX() <= 0 ||
                 botoms[i]->getPositionX() >= 560)
             {
@@ -106,11 +108,9 @@ public:
 
             flyingEnemies[i]->setOnGround(false);
 
-            // Only check ground platform (index 0) when flying
-            // Check all platforms only when NOT flying
             if (flyingEnemies[i]->getIsFlying())
             {
-                // Only bottom ground platform collision during flight
+                // Only ground platform during flight
                 sf::FloatRect flyingBounds(
                     flyingEnemies[i]->getPositionX(),
                     flyingEnemies[i]->getPositionY(),
@@ -131,7 +131,7 @@ public:
             }
             else
             {
-                // Not flying - check ALL platforms normally
+                // All platforms when walking
                 for (int j = 0; j < platformCount; j++)
                 {
                     sf::FloatRect flyingBounds(
@@ -157,7 +157,71 @@ public:
             flyingEnemies[i]->movementsUpdate();
         }
 
-        // ---- Rolling Botom kills other enemies ----
+        // ---- Update Tornados ----
+        for (int i = 0; i < TORNADO_COUNT; i++)
+        {
+            if (tornados[i] == nullptr || tornados[i]->getIsDead())
+            {
+                continue;
+            }
+
+            tornados[i]->setOnGround(false);
+
+            if (tornados[i]->getIsFlying())
+            {
+                // Only ground platform during flight/teleport
+                sf::FloatRect tornadoBounds(
+                    tornados[i]->getPositionX(),
+                    tornados[i]->getPositionY(),
+                    40.f, 40.f
+                );
+                sf::FloatRect groundBounds = platforms[0].getGlobalBounds();
+
+                if (tornadoBounds.intersects(groundBounds))
+                {
+                    float groundTop = platforms[0].getPosition().y;
+
+                    if (tornados[i]->getPositionY() + 40.f <= groundTop + 10.f)
+                    {
+                        tornados[i]->setOnGround(true);
+                        tornados[i]->snapToGround(groundTop - 40.f);
+                    }
+                }
+            }
+            else
+            {
+                // All platforms when walking
+                for (int j = 0; j < platformCount; j++)
+                {
+                    sf::FloatRect tornadoBounds(
+                        tornados[i]->getPositionX(),
+                        tornados[i]->getPositionY(),
+                        40.f, 40.f
+                    );
+                    sf::FloatRect platformBounds = platforms[j].getGlobalBounds();
+
+                    if (tornadoBounds.intersects(platformBounds))
+                    {
+                        float platformTop = platforms[j].getPosition().y;
+                        float tornadoBottom = tornados[i]->getPositionY() + 40.f;
+
+                        if (tornadoBottom >= platformTop &&
+                            tornados[i]->getPositionY() < platformTop &&
+                            tornados[i]->getVelocityY() >= 0)
+                        {
+                            tornados[i]->setOnGround(true);
+                            tornados[i]->snapToGround(platformTop - 39.99f);
+                        }
+                    }
+                }
+            }
+
+            // Update player position for knife throwing
+            tornados[i]->setPlayerPosition(playerX, playerY);
+            tornados[i]->movementsUpdate();
+        }
+
+        // ---- Chain kill check ----
         checkChainKill();
     }
 
@@ -174,7 +238,7 @@ public:
 
         sf::FloatRect snowballBounds = snowball->getHitBox();
 
-        // Check against Botoms
+        // Check Botoms
         for (int i = 0; i < BOTOM_COUNT; i++)
         {
             if (botoms[i] == nullptr || botoms[i]->getIsDead())
@@ -192,7 +256,6 @@ public:
             {
                 if (botoms[i]->getIsEncased() && !botoms[i]->getIsRolling())
                 {
-                    // Launch rolling
                     botoms[i]->kickRoll(snowball->getDirection());
                     snowball->deactivate();
                     return;
@@ -207,7 +270,7 @@ public:
             }
         }
 
-        // Check against FlyingFoogo
+        // Check FlyingFoogo
         for (int i = 0; i < FLYING_COUNT; i++)
         {
             if (flyingEnemies[i] == nullptr || flyingEnemies[i]->getIsDead())
@@ -225,7 +288,6 @@ public:
             {
                 if (flyingEnemies[i]->getIsEncased() && !flyingEnemies[i]->getIsRolling())
                 {
-                    // Launch rolling
                     flyingEnemies[i]->kickRoll(snowball->getDirection());
                     snowball->deactivate();
                     return;
@@ -234,6 +296,38 @@ public:
                 if (!flyingEnemies[i]->getIsEncased())
                 {
                     flyingEnemies[i]->reduceHealth();
+                    snowball->deactivate();
+                    return;
+                }
+            }
+        }
+
+        // Check Tornados
+        for (int i = 0; i < TORNADO_COUNT; i++)
+        {
+            if (tornados[i] == nullptr || tornados[i]->getIsDead())
+            {
+                continue;
+            }
+
+            sf::FloatRect enemyBounds(
+                tornados[i]->getPositionX(),
+                tornados[i]->getPositionY(),
+                40.f, 40.f
+            );
+
+            if (snowballBounds.intersects(enemyBounds))
+            {
+                if (tornados[i]->getIsEncased() && !tornados[i]->getIsRolling())
+                {
+                    tornados[i]->kickRoll(snowball->getDirection());
+                    snowball->deactivate();
+                    return;
+                }
+
+                if (!tornados[i]->getIsEncased())
+                {
+                    tornados[i]->reduceHealth();
                     snowball->deactivate();
                     return;
                 }
@@ -257,7 +351,6 @@ public:
                 continue;
             }
 
-            // Encased stationary - safe to touch
             if (botoms[i]->getIsEncased() && !botoms[i]->getIsRolling())
             {
                 continue;
@@ -283,7 +376,6 @@ public:
                 continue;
             }
 
-            // Encased stationary - safe to touch
             if (flyingEnemies[i]->getIsEncased() && !flyingEnemies[i]->getIsRolling())
             {
                 continue;
@@ -292,6 +384,31 @@ public:
             sf::FloatRect enemyBounds(
                 flyingEnemies[i]->getPositionX(),
                 flyingEnemies[i]->getPositionY(),
+                40.f, 40.f
+            );
+
+            if (playerBounds.intersects(enemyBounds))
+            {
+                return true;
+            }
+        }
+
+        // Check Tornados
+        for (int i = 0; i < TORNADO_COUNT; i++)
+        {
+            if (tornados[i] == nullptr || tornados[i]->getIsDead())
+            {
+                continue;
+            }
+
+            if (tornados[i]->getIsEncased() && !tornados[i]->getIsRolling())
+            {
+                continue;
+            }
+
+            sf::FloatRect enemyBounds(
+                tornados[i]->getPositionX(),
+                tornados[i]->getPositionY(),
                 40.f, 40.f
             );
 
@@ -310,35 +427,31 @@ public:
 
     bool isLevelComplete()
     {
-        // Check all Botoms dead
         for (int i = 0; i < BOTOM_COUNT; i++)
         {
-            if (botoms[i] == nullptr)
-            {
-                continue;
-            }
-
-            if (!botoms[i]->getIsDead())
+            if (botoms[i] != nullptr && !botoms[i]->getIsDead())
             {
                 return false;
             }
         }
 
-        // Check all FlyingFoogo dead
         for (int i = 0; i < FLYING_COUNT; i++)
         {
-            if (flyingEnemies[i] == nullptr)
-            {
-                continue;
-            }
-
-            if (!flyingEnemies[i]->getIsDead())
+            if (flyingEnemies[i] != nullptr && !flyingEnemies[i]->getIsDead())
             {
                 return false;
             }
         }
 
-        return true;    // All dead!
+        for (int i = 0; i < TORNADO_COUNT; i++)
+        {
+            if (tornados[i] != nullptr && !tornados[i]->getIsDead())
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // ==========================================
@@ -352,7 +465,6 @@ public:
             window.draw(backgroundSprite);
         }
 
-        // Draw Botoms
         for (int i = 0; i < BOTOM_COUNT; i++)
         {
             if (botoms[i] != nullptr && !botoms[i]->getIsDead())
@@ -361,12 +473,19 @@ public:
             }
         }
 
-        // Draw FlyingFoogo
         for (int i = 0; i < FLYING_COUNT; i++)
         {
             if (flyingEnemies[i] != nullptr && !flyingEnemies[i]->getIsDead())
             {
                 flyingEnemies[i]->DisplayEnemy(window);
+            }
+        }
+
+        for (int i = 0; i < TORNADO_COUNT; i++)
+        {
+            if (tornados[i] != nullptr && !tornados[i]->getIsDead())
+            {
+                tornados[i]->DisplayEnemy(window);
             }
         }
     }
@@ -375,7 +494,7 @@ public:
     // DESTRUCTOR
     // ==========================================
 
-    ~Level2()
+    ~Level3()
     {
         for (int i = 0; i < BOTOM_COUNT; i++)
         {
@@ -394,6 +513,15 @@ public:
                 flyingEnemies[i] = nullptr;
             }
         }
+
+        for (int i = 0; i < TORNADO_COUNT; i++)
+        {
+            if (tornados[i] != nullptr)
+            {
+                delete tornados[i];
+                tornados[i] = nullptr;
+            }
+        }
     }
 
 private:
@@ -404,119 +532,55 @@ private:
 
     void checkChainKill()
     {
-        // Rolling Botom kills other Botoms
+        // All rolling enemies - check against all others
+        Botom* allEnemies[BOTOM_COUNT + FLYING_COUNT + TORNADO_COUNT];
+        int totalCount = 0;
+
         for (int i = 0; i < BOTOM_COUNT; i++)
         {
-            if (botoms[i] == nullptr || !botoms[i]->getIsRolling())
-            {
-                continue;
-            }
-
-            sf::FloatRect rollingBounds(
-                botoms[i]->getPositionX(),
-                botoms[i]->getPositionY(),
-                44.f, 44.f
-            );
-
-            // Check against other Botoms
-            for (int j = 0; j < BOTOM_COUNT; j++)
-            {
-                if (i == j || botoms[j] == nullptr ||
-                    botoms[j]->getIsDead() || botoms[j]->getIsRolling())
-                {
-                    continue;
-                }
-
-                sf::FloatRect otherBounds(
-                    botoms[j]->getPositionX(),
-                    botoms[j]->getPositionY(),
-                    40.f, 40.f
-                );
-
-                if (rollingBounds.intersects(otherBounds))
-                {
-                    botoms[j]->instantKill();
-                }
-            }
-
-            // Check against FlyingFoogo
-            for (int j = 0; j < FLYING_COUNT; j++)
-            {
-                if (flyingEnemies[j] == nullptr ||
-                    flyingEnemies[j]->getIsDead() ||
-                    flyingEnemies[j]->getIsRolling())
-                {
-                    continue;
-                }
-
-                sf::FloatRect otherBounds(
-                    flyingEnemies[j]->getPositionX(),
-                    flyingEnemies[j]->getPositionY(),
-                    40.f, 40.f
-                );
-
-                if (rollingBounds.intersects(otherBounds))
-                {
-                    flyingEnemies[j]->instantKill();
-                }
-            }
+            allEnemies[totalCount++] = botoms[i];
         }
-
-        // Rolling FlyingFoogo kills others too
         for (int i = 0; i < FLYING_COUNT; i++)
         {
-            if (flyingEnemies[i] == nullptr || !flyingEnemies[i]->getIsRolling())
+            allEnemies[totalCount++] = flyingEnemies[i];
+        }
+        for (int i = 0; i < TORNADO_COUNT; i++)
+        {
+            allEnemies[totalCount++] = tornados[i];
+        }
+
+        // Check rolling vs all others
+        for (int i = 0; i < totalCount; i++)
+        {
+            if (allEnemies[i] == nullptr || !allEnemies[i]->getIsRolling())
             {
                 continue;
             }
 
             sf::FloatRect rollingBounds(
-                flyingEnemies[i]->getPositionX(),
-                flyingEnemies[i]->getPositionY(),
+                allEnemies[i]->getPositionX(),
+                allEnemies[i]->getPositionY(),
                 44.f, 44.f
             );
 
-            // Check against Botoms
-            for (int j = 0; j < BOTOM_COUNT; j++)
+            for (int j = 0; j < totalCount; j++)
             {
-                if (botoms[j] == nullptr ||
-                    botoms[j]->getIsDead() ||
-                    botoms[j]->getIsRolling())
+                if (i == j || allEnemies[j] == nullptr ||
+                    allEnemies[j]->getIsDead() ||
+                    allEnemies[j]->getIsRolling())
                 {
                     continue;
                 }
 
                 sf::FloatRect otherBounds(
-                    botoms[j]->getPositionX(),
-                    botoms[j]->getPositionY(),
+                    allEnemies[j]->getPositionX(),
+                    allEnemies[j]->getPositionY(),
                     40.f, 40.f
                 );
 
                 if (rollingBounds.intersects(otherBounds))
                 {
-                    botoms[j]->instantKill();
-                }
-            }
-
-            // Check against other FlyingFoogo
-            for (int j = 0; j < FLYING_COUNT; j++)
-            {
-                if (i == j || flyingEnemies[j] == nullptr ||
-                    flyingEnemies[j]->getIsDead() ||
-                    flyingEnemies[j]->getIsRolling())
-                {
-                    continue;
-                }
-
-                sf::FloatRect otherBounds(
-                    flyingEnemies[j]->getPositionX(),
-                    flyingEnemies[j]->getPositionY(),
-                    40.f, 40.f
-                );
-
-                if (rollingBounds.intersects(otherBounds))
-                {
-                    flyingEnemies[j]->instantKill();
+                    allEnemies[j]->instantKill();
                 }
             }
         }

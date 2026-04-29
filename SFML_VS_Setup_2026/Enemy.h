@@ -107,6 +107,15 @@ public:
         return velocityY;
     }
 
+    virtual bool getIsDead() { return false; }
+    virtual bool getIsEncased() { return snowCovered; }
+    virtual bool getIsRolling() { return false; }
+    virtual void kickRoll(int direction) {}
+    virtual void instantKill() {}
+    virtual float getRollVelocityX() { return 0.f; }
+    virtual void setHitWall(bool value) {}
+    virtual void setOnGround(bool value) {}
+    virtual void snapToGround(float groundY) { y = groundY; velocityY = 0; }
 
     // CHEEEMA This is a hitbox function that returns the invisible rectangular boundary around my sprite which is used for collision detection.
     // Nilla i aint blind - Cheema

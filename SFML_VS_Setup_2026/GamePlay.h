@@ -2,7 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include "Nick.h"
 #include "HUD.h"
-#include "levels.h"
+#include "Level1.h"
+#include "Level2.h"
+
 class GamePlay
 {
 private:
@@ -28,7 +30,7 @@ public:
         saveMessageTimer = 0;
         currentLevelNumber = 1;
 
-        setupPlatforms();
+        
         levels[0] = new Level1();
         levels[1] = new Level2();
         totalLevels = 2;
@@ -193,39 +195,6 @@ public:
 
 private:
 
-
-    void setupPlatforms()
-    {
-        // Platform 1 - Ground
-        platforms[0].setSize(sf::Vector2f(600.f, 20.f));
-        platforms[0].setFillColor(sf::Color(128, 0, 128));
-        platforms[0].setPosition(0.f, 560.f);
-
-        // Platform 2 - Middle Left
-        platforms[1].setSize(sf::Vector2f(250.f, 20.f));
-        platforms[1].setFillColor(sf::Color(128, 0, 128));
-        platforms[1].setPosition(0.f, 420.f);
-
-        // Platform 3 - Middle Right
-        platforms[2].setSize(sf::Vector2f(250.f, 20.f));
-        platforms[2].setFillColor(sf::Color(128, 0, 128));
-        platforms[2].setPosition(350.f, 420.f);
-
-        // Platform 4 - Upper Middle
-        platforms[3].setSize(sf::Vector2f(300.f, 20.f));
-        platforms[3].setFillColor(sf::Color(128, 0, 128));
-        platforms[3].setPosition(150.f, 280.f);
-
-        // Platform 5 - Top Left
-        platforms[4].setSize(sf::Vector2f(200.f, 20.f));
-        platforms[4].setFillColor(sf::Color(128, 0, 128));
-        platforms[4].setPosition(0.f, 140.f);
-
-        // Platform 6 - Top Right
-        platforms[5].setSize(sf::Vector2f(200.f, 20.f));
-        platforms[5].setFillColor(sf::Color(128, 0, 128));
-        platforms[5].setPosition(400.f, 140.f);
-    }
 
 
     void handlePlayerPlatformCollision()

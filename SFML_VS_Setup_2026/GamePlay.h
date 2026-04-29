@@ -6,6 +6,7 @@
 #include "levels.h"
 #include "Level1.h"
 #include "Level2.h"
+<<<<<<< HEAD
 #include "Level3.h"
 #include "Level4.h"
 #include "Level5.h"
@@ -15,6 +16,8 @@
 #include "Level9.h"
 #include "Level10.h"
 
+=======
+>>>>>>> ffc21b01c7fd8b9993a5a0810c34c12abab3c75c
 
 class GamePlay
 {
@@ -41,6 +44,7 @@ public:
         saveMessageTimer = 0;
         currentLevelNumber = 1;
 
+<<<<<<< HEAD
         setupPlatforms();
         levels[0] = new Level1();
         levels[1] = new Level2();
@@ -53,6 +57,12 @@ public:
         levels[8] = new Level9();
         levels[9] = new Level10();
         totalLevels = 10;
+=======
+        
+        levels[0] = new Level1();
+        levels[1] = new Level2();
+        totalLevels = 2;
+>>>>>>> ffc21b01c7fd8b9993a5a0810c34c12abab3c75c
         for (int i = totalLevels; i < 10; i++)
             levels[i] = nullptr;
     }
@@ -89,7 +99,11 @@ public:
             {
                 if (current->checkSnowballCollision(nick.getSnowball()))
                 {
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> ffc21b01c7fd8b9993a5a0810c34c12abab3c75c
                 }
             }
 
@@ -124,6 +138,7 @@ public:
         Level* current = levels[currentLevelNumber - 1];
         if (current != nullptr)
             current->draw(window);
+<<<<<<< HEAD
 
         // Debug / fallback: if level has no platforms (blank) draw gameplay's platforms
         if (current == nullptr || current->getPlatformCount() == 0)
@@ -131,11 +146,14 @@ public:
             for (int i = 0; i < 6; i++)
                 window.draw(platforms[i]);
         }
+=======
+>>>>>>> ffc21b01c7fd8b9993a5a0810c34c12abab3c75c
 
         nick.drawSnowball(window);
         nick.displayPlayer(window);
         hud.draw(window);
 
+<<<<<<< HEAD
         // Draw current level number and platform count for debugging
         sf::Text lvlText;
         lvlText.setFont(font);
@@ -147,6 +165,8 @@ public:
         lvlText.setPosition(10.f, 560.f);
         window.draw(lvlText);
 
+=======
+>>>>>>> ffc21b01c7fd8b9993a5a0810c34c12abab3c75c
         if (saveMessageTimer > 0)
         {
             sf::Text saveText;
@@ -202,7 +222,11 @@ public:
         nick = Nick(100.f, 520.f);
         saveMessage = "";
         saveMessageTimer = 0;
+<<<<<<< HEAD
         // levelTimer = 0;
+=======
+       // levelTimer = 0;
+>>>>>>> ffc21b01c7fd8b9993a5a0810c34c12abab3c75c
 
         for (int i = 0; i < 10; i++)
         {
@@ -215,6 +239,7 @@ public:
 
         levels[0] = new Level1();
         levels[1] = new Level2();
+<<<<<<< HEAD
         levels[2] = new Level3();
         levels[3] = new Level4();
         levels[4] = new Level5();
@@ -225,6 +250,9 @@ public:
         levels[9] = new Level10();
 
         totalLevels = 10;
+=======
+        totalLevels = 2;
+>>>>>>> ffc21b01c7fd8b9993a5a0810c34c12abab3c75c
     }
 
     ~GamePlay()
@@ -241,39 +269,6 @@ public:
 
 private:
 
-
-    void setupPlatforms()
-    {
-        // Platform 1 - Ground
-        platforms[0].setSize(sf::Vector2f(600.f, 20.f));
-        platforms[0].setFillColor(sf::Color(128, 0, 128));
-        platforms[0].setPosition(0.f, 560.f);
-
-        // Platform 2 - Middle Left
-        platforms[1].setSize(sf::Vector2f(250.f, 20.f));
-        platforms[1].setFillColor(sf::Color(128, 0, 128));
-        platforms[1].setPosition(0.f, 420.f);
-
-        // Platform 3 - Middle Right
-        platforms[2].setSize(sf::Vector2f(250.f, 20.f));
-        platforms[2].setFillColor(sf::Color(128, 0, 128));
-        platforms[2].setPosition(350.f, 420.f);
-
-        // Platform 4 - Upper Middle
-        platforms[3].setSize(sf::Vector2f(300.f, 20.f));
-        platforms[3].setFillColor(sf::Color(128, 0, 128));
-        platforms[3].setPosition(150.f, 280.f);
-
-        // Platform 5 - Top Left
-        platforms[4].setSize(sf::Vector2f(200.f, 20.f));
-        platforms[4].setFillColor(sf::Color(128, 0, 128));
-        platforms[4].setPosition(0.f, 140.f);
-
-        // Platform 6 - Top Right
-        platforms[5].setSize(sf::Vector2f(200.f, 20.f));
-        platforms[5].setFillColor(sf::Color(128, 0, 128));
-        platforms[5].setPosition(400.f, 140.f);
-    }
 
 
     void handlePlayerPlatformCollision()

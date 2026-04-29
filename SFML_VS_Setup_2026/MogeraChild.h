@@ -41,9 +41,10 @@ public:
         {
             return;
         }
+
         if (!onGround)
         {
-            velocityY = velocityY + 0.5f;                   // This function is used to bring mogera childs to ground
+            velocityY = velocityY + 0.5f;
         }
         else
         {
@@ -53,10 +54,17 @@ public:
         x = x + velocityX;
         y = y + velocityY;
 
-        // Deactivate when goes off screen
-        if (x < 0 || x > 600)
+        // Turn around at walls instead of deactivating
+        if (x < 0)
         {
-            active = false;
+            x = 0;
+            velocityX = -velocityX;     // Reverse direction
+        }
+
+        if (x > 560)
+        {
+            x = 560;
+            velocityX = -velocityX;     // Reverse direction
         }
 
         // Stop at ground level
@@ -90,7 +98,12 @@ public:
         onGround = value;
     }
 
-
+    void snapToGround(float groundY)
+    {
+        y = groundY;
+        velocityY = 0;
+        onGround = true;
+    }
 
 
     void deactivate()

@@ -10,6 +10,8 @@ private:
     float playerX;
     float playerY;
     bool isDefeated;
+    bool onGround;
+    float velocityY;
 
     static const int numberOfChilds = 10;
     MogeraChild child[numberOfChilds];
@@ -26,6 +28,10 @@ public:
         playerX = 0;     // 0 bcz Mogera is stationary ......
         playerY = 0;
 
+
+        onGround = false;
+        velocityY = 0;
+
         isDefeated = false;
     }
 
@@ -38,6 +44,27 @@ public:
 
     void movementsUpdate() override
     {
+
+
+        if (isDefeated)
+        {
+            return;
+        }
+
+        // Apply gravity
+        if (!onGround)
+        {
+            velocityY += 0.5f;
+            if (velocityY > 8.f)
+            {
+                velocityY = 8.f;
+            }
+            y += velocityY;
+        }
+        else
+        {
+            velocityY = 0;
+        }
 
         if (isDefeated)                      // base condition if it is defeated we ll be instantly 
         {                                    // backed from the function..........
@@ -68,6 +95,26 @@ public:
             }
         }
     }
+
+
+    void snapChildToGround(int index, float groundY)
+    {
+        if (index >= 0 && index < numberOfChilds)
+        {
+            child[index].snapToGround(groundY);
+            child[index].setOnGround(true);
+        }
+    }
+
+
+    void deactivateChild(int index)
+    {
+        if (index >= 0 && index < numberOfChilds)
+        {
+            child[index].deactivate();
+        }
+    }
+
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
@@ -123,6 +170,12 @@ public:
         return isDefeated;
     }
 
+    // Integrate with Level's expectation
+    bool getIsDead() override
+    {
+        return isDefeated;
+    }
+
 
 
     void setChildOnGround(int index, bool value)
@@ -148,6 +201,17 @@ public:
     }
 
 
+    void setOnGround(bool value)
+    {
+        onGround = value;
+    }
+
+    void snapToGround(float groundY)
+    {
+        y = groundY;
+        velocityY = 0;
+        onGround = true;
+    }
 
 
 

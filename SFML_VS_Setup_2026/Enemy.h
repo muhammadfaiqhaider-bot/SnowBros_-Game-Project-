@@ -52,6 +52,16 @@ public:
     virtual void movementsUpdate() = 0;
     virtual void DisplayEnemy(sf::RenderWindow& window) = 0;
 
+    virtual bool getIsDead() { return false; }
+    virtual bool getIsEncased() { return snowCovered; }
+    virtual bool getIsRolling() { return false; }
+    virtual void kickRoll(int direction) {}
+    virtual void instantKill() {}
+    virtual float getRollVelocityX() { return 0.f; }
+    virtual void setHitWall(bool value) {}
+    virtual void setOnGround(bool value) {}
+    virtual void snapToGround(float groundY) { y = groundY; velocityY = 0; }
+
 
     // Reducing Health Logic
     virtual void reduceHealth()

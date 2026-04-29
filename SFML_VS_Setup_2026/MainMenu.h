@@ -6,7 +6,6 @@ class MainMenu
 {
 private:
     sf::Font font;
-    sf::Font texts;
 
     // Button hover effect
     bool playHovered;
@@ -16,9 +15,7 @@ private:
 public:
     MainMenu()
     {
-        font.loadFromFile("assets/Title.ttf");
-
-        texts.loadFromFile("assets/Text.ttf");
+        font.loadFromFile("Orbitron-VariableFont_wght.ttf");
 
         playHovered = false;
         leaderboardHovered = false;
@@ -123,7 +120,7 @@ public:
 
         // ---- WELCOME TEXT ----
         sf::Text welcome;
-        welcome.setFont(texts);
+        welcome.setFont(font);
         welcome.setString("Welcome,  " + playerName);
         welcome.setCharacterSize(18);
         welcome.setFillColor(sf::Color(180, 180, 255));
@@ -175,7 +172,7 @@ private:
 
         // Button text
         sf::Text buttonText;
-        buttonText.setFont(texts);
+        buttonText.setFont(font);
         buttonText.setString(text);
         buttonText.setCharacterSize(18);
         buttonText.setFillColor(sf::Color::White);

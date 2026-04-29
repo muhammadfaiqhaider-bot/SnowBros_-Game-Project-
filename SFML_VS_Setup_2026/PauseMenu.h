@@ -16,7 +16,7 @@ private:
 public:
     PauseMenu()
     {
-        font.loadFromFile("assets/Text.ttf");
+        font.loadFromFile("Orbitron-VariableFont_wght.ttf");
 
         resumeHovered = false;
         shopHovered = false;

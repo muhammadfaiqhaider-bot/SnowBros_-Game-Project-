@@ -1,6 +1,7 @@
 #pragma once
 #include "Enemy.h"
 #include "Rocket.h"
+#include "PLayer.h"
 #include <cmath>
 
 
@@ -21,6 +22,9 @@ private:
     float playerX;
     float playerY;
 
+    bool onGround;
+    float velocityY;
+
 public:
     Gamakichi(float posX, float posY) : Enemy(posX, posY, "Gamakichi")
     {                                                              // Gamakichi He is the final boss so he ll  have zada power
@@ -34,6 +38,9 @@ public:
 
         playerX = 0;
         playerY = 0;
+
+        onGround = false;
+        velocityY = 0;
 
         for (int i = 0; i < MAX_ROCKETS; i++)
         {
@@ -59,6 +66,21 @@ public:
         {
             x = 0;
         }
+
+        if (!onGround)
+        {
+            velocityY += 0.5f;
+            if (velocityY > 8.f)
+            {
+                velocityY = 8.f;
+            }
+            y += velocityY;
+        }
+        else
+        {
+            velocityY = 0;
+        }
+
         if (x > 520)        // 600 - 80 (boss width)
         {
             x = 520;
@@ -229,10 +251,55 @@ public:
         return isDefeated;
     }
 
+    void setOnGround(bool value)
+    {
+        onGround = value;
+    }
+
+    void snapToGround(float groundY)
+    {
+        y = groundY;
+        velocityY = 0;
+        onGround = true;
+    }
+
     int getPhase()
     {
         return phase;
     }
+
+
+
+
+
+    bool isRocketHittingPlayer(float playerX, float playerY)
+    {
+        sf::FloatRect playerBounds(playerX, playerY, 40.f, 40.f);
+
+        for (int i = 0; i < MAX_ROCKETS; i++)
+        {
+            if (rockets[i] == nullptr || !rockets[i]->isActive())
+            {
+                continue;
+            }
+
+            sf::FloatRect rocketBounds(
+                rockets[i]->getX(),
+                rockets[i]->getY(),
+                15.f, 8.f
+            );
+
+            if (rocketBounds.intersects(playerBounds))
+            {
+                rockets[i]->deactivate();   // Rocket disappears on hit
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 
     ~Gamakichi()
     {

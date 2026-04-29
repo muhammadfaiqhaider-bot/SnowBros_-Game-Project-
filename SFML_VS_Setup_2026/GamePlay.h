@@ -1,10 +1,20 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "Nick.h"
 #include "HUD.h"
+#include "levels.h"
 #include "Level1.h"
 #include "Level2.h"
 #include "Level3.h"
+#include "Level4.h"
+#include "Level5.h"
+#include "Level6.h"
+#include "Level7.h"
+#include "Level8.h"
+#include "Level9.h"
+#include "Level10.h"
+
 
 class GamePlay
 {
@@ -13,9 +23,8 @@ private:
     Nick nick;
     HUD hud;
     int currentLevelNumber;
-    Level1* level1;
-    Level2* level2;
-    Level3* level3;
+    Level* levels[10];
+    int totalLevels;
 
 
     std::string saveMessage;
@@ -33,12 +42,19 @@ public:
         currentLevelNumber = 1;
 
         setupPlatforms();
-
-        // Start with level 1
-        level1 = new Level1();
-        level2 = new Level2();
-        level3 = new Level3();
-
+        levels[0] = new Level1();
+        levels[1] = new Level2();
+        levels[2] = new Level3();
+        levels[3] = new Level4();
+        levels[4] = new Level5();
+        levels[5] = new Level6();
+        levels[6] = new Level7();
+        levels[7] = new Level8();
+        levels[8] = new Level9();
+        levels[9] = new Level10();
+        totalLevels = 10;
+        for (int i = totalLevels; i < 10; i++)
+            levels[i] = nullptr;
     }
 
     int handleEvents(sf::Event& event)
@@ -52,159 +68,85 @@ public:
 
             if (event.key.code == sf::Keyboard::Escape)
             {
-                return 4;     
+                return 4;
             }
         }
 
         return 3;
     }
 
-
     int update()
     {
-        // Player platform collision - physics stay same as before
         handlePlayerPlatformCollision();
 
-        // Update current level enemies
-        if (currentLevelNumber == 1 && level1 != nullptr)
+        Level* current = levels[currentLevelNumber - 1];
+
+        if (current != nullptr)
         {
-            level1->update(
-                nick.getPositionX(),
-                nick.getPositionY(),
-                platforms,
-                6
-            );
-
-            // Check snowball vs enemies
-            if (nick.getSnowball() != nullptr)
-            {
-                level1->checkSnowballCollision(nick.getSnowball());
-            }
-
-            // Check player vs enemies
-            if (level1->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
-            {
-
-                    nick.loseLife();
-      
-            }
-
-            // Check level complete
-            if (level1->isLevelComplete())
-            {
-                return 6;       // Level complete
-            }
-        }
-
-        // Check game over
-        if (!nick.getIsAlive())
-        {
-            return 5;
-        }
-
-        // Update snowball
-        nick.updateSnowball();
-
-        // Update HUD
-        hud.update(
-            nick.getScore(),
-            nick.getLives(),
-            nick.getGemCount(),
-            currentLevelNumber
-        );
-
-        // Update save message timer
-        if (saveMessageTimer > 0)
-        {
-            saveMessageTimer--;
-        }
-
-        // Update player
-        nick.movementsUpdate();
-
-
-        if (currentLevelNumber == 2 && level2 != nullptr)
-        {
-            level2->update(nick.getPositionX(), nick.getPositionY(), platforms, 6);
+            current->update(nick.getPositionX(), nick.getPositionY());
 
             if (nick.getSnowball() != nullptr)
             {
-                level2->checkSnowballCollision(nick.getSnowball());
-            }
-
-            if (level2->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
-            {
-                if (nick.getSnowball() == nullptr)  // Only take damage if snowball isn't active
+                if (current->checkSnowballCollision(nick.getSnowball()))
                 {
-                    nick.loseLife();
+
                 }
             }
 
-            if (level2->isLevelComplete())
-            {
-                return 6;
-            }
-        }
-
-
-
-        if (currentLevelNumber == 3 && level3 != nullptr)
-        {
-            level3->update(nick.getPositionX(), nick.getPositionY(), platforms, 6);
-
-            if (nick.getSnowball() != nullptr)
-            {
-                level3->checkSnowballCollision(nick.getSnowball());
-            }
-
-            if (level3->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
+            if (current->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
             {
                 nick.loseLife();
             }
 
-            if (level3->isLevelComplete())
+            if (current->isLevelComplete())
             {
                 return 6;
             }
         }
 
+        if (!nick.getIsAlive())
+            return 5;
+
+        nick.updateSnowball();
+        hud.update(nick.getScore(), nick.getLives(), nick.getGemCount(), currentLevelNumber);
+
+        if (saveMessageTimer > 0)
+            saveMessageTimer--;
+
+        nick.movementsUpdate();
 
         return 3;
     }
-
     void draw(sf::RenderWindow& window)
     {
         window.clear(sf::Color(200, 150, 150));
 
-        // Draw platforms
-        for (int i = 0; i < 6; i++)
+        Level* current = levels[currentLevelNumber - 1];
+        if (current != nullptr)
+            current->draw(window);
+
+        // Debug / fallback: if level has no platforms (blank) draw gameplay's platforms
+        if (current == nullptr || current->getPlatformCount() == 0)
         {
-            window.draw(platforms[i]);
+            for (int i = 0; i < 6; i++)
+                window.draw(platforms[i]);
         }
 
-        // Draw current level enemies
-        if (currentLevelNumber == 1 && level1 != nullptr)
-        {
-            level1->draw(window);
-        }
-        if (currentLevelNumber == 2 && level2 != nullptr)
-        {
-            level2->draw(window);
-        }
-        if (currentLevelNumber == 3 && level3 != nullptr)
-        {
-            level3->draw(window);
-        }
-        // Draw snowball
         nick.drawSnowball(window);
-
-        // Draw player
         nick.displayPlayer(window);
-
-        // Draw HUD
         hud.draw(window);
 
-        // Draw save message
+        // Draw current level number and platform count for debugging
+        sf::Text lvlText;
+        lvlText.setFont(font);
+        int platformCount = 0;
+        if (current != nullptr) platformCount = current->getPlatformCount();
+        lvlText.setString(std::string("Level: ") + std::to_string(currentLevelNumber) + " P: " + std::to_string(platformCount));
+        lvlText.setCharacterSize(14);
+        lvlText.setFillColor(sf::Color::Yellow);
+        lvlText.setPosition(10.f, 560.f);
+        window.draw(lvlText);
+
         if (saveMessageTimer > 0)
         {
             sf::Text saveText;
@@ -221,30 +163,13 @@ public:
     {
         window.clear(sf::Color(200, 150, 150));
 
-        for (int i = 0; i < 6; i++)
-        {
-            window.draw(platforms[i]);
-        }
-
-        if (currentLevelNumber == 1 && level1 != nullptr)
-        {
-            level1->draw(window);
-        }
-
-        if (currentLevelNumber == 2 && level2 != nullptr)
-        {
-            level2->draw(window);
-        }
-        if (currentLevelNumber == 3 && level3 != nullptr)
-        {
-            level3->draw(window);
-        }
+        Level* current = levels[currentLevelNumber - 1];
+        if (current != nullptr)
+            current->draw(window);
 
         nick.displayPlayer(window);
         hud.draw(window);
     }
-
-
 
     void goNextLevel()
     {
@@ -274,33 +199,43 @@ public:
     void reset()
     {
         currentLevelNumber = 1;
-        nick = Nick(100.f, 520.f);   // Re-construct nick at start position (resets lives/score/gems)
+        nick = Nick(100.f, 520.f);
         saveMessage = "";
         saveMessageTimer = 0;
+        // levelTimer = 0;
 
-        // Reset levels too
-        delete level1;
-        delete level2;
-        level1 = new Level1();
-        level2 = new Level2();
+        for (int i = 0; i < 10; i++)
+        {
+            if (levels[i] != nullptr)
+            {
+                delete levels[i];
+                levels[i] = nullptr;
+            }
+        }
+
+        levels[0] = new Level1();
+        levels[1] = new Level2();
+        levels[2] = new Level3();
+        levels[3] = new Level4();
+        levels[4] = new Level5();
+        levels[5] = new Level6();
+        levels[6] = new Level7();
+        levels[7] = new Level8();
+        levels[8] = new Level9();
+        levels[9] = new Level10();
+
+        totalLevels = 10;
     }
 
     ~GamePlay()
     {
-        if (level1 != nullptr)
+        for (int i = 0; i < 10; i++)
         {
-            delete level1;
-            level1 = nullptr;
-        }
-        if (level2 != nullptr)
-        {
-            delete level2;
-            level2 = nullptr;
-        }
-        if (level3 != nullptr)
-        {
-            delete level3;
-            level3 = nullptr;
+            if (levels[i] != nullptr)
+            {
+                delete levels[i];
+                levels[i] = nullptr;
+            }
         }
     }
 
@@ -343,9 +278,14 @@ private:
 
     void handlePlayerPlatformCollision()
     {
+        if (levels[currentLevelNumber - 1] == nullptr) return;
+
+        sf::RectangleShape* platforms = levels[currentLevelNumber - 1]->getPlatforms();
+        int count = levels[currentLevelNumber - 1]->getPlatformCount();
+
         nick.setOnGround(false);
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < count; i++)
         {
             sf::FloatRect nickBounds(nick.getPositionX(), nick.getPositionY(), 40.f, 40.f);
             sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
@@ -363,6 +303,5 @@ private:
             }
         }
     }
-
 
 };

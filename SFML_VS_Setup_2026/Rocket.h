@@ -24,6 +24,25 @@ public:
         checkScreenBoundary();            // Check for is my projectile inside the game solution range or not....
     }
 
+
+    void deactivate()
+    {
+        active = false;
+    }
+
+
+
+    float getX()
+    {
+        return x;
+    }
+
+    float getY()
+    {
+        return y;
+    }
+
+
     void drawProjectiles(sf::RenderWindow& window) override
     {
         if (!active)

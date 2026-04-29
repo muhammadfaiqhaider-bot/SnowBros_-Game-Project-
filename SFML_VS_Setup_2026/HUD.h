@@ -16,7 +16,7 @@ private:
 public:
     HUD()
     {
-        font.loadFromFile("assets/Text.ttf");
+        font.loadFromFile("Orbitron-VariableFont_wght.ttf");
 
         score = 0;
         lives = 2;

@@ -17,15 +17,10 @@ public:
         addPlatform(400, 140, 200, 20);   // Top right
 
         // Enemies
-<<<<<<< HEAD
         // Level adjustment: 4 Botoms
         addEnemy(new Botom(100.f, 520.f));
         addEnemy(new Botom(250.f, 520.f));
         addEnemy(new Botom(400.f, 520.f));
-=======
-        addEnemy(new Botom(150.f, 520.f));
-        addEnemy(new Botom(350.f, 520.f));
->>>>>>> ffc21b01c7fd8b9993a5a0810c34c12abab3c75c
         addEnemy(new Botom(500.f, 380.f));
     }
 };

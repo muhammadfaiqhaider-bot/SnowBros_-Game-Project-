@@ -6,6 +6,8 @@
 #include "CollisionManager.h"
 #include "Nick.h"
 #include "SnowBall.h"
+#include "Mogera.h"
+#include "Gamakichi.h"
 
 class TestLevel
 {
@@ -21,6 +23,8 @@ private:
     Botom* botoms[BOTOM_COUNT];
     FlyingFoogaFoog* flyingEnemies[FLYING_COUNT];
     Tornado* tornados[TORNADO_COUNT];
+    Mogera* mogera;
+    Gamakichi* gamakichi;
 
 public:
     TestLevel()
@@ -34,7 +38,13 @@ public:
         flyingEnemies[0] = new FlyingFoogaFoog(300.f, 240.f);
 
         tornados[0] = new Tornado(450.f, 100.f);
+
+        mogera = new Mogera(230.f, 200.f);
+
+        gamakichi = new Gamakichi(400.f, 20.f);
+
     }
+
 
     // ==========================================
     // UPDATE
@@ -44,6 +54,40 @@ public:
     {
         // Player collision
         CollisionManager::handlePlayer(player, platforms, 6);
+
+
+
+        // MogeraChild platform collision
+        for (int i = 0; i < mogera->getNumberOfChilds(); i++)
+        {
+            if (mogera->getChildX(i) < 0)
+            {
+                continue;
+            }
+
+            for (int j = 0; j < 6; j++)
+            {
+                sf::FloatRect childBounds(
+                    mogera->getChildX(i),
+                    mogera->getChildY(i),
+                    20.f, 20.f
+                );
+                sf::FloatRect platformBounds = platforms[j].getGlobalBounds();
+
+                if (childBounds.intersects(platformBounds))
+                {
+                    float platformTop = platforms[j].getPosition().y;
+                    float childBottom = mogera->getChildY(i) + 20.f;
+
+                    if (childBottom >= platformTop &&
+                        mogera->getChildY(i) < platformTop)
+                    {
+                        mogera->setChildOnGround(i, true);
+                        mogera->snapChildToGround(i, platformTop - 20.f);
+                    }
+                }
+            }
+        }
 
         // Botom collisions
         for (int i = 0; i < BOTOM_COUNT; i++)
@@ -99,6 +143,90 @@ public:
             }
         }
 
+
+        // Mogera update
+        if (mogera != nullptr && !mogera->getIsDefeated())
+        {
+            // Platform collision for Mogera
+            mogera->setOnGround(false);
+
+            for (int i = 0; i < 6; i++)
+            {
+                sf::FloatRect mogeraBounds(
+                    mogera->getPositionX(),
+                    mogera->getPositionY(),
+                    80.f, 80.f
+                );
+                sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
+
+                if (mogeraBounds.intersects(platformBounds))
+                {
+                    float platformTop = platforms[i].getPosition().y;
+                    float mogeraBottom = mogera->getPositionY() + 80.f;
+
+                    if (mogeraBottom >= platformTop &&
+                        mogera->getPositionY() < platformTop)
+                    {
+                        mogera->setOnGround(true);
+                        mogera->snapToGround(platformTop - 80.f);
+                    }
+                }
+            }
+
+            mogera->setPlayerPosition(
+                player.getPositionX(),
+                player.getPositionY()
+            );
+
+            // Reset child onGround before platform check
+            for (int i = 0; i < mogera->getNumberOfChilds(); i++)
+            {
+                if (mogera->getChildX(i) < 0)
+                {
+                    continue;
+                }
+                mogera->setChildOnGround(i, false);  // Reset first!
+            }
+
+            mogera->movementsUpdate();
+        }
+
+        // Gamakichi update
+        if (gamakichi != nullptr && !gamakichi->getIsDefeated())
+        {
+            // Platform collision for Gamakichi
+            gamakichi->setOnGround(false);
+
+            for (int i = 0; i < 6; i++)
+            {
+                sf::FloatRect gamakichiBounds(
+                    gamakichi->getPositionX(),
+                    gamakichi->getPositionY(),
+                    100.f, 120.f        // Gamakichi size
+                );
+                sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
+
+                if (gamakichiBounds.intersects(platformBounds))
+                {
+                    float platformTop = platforms[i].getPosition().y;
+                    float gamakichiBottom = gamakichi->getPositionY() + 120.f;
+
+                    if (gamakichiBottom >= platformTop &&
+                        gamakichi->getPositionY() < platformTop)
+                    {
+                        gamakichi->setOnGround(true);
+                        gamakichi->snapToGround(platformTop - 120.f);
+                    }
+                }
+            }
+
+            gamakichi->setPlayerPosition(
+                player.getPositionX(),
+                player.getPositionY()
+            );
+            gamakichi->movementsUpdate();
+        }
+
         // Snowball collision
         if (player.getSnowball() != nullptr)
         {
@@ -121,6 +249,12 @@ public:
 
     void draw(sf::RenderWindow& window)
     {
+
+        if (mogera != nullptr && !mogera->getIsDefeated())
+        {
+            mogera->DisplayEnemy(window);
+        }
+
         // Draw platforms
         for (int i = 0; i < 6; i++)
         {
@@ -150,6 +284,11 @@ public:
             {
                 tornados[i]->DisplayEnemy(window);
             }
+        }
+
+        if (gamakichi != nullptr && !gamakichi->getIsDefeated())
+        {
+            gamakichi->DisplayEnemy(window);
         }
     }
 
@@ -199,6 +338,19 @@ public:
                 tornados[i] = nullptr;
             }
         }
+
+        if (mogera != nullptr)
+        {
+            delete mogera;
+            mogera = nullptr;
+        }
+
+        if (gamakichi != nullptr)
+        {
+            delete gamakichi;
+            gamakichi = nullptr;
+        }
+
     }
 
 private:
@@ -329,6 +481,66 @@ private:
                 }
             }
         }
+
+        // Check Mogera
+        if (mogera != nullptr && !mogera->getIsDefeated())
+        {
+            sf::FloatRect mogeraBounds(
+                mogera->getPositionX(),
+                mogera->getPositionY(),
+                80.f, 80.f      // Mogera is bigger
+            );
+
+            if (snowballBounds.intersects(mogeraBounds))
+            {
+                mogera->reduceHealth();
+                snowball->deactivate();
+                return;
+            }
+        }
+        // Check MogeraChild
+        if (mogera != nullptr && !mogera->getIsDefeated())
+        {
+            for (int i = 0; i < mogera->getNumberOfChilds(); i++)
+            {
+                if (mogera->getChildX(i) < 0)
+                {
+                    continue;
+                }
+
+                sf::FloatRect childBounds(
+                    mogera->getChildX(i),
+                    mogera->getChildY(i),
+                    20.f, 20.f
+                );
+
+                if (snowballBounds.intersects(childBounds))
+                {
+                    // Deactivate child on snowball hit
+                    mogera->deactivateChild(i);
+                    snowball->deactivate();
+                    return;
+                }
+            }
+        }
+
+        // Check Gamakichi
+        if (gamakichi != nullptr && !gamakichi->getIsDefeated())
+        {
+            sf::FloatRect gamakichiBounds(
+                gamakichi->getPositionX(),
+                gamakichi->getPositionY(),
+                100.f, 120.f
+            );
+
+            if (snowballBounds.intersects(gamakichiBounds))
+            {
+                gamakichi->reduceHealth();
+                snowball->deactivate();
+                return;
+            }
+        }
+
     }
 
     bool isPlayerHit(float playerX, float playerY)
@@ -402,6 +614,41 @@ private:
             );
 
             if (playerBounds.intersects(enemyBounds))
+            {
+                return true;
+            }
+        }
+
+
+        // Mogera children can hit player
+        if (mogera != nullptr && !mogera->getIsDefeated())
+        {
+            // Check Mogera children
+            for (int i = 0; i < mogera->getNumberOfChilds(); i++)
+            {
+                if (mogera->getChildX(i) < 0)
+                {
+                    continue;
+                }
+
+                sf::FloatRect childBounds(
+                    mogera->getChildX(i),
+                    mogera->getChildY(i),
+                    20.f, 20.f
+                );
+
+                if (playerBounds.intersects(childBounds))
+                {
+                    return true;
+                }
+            }
+        }
+
+        // ✅ FIX: Use playerX and playerY parameters (not player object)
+        // Gamakichi rockets hit player
+        if (gamakichi != nullptr && !gamakichi->getIsDefeated())
+        {
+            if (gamakichi->isRocketHittingPlayer(playerX, playerY))
             {
                 return true;
             }
@@ -526,6 +773,28 @@ private:
                 if (rollingBounds.intersects(otherBounds))
                 {
                     botoms[j]->instantKill();
+                }
+            }
+
+            // ✅ FlyingFooga rolling kills Tornado
+            for (int j = 0; j < TORNADO_COUNT; j++)
+            {
+                if (tornados[j] == nullptr ||
+                    tornados[j]->getIsDead() ||
+                    tornados[j]->getIsRolling())
+                {
+                    continue;
+                }
+
+                sf::FloatRect otherBounds(
+                    tornados[j]->getPositionX(),
+                    tornados[j]->getPositionY(),
+                    40.f, 40.f
+                );
+
+                if (rollingBounds.intersects(otherBounds))
+                {
+                    tornados[j]->instantKill();
                 }
             }
         }

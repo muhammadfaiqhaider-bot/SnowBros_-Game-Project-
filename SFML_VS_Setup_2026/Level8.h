@@ -7,25 +7,23 @@ class Level8 : public Level
 public:
     Level8()
     {
-        loadBackground("assets/bg_level8.png");
+        loadBackground("assets/bg_level4.jpg");
+        loadPlatformTexture("assets/plat_04.png");
 
-        // Platforms
-        addPlatform(0, 560, 600, 20);   // Ground
-        addPlatform(0, 420, 250, 20);   // Mid left
-        addPlatform(350, 420, 250, 20); // Mid right
-        addPlatform(150, 280, 300, 20); // Upper mid
-        addPlatform(0, 140, 200, 20);   // Top left
-        addPlatform(400, 140, 200, 20); // Top right
+        addPlatform(0, 560, 600, 32);   // Ground
+        addPlatform(0, 450, 140, 32);   // Far left low
+        addPlatform(460, 450, 140, 32);   // Far right low
+        addPlatform(150, 370, 140, 32);   // Left mid
+        addPlatform(310, 370, 140, 32);   // Right mid
+        addPlatform(0, 220, 160, 32);   // Top left
+        addPlatform(440, 220, 160, 32);   // Top right
 
-        // Enemies - Level8: 4 BlueBotom, 2 BlueFlyingFoogo, 1 BlueTornado
         addEnemy(new BlueBotom(80.f, 520.f));
         addEnemy(new BlueBotom(220.f, 520.f));
         addEnemy(new BlueBotom(360.f, 520.f));
-        addEnemy(new BlueBotom(500.f, 380.f));
-
-        addEnemy(new BlueFlyingFoogo(200.f, 240.f));
+        addEnemy(new BlueBotom(500.f, 410.f));
+        addEnemy(new BlueFlyingFoogo(200.f, 330.f));
         addEnemy(new BlueFlyingFoogo(320.f, 180.f));
-
-        addEnemy(new BlueTornado(420.f, 100.f));
+        addEnemy(new BlueTornado(420.f, 90.f));
     }
 };

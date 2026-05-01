@@ -7,24 +7,23 @@ class Level7 : public Level
 public:
     Level7()
     {
-        loadBackground("assets/bg_level7.png");
+        loadBackground("assets/bg_level4.jpg");
+        loadPlatformTexture("assets/plat_04.png");
 
-        // Platforms
-        addPlatform(0, 560, 600, 20);   // Ground
-        addPlatform(0, 420, 250, 20);   // Mid left
-        addPlatform(350, 420, 250, 20); // Mid right
-        addPlatform(150, 280, 300, 20); // Upper mid
-        addPlatform(0, 140, 200, 20);   // Top left
-        addPlatform(400, 140, 200, 20); // Top right
+        addPlatform(0, 560, 600, 32);   // Ground
+        addPlatform(0, 440, 160, 32);   // Left low
+        addPlatform(440, 440, 160, 32);   // Right low
+        addPlatform(200, 360, 200, 32);   // Center mid
+        addPlatform(0, 240, 140, 32);   // Left upper
+        addPlatform(460, 240, 140, 32);   // Right upper
+        addPlatform(180, 130, 240, 32);   // Top center
 
-        // Enemies - Level7: 4 GreenBotom, 3 GreenFlyingFoogo
         addEnemy(new GreenBotom(80.f, 520.f));
         addEnemy(new GreenBotom(220.f, 520.f));
         addEnemy(new GreenBotom(360.f, 520.f));
-        addEnemy(new GreenBotom(500.f, 380.f));
-
-        addEnemy(new GreenFlyingFoogo(200.f, 240.f));
-        addEnemy(new GreenFlyingFoogo(320.f, 180.f));
-        addEnemy(new GreenFlyingFoogo(430.f, 120.f));
+        addEnemy(new GreenBotom(500.f, 400.f));
+        addEnemy(new GreenFlyingFoogo(200.f, 320.f));
+        addEnemy(new GreenFlyingFoogo(320.f, 200.f));
+        addEnemy(new GreenFlyingFoogo(430.f, 90.f));
     }
 };

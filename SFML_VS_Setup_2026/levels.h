@@ -3,6 +3,7 @@
 #include "Botom.h"
 #include "FlyingFoogo.h"
 #include "SnowBall.h"
+#include "Tornado.h"
 
 class Level
 {
@@ -22,6 +23,10 @@ protected:
     sf::Sprite backgroundSprite;
     bool backgroundLoaded;
 
+    sf::Texture platformTexture;
+    bool platformTextureLoaded;
+    sf::Color enemyTint;
+
 public:
     Level()
     {
@@ -31,8 +36,18 @@ public:
 
         for (int i = 0; i < MAX_ENEMIES; i++)
             enemies[i] = nullptr;
+        
+        platformTextureLoaded = false;
+        enemyTint = sf::Color::White;
+
     }
 
+    void loadPlatformTexture(const std::string& path)
+    {
+        platformTextureLoaded = platformTexture.loadFromFile(path);
+        if (platformTextureLoaded)
+            platformTexture.setRepeated(true);  // enables tiling
+    }
     // ---- CALLED BY SUBCLASS TO REGISTER ENEMIES ----
     void addEnemy(Enemy* e)
     {
@@ -43,7 +58,10 @@ public:
         }
     }
 
-    // ---- CALLED BY SUBCLASS TO REGISTER PLATFORMS ----
+    void setEnemyTint(sf::Color color)
+    {
+        enemyTint = color;
+    }
     void addPlatform(float x, float y, float w, float h,
         sf::Color color = sf::Color(128, 0, 128))
     {
@@ -52,6 +70,15 @@ public:
             platforms[platformCount].setSize(sf::Vector2f(w, h));
             platforms[platformCount].setFillColor(color);
             platforms[platformCount].setPosition(x, y);
+
+            if (platformTextureLoaded)
+            {
+                platforms[platformCount].setFillColor(sf::Color::White);
+                platforms[platformCount].setTexture(&platformTexture);
+                // Tile the texture across the platform width
+                platforms[platformCount].setTextureRect(sf::IntRect(0, 0, (int)w, (int)h));
+            }
+
             platformCount++;
         }
     }
@@ -111,7 +138,7 @@ public:
             {
                 enemies[i]->setHitWall(true);
             }
-
+ 
             enemies[i]->movementsUpdate();
         }
 
@@ -226,6 +253,12 @@ public:
             if (enemies[i] == nullptr || enemies[i]->getIsDead())
                 continue;
 
+            // Check knife hit from Tornado
+            Tornado* tornado = dynamic_cast<Tornado*>(enemies[i]);
+            if (tornado != nullptr && tornado->isKnifeHittingPlayer(playerX, playerY))
+                return true;
+
+
             if (enemies[i]->getIsEncased())
                 continue;
 
@@ -260,15 +293,25 @@ public:
     void draw(sf::RenderWindow& window)
     {
         if (backgroundLoaded)
+        {
             window.draw(backgroundSprite);
-
+            sf::RectangleShape overlay(sf::Vector2f(600.f, 600.f));
+            overlay.setFillColor(sf::Color(0, 0, 0, 70));  // change 100 to taste
+            window.draw(overlay);
+        }
         for (int i = 0; i < platformCount; i++)
             window.draw(platforms[i]);
 
         for (int i = 0; i < enemyCount; i++)
         {
             if (enemies[i] != nullptr && !enemies[i]->getIsDead())
+            {
+                if (enemyTint != sf::Color::White)
+                    enemies[i]->setTint(enemyTint);
+
                 enemies[i]->DisplayEnemy(window);
+
+            }
         }
     }
 

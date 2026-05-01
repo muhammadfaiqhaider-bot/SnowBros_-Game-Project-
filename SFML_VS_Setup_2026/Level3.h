@@ -7,23 +7,19 @@ class Level3 : public Level
 public:
     Level3()
     {
-        loadBackground("assets/bg_level3.png");
+        loadBackground("assets/bg_level2.png");
+        loadPlatformTexture("assets/plat_02.png");
 
-        // Platforms
-        addPlatform(0, 560, 600, 20);   // Ground
-        addPlatform(0, 420, 250, 20);   // Mid left
-        addPlatform(350, 420, 250, 20); // Mid right
-        addPlatform(150, 280, 300, 20); // Upper mid
-        addPlatform(0, 140, 200, 20);   // Top left
-        addPlatform(400, 140, 200, 20); // Top right
+        addPlatform(0, 560, 600, 32);   // Ground
+        addPlatform(0, 400, 200, 32);   // Left only - no right mid
+        addPlatform(300, 340, 150, 32);   // Small right mid - lower
+        addPlatform(100, 210, 260, 32);   // Upper mid - shifted left
+        addPlatform(380, 140, 220, 32);   // Top right - wide
 
-        // Enemies - Level3 = 3 Botoms + 1 FlyingFooga + 1 Tornado
         addEnemy(new Botom(120.f, 520.f));
         addEnemy(new Botom(300.f, 520.f));
-        addEnemy(new Botom(480.f, 380.f));
-
-        addEnemy(new FlyingFoogaFoog(260.f, 200.f));
-
+        addEnemy(new Botom(480.f, 300.f));
+        addEnemy(new FlyingFoogaFoog(260.f, 170.f));
         addEnemy(new Tornado(420.f, 100.f));
     }
 };

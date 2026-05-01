@@ -7,26 +7,25 @@ class Level9 : public Level
 public:
     Level9()
     {
-        loadBackground("assets/bg_level9.png");
+        loadBackground("assets/bg_level6.png");
+        setEnemyTint(sf::Color(144, 120, 161, 255));
 
-        // Platforms
-        addPlatform(0, 560, 600, 20);   // Ground
-        addPlatform(0, 420, 250, 20);   // Mid left
-        addPlatform(350, 420, 250, 20); // Mid right
-        addPlatform(150, 280, 300, 20); // Upper mid
-        addPlatform(0, 140, 200, 20);   // Top left
-        addPlatform(400, 140, 200, 20); // Top right
+        addPlatform(0, 560, 600, 32);   // Ground
+        addPlatform(0, 460, 130, 32);   // Far left low
+        addPlatform(470, 460, 130, 32);   // Far right low
+        addPlatform(130, 380, 130, 32);   // Left mid
+        addPlatform(340, 380, 130, 32);   // Right mid
+        addPlatform(220, 280, 160, 32);   // Center
+        addPlatform(0, 180, 140, 32);   // Top left
+        addPlatform(460, 180, 140, 32);   // Top right
 
-        // Enemies - Level9: 3 PurpleBotom, 3 PurpleFlyingFoogo, 2 PurpleTornado
         addEnemy(new PurpleBotom(120.f, 520.f));
         addEnemy(new PurpleBotom(300.f, 520.f));
-        addEnemy(new PurpleBotom(480.f, 380.f));
-
-        addEnemy(new PurpleFlyingFoogo(200.f, 240.f));
-        addEnemy(new PurpleFlyingFoogo(320.f, 180.f));
-        addEnemy(new PurpleFlyingFoogo(420.f, 120.f));
-
-        addEnemy(new PurpleTornado(220.f, 100.f));
-        addEnemy(new PurpleTornado(460.f, 60.f));
+        addEnemy(new PurpleBotom(480.f, 420.f));
+        addEnemy(new PurpleFlyingFoogo(200.f, 340.f));
+        addEnemy(new PurpleFlyingFoogo(320.f, 240.f));
+        addEnemy(new PurpleFlyingFoogo(420.f, 140.f));
+        addEnemy(new PurpleTornado(220.f, 90.f));
+        addEnemy(new PurpleTornado(460.f, 90.f));
     }
 };

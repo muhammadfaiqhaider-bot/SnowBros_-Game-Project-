@@ -11,6 +11,32 @@ private:
     int walkingTimer;
     int walkingDuration;
 
+    sf::Texture foogaTexture;
+    sf::Sprite foogaSprite;
+    bool foogaTextureLoaded;
+    int foogaAnimFrame;   // 0 or 1 for flying cycle
+    int foogaAnimTimer;
+    static const int FOOGA_ANIM_SPEED = 8;
+
+    // Frame 1 - idle/walk
+    static const int WALK_X = 56;
+    static const int WALK_Y = 30;
+    static const int WALK_W = 90;
+    static const int WALK_H = 155;
+
+    // Frame 2 - flying pose 1
+    static const int FLY1_X = 223;
+    static const int FLY1_Y = 17;
+    static const int FLY1_W = 152;
+    static const int FLY1_H = 172;
+
+    // Frame 3 - flying pose 2
+    static const int FLY2_X = 431;
+    static const int FLY2_Y = 17;
+    static const int FLY2_W = 152;
+    static const int FLY2_H = 172;
+
+
 public:
     FlyingFoogaFoog(float xPos, float yPos) : Botom(xPos, yPos)
     {
@@ -22,6 +48,19 @@ public:
 
 
         name = "FlyingFoogaFoog";      // name Changed in Botom to FlyingFoogaFoog
+
+        foogaAnimFrame = 0;
+        foogaAnimTimer = 0;
+        foogaTextureLoaded = false;
+
+        if (foogaTexture.loadFromFile("assets/FlyingFoogaFoog_Blue.png"))
+        {
+            foogaTextureLoaded = true;
+            foogaSprite.setTexture(foogaTexture);
+            // Start with idle frame
+            foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
+            foogaSprite.setScale(40.f / WALK_W, 40.f / WALK_H);
+        }
     }
 
     void movementsUpdate() override
@@ -205,16 +244,11 @@ public:
     }
 
 
-
     void DisplayEnemy(sf::RenderWindow& window) override
     {
-        // Don't draw if dead
-        if (isDead)
-        {
-            return;
-        }
+        if (isDead) return;
 
-        // ROLLING SNOWBALL (kicked and moving)
+        // ROLLING
         if (isRolling)
         {
             sf::CircleShape rollingBall(22.0f);
@@ -226,7 +260,7 @@ public:
             return;
         }
 
-        // FULLY ENCASED (stationary) 
+        // FULLY ENCASED
         if (snowCovered)
         {
             sf::CircleShape snowBall(20.0f);
@@ -236,7 +270,6 @@ public:
             snowBall.setPosition(x, y);
             window.draw(snowBall);
 
-            // Small indicator showing its kickable
             sf::RectangleShape leftArrow(sf::Vector2f(8.0f, 3.0f));
             leftArrow.setFillColor(sf::Color::Cyan);
             leftArrow.setPosition(x - 12.0f, y + 18.0f);
@@ -246,30 +279,80 @@ public:
             rightArrow.setFillColor(sf::Color::Cyan);
             rightArrow.setPosition(x + 44.0f, y + 18.0f);
             window.draw(rightArrow);
-
             return;
         }
 
-        // NORMAL DISPLAY (alive, not encased)
-        if (isFlying)
+        if (!foogaTextureLoaded)
         {
-            sf::RectangleShape tempShape(sf::Vector2f(30.f, 30.f));
-            tempShape.setFillColor(sf::Color::Blue);
-            tempShape.setPosition(x, y);
-            window.draw(tempShape);                                           // To show a contrast when Flying fooga flies it is BLUE
-        }                                                                     // when on ground its Green......
-        else
-        {
-            sf::RectangleShape tempShape(sf::Vector2f(30.f, 30.f));
-            tempShape.setFillColor(sf::Color::Green);
-            tempShape.setPosition(x, y);
-            window.draw(tempShape);
+            // Fallback rectangles
+            sf::RectangleShape temp(sf::Vector2f(30.f, 30.f));
+            temp.setFillColor(isFlying ? sf::Color::Blue : sf::Color::Green);
+            temp.setPosition(x, y);
+            window.draw(temp);
+            return;
         }
 
-        // Show snow overlay based on hit count (partially hit)
+        // ---- ANIMATION ----
+        if (isFlying)
+        {
+            // Cycle between fly frame 1 and 2
+            foogaAnimTimer++;
+            if (foogaAnimTimer >= FOOGA_ANIM_SPEED)
+            {
+                foogaAnimTimer = 0;
+                foogaAnimFrame = (foogaAnimFrame + 1) % 2;
+            }
+
+            if (foogaAnimFrame == 0)
+                foogaSprite.setTextureRect(sf::IntRect(FLY1_X, FLY1_Y, FLY1_W, FLY1_H));
+            else
+                foogaSprite.setTextureRect(sf::IntRect(FLY2_X, FLY2_Y, FLY2_W, FLY2_H));
+
+            // Scale to consistent size
+            float scaleX = 60.f / FLY1_W;
+            float scaleY = 60.f / FLY1_H;
+            // Sprite faces diagonal left on sheet
+            // velocityX > 0 means flying right so flip horizontally
+            if (velocityX > 0)
+            {
+                foogaSprite.setScale(-scaleX, scaleY);
+                foogaSprite.setPosition(x + 60.f, y);
+            }
+            else
+            {
+                foogaSprite.setScale(scaleX, scaleY);
+                foogaSprite.setPosition(x, y);
+            }
+        }
+        else
+        {
+            // Walking - frame 1 only, flip based on direction
+            foogaAnimFrame = 0;
+            foogaAnimTimer = 0;
+
+            foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
+
+            float scaleX = 40.f / WALK_W;
+            float scaleY = 40.f / WALK_H;
+            // Flip based on walking direction
+            // velocityX > 0 = moving right
+            if (velocityX > 0)
+            {
+                foogaSprite.setScale(-scaleX, scaleY);
+                foogaSprite.setPosition(x + 40.f, y);
+            }
+            else
+            {
+                foogaSprite.setScale(scaleX, scaleY);
+                foogaSprite.setPosition(x, y);
+            }
+        }
+
+        window.draw(foogaSprite);
+
+        // Snow overlay if partially hit
         if (hitCount == 1)
         {
-            // Light snow - 25% covered
             sf::CircleShape snowOverlay(15.f);
             snowOverlay.setFillColor(sf::Color(255, 255, 255, 80));
             snowOverlay.setPosition(x, y);
@@ -277,14 +360,17 @@ public:
         }
         else if (hitCount == 2)
         {
-            // Heavy snow - 65% covered
             sf::CircleShape snowOverlay(15.f);
             snowOverlay.setFillColor(sf::Color(255, 255, 255, 160));
             snowOverlay.setPosition(x, y);
             window.draw(snowOverlay);
         }
     }
-
+    void setTint(sf::Color color) override
+    {
+        enemySprite.setColor(color);    // for when its walking (uses botom sprite)
+        foogaSprite.setColor(color);    // for flying frames
+    }
     bool getIsFlying()
     {
         return isFlying;

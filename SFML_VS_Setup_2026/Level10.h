@@ -8,29 +8,28 @@ class Level10 : public Level
 public:
     Level10()
     {
-        loadBackground("assets/bg_boss2.png");
+        loadBackground("assets/bg_level6.png");
+        setEnemyTint(sf::Color(144, 120, 161, 255));
 
-        // Platforms
-        addPlatform(0, 560, 600, 20);   // Ground
-        addPlatform(0, 420, 250, 20);   // Mid left
-        addPlatform(350, 420, 250, 20); // Mid right
-        addPlatform(150, 280, 300, 20); // Upper mid
-        addPlatform(0, 140, 200, 20);   // Top left
-        addPlatform(400, 140, 200, 20); // Top right
+        addPlatform(0, 560, 600, 32);   // Ground
+        addPlatform(0, 470, 120, 32);   // Far left low
+        addPlatform(480, 470, 120, 32);   // Far right low
+        addPlatform(120, 390, 120, 32);   // Left mid low
+        addPlatform(360, 390, 120, 32);   // Right mid low
+        addPlatform(230, 310, 140, 32);   // Center mid
+        addPlatform(0, 210, 130, 32);   // Left upper
+        addPlatform(470, 210, 130, 32);   // Right upper
+        addPlatform(200, 120, 200, 32);   // Top center
 
-        // Enemies - Level10: 3 PurpleBotom, 3 PurpleFlyingFoogo, 3 PurpleTornado + Gamakichi boss top-right
         addEnemy(new PurpleBotom(100.f, 520.f));
         addEnemy(new PurpleBotom(300.f, 520.f));
         addEnemy(new PurpleBotom(500.f, 520.f));
-
-        addEnemy(new PurpleFlyingFoogo(180.f, 240.f));
-        addEnemy(new PurpleFlyingFoogo(320.f, 180.f));
-        addEnemy(new PurpleFlyingFoogo(460.f, 120.f));
-
-        addEnemy(new PurpleTornado(220.f, 100.f));
-        addEnemy(new PurpleTornado(340.f, 60.f));
-        addEnemy(new PurpleTornado(460.f, 100.f));
-
-        addEnemy(new Gamakichi(420.f, 20.f));
-    }
+        addEnemy(new PurpleFlyingFoogo(180.f, 350.f));
+        addEnemy(new PurpleFlyingFoogo(320.f, 270.f));
+        addEnemy(new PurpleFlyingFoogo(460.f, 170.f));
+        addEnemy(new PurpleTornado(220.f, 80.f));
+        addEnemy(new PurpleTornado(340.f, 80.f));
+        addEnemy(new PurpleTornado(460.f, 80.f));
+        addEnemy(new Gamakichi(260.f, 80.f));
+    } //Its better if you change this layout faiq -Cheema
 };

@@ -3,11 +3,21 @@
 
 class Knives : public Projectile
 {
+    sf::Texture knifeTexture;
+    sf::Sprite knifeSprite;
+    bool knifeTextureLoaded;
 public:
     Knives(float startX, float startY, float targetX, float targetY, float limit) : Projectile(startX, startY, limit, limit)
     {
+        calculateDirection(targetX, targetY, 4.0f);
 
-        calculateDirection(targetX, targetY, 4.0f);      // Use Projectile's Class calculateDirection method
+        knifeTextureLoaded = knifeTexture.loadFromFile("assets/Tornado_Blue.png");
+        if (knifeTextureLoaded)
+        {
+            knifeSprite.setTexture(knifeTexture);
+            knifeSprite.setTextureRect(sf::IntRect(290, 895, 65, 25));
+            knifeSprite.setScale(30.f / 65.f, 10.f / 25.f); // scale to match original rectangle size
+        }
     }                                                  // speed is passed, as throables are kinda fast so pass slightly high value
 
     void updateTrajactory() override
@@ -25,18 +35,21 @@ public:
 
     void drawProjectiles(sf::RenderWindow& window) override
     {
-        if (!active)
+        if (!active) return;
+
+        if (knifeTextureLoaded)
         {
-            return;
+            knifeSprite.setPosition(x, y);
+            window.draw(knifeSprite);
         }
-
-        // Yellow small rectangle for knife
-        sf::RectangleShape knifeShape(sf::Vector2f(15.f, 5.f));
-        knifeShape.setFillColor(sf::Color::Yellow);
-        knifeShape.setPosition(x, y);
-        window.draw(knifeShape);
+        else // added knife texture
+        {
+            sf::RectangleShape knifeShape(sf::Vector2f(15.f, 5.f));
+            knifeShape.setFillColor(sf::Color::Yellow);
+            knifeShape.setPosition(x, y);
+            window.draw(knifeShape);
+        }
     }
-
 
 
 

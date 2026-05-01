@@ -234,6 +234,7 @@ int main()
         // ---- LOGIN ----
         if (currentScreen == 0)
         {
+            loginScreen.update();
             loginScreen.draw(window);
         }
 

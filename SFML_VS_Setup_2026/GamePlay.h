@@ -42,21 +42,25 @@ public:
         currentLevelNumber = 1;
 
         setupPlatforms();
-        levels[0] = new Level1();
-        levels[1] = new Level2();
-        levels[2] = new Level3();
-        levels[3] = new Level4();
-        levels[4] = new Level5();
-        levels[5] = new Level6();
-        levels[6] = new Level7();
-        levels[7] = new Level8();
-        levels[8] = new Level9();
-        levels[9] = new Level10();
         totalLevels = 10;
         for (int i = totalLevels; i < 10; i++)
             levels[i] = nullptr;
     }
+    void loadCurrentLevel()
+    {
+        int idx = currentLevelNumber - 1;
 
+        if (levels[idx] != nullptr)
+            return;  // already loaded
+
+        switch (currentLevelNumber)
+        {
+        case 1: levels[idx] = new Level1(); break;
+        case 2: levels[idx] = new Level2(); break;
+            // case 3: levels[idx] = new Level3(); break;
+        default: break;
+        }
+    }
     int handleEvents(sf::Event& event)
     {
         if (event.type == sf::Event::KeyPressed)
@@ -77,6 +81,7 @@ public:
 
     int update()
     {
+        loadCurrentLevel();
         handlePlayerPlatformCollision();
 
         Level* current = levels[currentLevelNumber - 1];
@@ -119,6 +124,7 @@ public:
     }
     void draw(sf::RenderWindow& window)
     {
+        loadCurrentLevel();
         window.clear(sf::Color(200, 150, 150));
 
         Level* current = levels[currentLevelNumber - 1];
@@ -173,6 +179,13 @@ public:
 
     void goNextLevel()
     {
+        int idx = currentLevelNumber - 1;
+        if (levels[idx] != nullptr)
+        {
+            delete levels[idx];
+            levels[idx] = nullptr;
+        }
+
         currentLevelNumber++;
         nick.snapToGround(520.f);   // Reset player position
     }

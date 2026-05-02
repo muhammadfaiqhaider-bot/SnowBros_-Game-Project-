@@ -3,6 +3,7 @@
 
 class Knives : public Projectile
 {
+private:
     sf::Texture knifeTexture;
     sf::Sprite knifeSprite;
     bool knifeTextureLoaded;
@@ -10,7 +11,8 @@ public:
     Knives(float startX, float startY, float targetX, float targetY, float limit) : Projectile(startX, startY, limit, limit)
     {
         calculateDirection(targetX, targetY, 4.0f);
-
+                                                            // Use Projectile's Class calculateDirection method
+                                                             // speed is passed, as throables are kinda fast so pass slightly high value
         knifeTextureLoaded = knifeTexture.loadFromFile("assets/Tornado_Blue.png");
         if (knifeTextureLoaded)
         {
@@ -18,7 +20,8 @@ public:
             knifeSprite.setTextureRect(sf::IntRect(290, 895, 65, 25));
             knifeSprite.setScale(30.f / 65.f, 10.f / 25.f); // scale to match original rectangle size
         }
-    }                                                  // speed is passed, as throables are kinda fast so pass slightly high value
+    
+    }                                                 
 
     void updateTrajactory() override
     {
@@ -35,7 +38,10 @@ public:
 
     void drawProjectiles(sf::RenderWindow& window) override
     {
-        if (!active) return;
+        if (!active)
+        {
+            return;
+        }
 
         if (knifeTextureLoaded)
         {
@@ -50,6 +56,7 @@ public:
             window.draw(knifeShape);
         }
     }
+
 
 
 

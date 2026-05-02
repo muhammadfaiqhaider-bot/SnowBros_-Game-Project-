@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "Shop.h"
+#include <iostream>
 #include "Nick.h"
 #include "HUD.h"
 #include "levels.h"
@@ -22,6 +24,7 @@ private:
     sf::RectangleShape platforms[6];
     Nick nick;
     HUD hud;
+    Shop shop;
     int currentLevelNumber;
     Level* levels[10];
     int totalLevels;
@@ -43,21 +46,36 @@ public:
 
         setupPlatforms();
         totalLevels = 10;
-        for (int i = totalLevels; i < 10; i++)
+        for (int i = 0; i < 10; i++)
             levels[i] = nullptr;
+        // create first level lazily
+        levels[0] = new Level1();
     }
+
     void loadCurrentLevel()
     {
         int idx = currentLevelNumber - 1;
+        if (idx < 0 || idx >= 10)
+        {
+            std::cout << "[GamePlay] loadCurrentLevel: invalid level index " << idx << std::endl;
+            return;
+        }
 
         if (levels[idx] != nullptr)
             return;  // already loaded
-
+        std::cout << "[GamePlay] Loading level " << currentLevelNumber << std::endl;
         switch (currentLevelNumber)
         {
         case 1: levels[idx] = new Level1(); break;
         case 2: levels[idx] = new Level2(); break;
-            // case 3: levels[idx] = new Level3(); break;
+        case 3: levels[idx] = new Level3(); break;
+        case 4: levels[idx] = new Level4(); break;
+        case 5: levels[idx] = new Level5(); break;
+        case 6: levels[idx] = new Level6(); break;
+        case 7: levels[idx] = new Level7(); break;
+        case 8: levels[idx] = new Level8(); break;
+        case 9: levels[idx] = new Level9(); break;
+        case 10: levels[idx] = new Level10(); break;
         default: break;
         }
     }
@@ -79,16 +97,37 @@ public:
         return 3;
     }
 
+    // Forward shop events so purchases apply to the active player
+    int handleShopEvents(sf::Event& event)
+    {
+        int r = shop.handleEvents(event, nick);
+        return r;
+    }
+
+    void drawShop(sf::RenderWindow& window)
+    {
+        shop.draw(window);
+    }
+
     int update()
     {
         loadCurrentLevel();
         handlePlayerPlatformCollision();
 
+    
+
         Level* current = levels[currentLevelNumber - 1];
 
         if (current != nullptr)
         {
-            current->update(nick.getPositionX(), nick.getPositionY());
+            // Pass player pointer so Level::update can award score and gems
+            current->update(nick.getPositionX(), nick.getPositionY(), &nick);
+
+            // Sync shop coins with player's gems every frame
+            shop.syncGems(nick.getGemCount());
+
+            // Ensure snowball is moved before running collision checks so hits are detected
+            nick.updateSnowball();
 
             if (nick.getSnowball() != nullptr)
             {
@@ -105,6 +144,10 @@ public:
 
             if (current->isLevelComplete())
             {
+                std::cout << "[GamePlay] Level " << currentLevelNumber << " is complete" << std::endl;
+                // If this was the last level, indicate game complete (7)
+                if (currentLevelNumber >= totalLevels)
+                    return 7;
                 return 6;
             }
         }
@@ -112,7 +155,7 @@ public:
         if (!nick.getIsAlive())
             return 5;
 
-        nick.updateSnowball();
+        // snowball already updated before collision checks
         hud.update(nick.getScore(), nick.getLives(), nick.getGemCount(), currentLevelNumber);
 
         if (saveMessageTimer > 0)
@@ -163,6 +206,18 @@ public:
             saveText.setPosition(220.f, 560.f);
             window.draw(saveText);
         }
+
+        // Draw power-up pickup message (from player)
+        if (nick.getPowerupMessageTimer() > 0 && !nick.getPowerupMessage().empty())
+        {
+            sf::Text pText;
+            pText.setFont(font);
+            pText.setString(nick.getPowerupMessage());
+            pText.setCharacterSize(16);
+            pText.setFillColor(sf::Color::Yellow);
+            pText.setPosition(200.f, 540.f);
+            window.draw(pText);
+        }
     }
 
     void drawOnly(sf::RenderWindow& window)
@@ -179,6 +234,7 @@ public:
 
     void goNextLevel()
     {
+        std::cout << "[GamePlay] goNextLevel from " << currentLevelNumber << std::endl;
         int idx = currentLevelNumber - 1;
         if (levels[idx] != nullptr)
         {
@@ -192,7 +248,19 @@ public:
 
     bool isGameComplete()
     {
-        return currentLevelNumber > 10;
+        // Consider game complete when we've progressed past the last level
+        // or when the current (last) level is already marked complete.
+        if (currentLevelNumber > totalLevels)
+            return true;
+
+        if (currentLevelNumber == totalLevels)
+        {
+            Level* current = levels[currentLevelNumber - 1];
+            if (current != nullptr && current->isLevelComplete())
+                return true;
+        }
+
+        return false;
     }
 
 
@@ -208,6 +276,25 @@ public:
     int getLives() { return nick.getLives(); }
     int getGems() { return nick.getGemCount(); }
     int getLevel() { return currentLevelNumber; }
+
+    // Play/stop per-level music (wrappers that call into current Level)
+    void playLevelMusic()
+    {
+        int idx = currentLevelNumber - 1;
+        if (idx < 0 || idx >= 10) return;
+        if (levels[idx] == nullptr)
+            loadCurrentLevel();
+        if (levels[idx] != nullptr)
+            levels[idx]->playLevelMusic();
+    }
+
+    void stopLevelMusic()
+    {
+        int idx = currentLevelNumber - 1;
+        if (idx < 0 || idx >= 10) return;
+        if (levels[idx] != nullptr)
+            levels[idx]->stopLevelMusic();
+    }
 
     void reset()
     {
@@ -225,18 +312,8 @@ public:
                 levels[i] = nullptr;
             }
         }
-
+        // only recreate first level; others will be created lazily
         levels[0] = new Level1();
-        levels[1] = new Level2();
-        levels[2] = new Level3();
-        levels[3] = new Level4();
-        levels[4] = new Level5();
-        levels[5] = new Level6();
-        levels[6] = new Level7();
-        levels[7] = new Level8();
-        levels[8] = new Level9();
-        levels[9] = new Level10();
-
         totalLevels = 10;
     }
 

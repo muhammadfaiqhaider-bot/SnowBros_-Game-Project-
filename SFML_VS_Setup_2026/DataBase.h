@@ -43,7 +43,7 @@ public:
     DatabaseManager()            // Data base Manager that has following role 
     {                            // 1- take user data and store it 
                                  // 2- keep track of progress and rank them to make leaderboard.........
-    
+
         userCont = 0;
         progressCount = 0;
 
@@ -51,12 +51,12 @@ public:
         progressFile = "progress.txt";
         leaderboardFile = "leaderboard.txt";
 
-        
+
         loadUsersFromFile();    // Load existing data from files on start of the gamee......
         loadProgressFromFile();
     }
 
- 
+
     // THis function is use to create an  account for the user assign there username
     // Set password and save to the file......
     bool addUser(std::string username, std::string passwordHash, std::string email)
@@ -120,7 +120,7 @@ public:
 
 
 
- // Chek if user exsist or not........
+    // Chek if user exsist or not........
     bool userExists(std::string username)
     {
         for (int i = 0; i < userCont; i++)
@@ -251,7 +251,7 @@ private:
         if (!file.is_open())
         {
             std::cout << "Sorry BRAT there is some error while opening THIS SHYT....... /n";
-            return;    
+            return;
         }
 
         for (int i = 0; i < userCont; i++)
@@ -273,7 +273,7 @@ private:
         if (!file.is_open())
         {
             std::cout << "File doesnot exsist first create it N";
-            return;     
+            return;
         }
 
         std::string line;
@@ -301,7 +301,7 @@ private:
 
         file.close();
     }
-    
+
 
 
 
@@ -338,7 +338,7 @@ private:
 
         if (!file.is_open())
         {
-            return;     
+            return;
         }
 
         std::string line;

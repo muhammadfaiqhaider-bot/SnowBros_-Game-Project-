@@ -9,8 +9,6 @@ public:
         loadBackground("assets/bg_level1.png");
         loadPlatformTexture("assets/plat_01.png"); //added platform texture
 
-
-        // Platforms
         addPlatform(0, 560, 600, 32);   // Ground
         addPlatform(0, 420, 250, 32);   // Mid left
         addPlatform(350, 420, 250, 32);   // Mid right
@@ -20,9 +18,12 @@ public:
 
         // Enemies
         // Level adjustment: 4 Botoms
-        addEnemy(new Botom(100.f, 520.f));
-        addEnemy(new Botom(250.f, 520.f));
-        addEnemy(new Botom(400.f, 520.f));
-        addEnemy(new Botom(500.f, 380.f));
+        addEnemy(new Botom(100.f, 220.f));
+        addEnemy(new Botom(250.f, 220.f));
+        addEnemy(new Botom(400.f, 120.f));
+        addEnemy(new Botom(500.f, 180.f));
+
+        // Level-specific music
+        loadLevelMusic("assets/level_music_1.ogg");
     }
 };

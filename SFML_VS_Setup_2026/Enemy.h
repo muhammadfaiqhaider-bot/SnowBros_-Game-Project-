@@ -27,7 +27,6 @@ protected:
 
 
 
-
 public:
     Enemy(float posX, float posY, std::string n)
     {
@@ -62,6 +61,7 @@ public:
     virtual void setHitWall(bool value) {}
     virtual void setOnGround(bool value) {}
     virtual void snapToGround(float groundY) { y = groundY; velocityY = 0; }
+    virtual void setPlayerPosition(float pX, float pY) {}
 
 
     // Reducing Health Logic
@@ -118,10 +118,13 @@ public:
         return velocityY;
     }
 
+
     virtual void setTint(sf::Color color)
     {
         enemySprite.setColor(color);
     }
+
+
     // CHEEEMA This is a hitbox function that returns the invisible rectangular boundary around my sprite which is used for collision detection.
     // Nilla i aint blind - Cheema
     sf::FloatRect getHitBox()
@@ -132,4 +135,9 @@ public:
     virtual ~Enemy()
     {
     }
+
+    // Some enemies may throw projectiles; base implementation returns false
+    virtual bool isKnifeHittingPlayer(float playerX, float playerY) { return false; }
+    // General projectile check (rockets, knives, etc.) - default false
+    virtual bool isProjectileHittingPlayer(float playerX, float playerY) { return false; }
 };

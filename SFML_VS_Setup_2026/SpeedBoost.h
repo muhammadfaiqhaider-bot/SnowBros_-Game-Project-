@@ -12,7 +12,8 @@ public:
 
     void updatePowerUp() override
     {
-        // No use here bcz in player class there is already function for increaseing speed so we ll just simply use that........
+        // Apply base gravity so spawned power-ups fall to ground
+        PowerUps::updatePowerUp();
     }
 
     void applyEffect(Player& player) override

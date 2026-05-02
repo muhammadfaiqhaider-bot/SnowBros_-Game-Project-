@@ -34,6 +34,10 @@ protected:
     bool hasBalloonMode;
     int powerUpTimer;
 
+    // Message to show when a power-up is collected
+    std::string powerupMessage;
+    int powerupMessageTimer;
+
 
     Snowball* snowball;
 
@@ -78,6 +82,8 @@ public:
 
 
         snowball = nullptr;
+        powerupMessage = "";
+        powerupMessageTimer = 0;
 
     }
 
@@ -102,6 +108,7 @@ public:
             isInvincible = true;
             invincibleTimer = 120;  // 2 seconds at 60 FPS
         }
+
     }
 
     // Update invincibility timer - called every frame
@@ -137,6 +144,11 @@ public:
     {
         distanceIncreaseStatus = true;
         snowballDistance = 400.0f;  // Full screen width
+    }
+
+    void addLife()
+    {
+        lives++;
     }
 
     void applyBalloonMode()
@@ -178,6 +190,17 @@ public:
                 }
 
                 powerUpTimer = 0;
+            }
+        }
+
+        // Powerup pickup message timer (decrements each frame)
+        if (!powerupMessage.empty())
+        {
+            powerupMessageTimer--;
+            if (powerupMessageTimer <= 0)
+            {
+                powerupMessage.clear();
+                powerupMessageTimer = 0;
             }
         }
     }
@@ -438,4 +461,15 @@ public:
             snowball = nullptr;
         }
     }
+
+    // Powerup message helpers
+    void showPowerupMessage(const std::string& msg, int frames = 120)
+    {
+        powerupMessage = msg;
+        powerupMessageTimer = frames;
+    }
+
+    const std::string& getPowerupMessage() const { return powerupMessage; }
+
+    int getPowerupMessageTimer() const { return powerupMessageTimer; }
 };

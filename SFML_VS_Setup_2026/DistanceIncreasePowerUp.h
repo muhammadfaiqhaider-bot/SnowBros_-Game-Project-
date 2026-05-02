@@ -12,7 +12,8 @@ public:
 
     void updatePowerUp() override
     {
-        // No update logic needed for now
+        // Apply gravity so it falls to the ground
+        PowerUps::updatePowerUp();
     }
 
     void applyEffect(Player& player) override

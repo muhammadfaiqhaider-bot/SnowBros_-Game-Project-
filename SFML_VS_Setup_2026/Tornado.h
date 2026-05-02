@@ -109,7 +109,17 @@ public:
             rollTimer++;
             if (rollTimer >= rollDuration)
             {
-                isDead = true;      // Vanish after 3 seconds
+                // Vanish after 3 seconds — ensure rolling state is cleared to avoid ghost collisions
+                isDead = true;
+                isRolling = false;
+                rollVelocityX = 0;
+
+                // Clean up any active knife immediately
+                if (churi != nullptr)
+                {
+                    delete churi;
+                    churi = nullptr;
+                }
             }
 
             return;     // Exit early - don't do normal movement
@@ -147,6 +157,19 @@ public:
             }
 
             return;     // Exit early - stationary snowball
+        }
+
+        // Ensure we never leave a lingering rolling flag when dead — safety guard
+        if (isDead)
+        {
+            isRolling = false;
+            rollVelocityX = 0;
+            if (churi != nullptr)
+            {
+                delete churi;
+                churi = nullptr;
+            }
+            return;
         }
 
         // ============================================================
@@ -236,10 +259,12 @@ public:
 
             if (churi == nullptr)
             {
-                // Only throw knife if player position is valid
-                // playerY must be different from tornado Y for diagonal throw
-                churi = new Knives(x, y, playerX, playerY, 600.0f);        // Calling Knife class for creating an
-            }                                                              // an Object.......
+                // Throw a horizontal-only knife toward player's X position.
+                // Set targetY to this tornado's y so the knife travels only along x-axis.
+                float targetX = playerX;
+                float targetY = y; // keep same vertical level for pure horizontal throw
+                churi = new Knives(x, y, targetX, targetY, 600.0f);
+            }
         }
 
         if (churi != nullptr)
@@ -332,7 +357,7 @@ public:
 
 
 
-    bool isKnifeHittingPlayer(float playerX, float playerY)
+    bool isKnifeHittingPlayer(float playerX, float playerY) override
     {
         if (churi == nullptr || !churi->isActive())
         {
@@ -355,6 +380,11 @@ public:
         }
 
         return false;
+    }
+
+    bool isProjectileHittingPlayer(float playerX, float playerY) override
+    {
+        return isKnifeHittingPlayer(playerX, playerY);
     }
 
 

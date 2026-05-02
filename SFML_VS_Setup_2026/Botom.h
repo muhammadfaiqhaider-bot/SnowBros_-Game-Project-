@@ -171,6 +171,9 @@ public:
             if (rollTimer >= rollDuration)
             {
                 isDead = true;      // Vanish after 3 seconds
+                // Clear rolling state to avoid lingering chain-kill collisions
+                isRolling = false;
+                rollVelocityX = 0;
             }
 
             return;
@@ -395,17 +398,18 @@ public:
         hitCount = 3;
     }
 
+    // Expose death state to Level via virtual
+    bool getIsDead() override
+    {
+        return isDead;
+    }
+
 
     // GETTERS
   
     bool getSnowCoveredStatus()
     {
         return snowCovered;
-    }
-
-    bool getIsDead() 
-    { 
-        return isDead; 
     }
     bool getIsRolling() 
     { 

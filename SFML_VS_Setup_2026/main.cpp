@@ -1,11 +1,15 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "LoginScreen.h"
+#include <iostream>
 #include "MainMenu.h"
 #include "CharacterSelecte.h"
 #include "PauseMenu.h"
 #include "GamePlay.h"
+#include "GameEnd.h"
 #include "AuthenticationSystem.h"
 #include "DataBase.h"
+#include "LeaderboardScreen.h"
 
 int main()
 {
@@ -35,9 +39,11 @@ int main()
     //-00
     LoginScreen loginScreen;
     MainMenu mainMenu;
+    LeaderboardScreen leaderboardScreen;
     CharacterSelect charSelect;
     PauseMenu pauseMenu;
     GamePlay gameplay;
+    GameEnd gameEnd;
 
     // ---- CURRENT SCREEN ----
     // 0 = Login
@@ -51,7 +57,44 @@ int main()
     // 9 = Shop (later)
     int currentScreen = 0;
 
+    // ---- AUDIO: menu music ----
+    sf::Music menuMusic;
+    bool menuMusicLoaded = false;
+    const float menuMusicInitialVolume = 80.f;
+    int menuFadeFramesRemaining = 0; // fade-out duration in frames
+
+    if (menuMusic.openFromFile("assets/menu.ogg"))
+    {
+        menuMusic.setLoop(true);
+        menuMusic.setVolume(menuMusicInitialVolume);
+        menuMusic.play();
+        menuMusicLoaded = true;
+    }
+    // ---- AUDIO: level complete music (plays while level-complete screen shown) ----
+    sf::Music levelCompleteMusic;
+    bool levelCompleteLoaded = false;
+    if (levelCompleteMusic.openFromFile("assets/level_complete.ogg"))
+    {
+        levelCompleteMusic.setLoop(true); // keep playing until player presses ENTER
+        levelCompleteMusic.setVolume(90.f);
+        levelCompleteLoaded = true;
+    }
+    // Optional background image for level-complete screen
+    sf::Texture levelCompleteBgTexture;
+    sf::Sprite levelCompleteBgSprite;
+    bool levelCompleteBgLoaded = false;
+    if (levelCompleteBgTexture.loadFromFile("assets/level_complete_bg.png"))
+    {
+        levelCompleteBgLoaded = true;
+        levelCompleteBgSprite.setTexture(levelCompleteBgTexture);
+        float sx = 600.f / levelCompleteBgTexture.getSize().x;
+        float sy = 600.f / levelCompleteBgTexture.getSize().y;
+        levelCompleteBgSprite.setScale(sx, sy);
+    }
+
     // ---- GAME LOOP ----
+    int lastScreen = -1;
+    int lastPlayedLevel = -1;
     while (window.isOpen())
     {
         // ==========================================
@@ -84,6 +127,12 @@ int main()
                 {
                     currentScreen = 2;      // Go to character select
                 }
+
+                else if (result == 8)
+                {
+                    currentScreen = 8;      // Go to leaderboard
+                }
+
                 else if (result == -1)
                 {
                     window.close();         // Exit game
@@ -129,6 +178,7 @@ int main()
                 }
                 else if (result == 9)
                 {
+                    std::cout << "[Main] PauseMenu requested SHOP" << std::endl;
                     currentScreen = 9;      // Go to shop
                 }
                 else if (result == 10)
@@ -169,6 +219,10 @@ int main()
                 {
                     if (event.key.code == sf::Keyboard::Return)
                     {
+                        // Stop level-complete music when proceeding
+                        if (levelCompleteLoaded && levelCompleteMusic.getStatus() == sf::Music::Playing)
+                            levelCompleteMusic.stop();
+
                         gameplay.goNextLevel();
                         currentScreen = 3;  // Back to gameplay next level
                     }
@@ -187,16 +241,24 @@ int main()
                 }
             }
 
+
+
             // ---- SHOP ----
             else if (currentScreen == 9)
             {
-                if (event.type == sf::Event::KeyPressed)
+                int shopResult = gameplay.handleShopEvents(event);
+                if (shopResult == 3)
                 {
-                    if (event.key.code == sf::Keyboard::Escape)
-                    {
-                        currentScreen = 4;  // Back to pause
-                    }
+                    // Resume gameplay
+                    currentScreen = 3;
                 }
+            }
+            // ---- LEADERBOARD ----
+            else if (currentScreen == 8)
+            {
+                int lbResult = leaderboardScreen.handleEvents(event);
+                if (lbResult == 1)
+                    currentScreen = 1; // Back to main menu
             }
         }
 
@@ -204,24 +266,69 @@ int main()
         // 2. UPDATE - Only during gameplay
         // ==========================================
 
+        // handle menu music fade when entering gameplay
+        if (menuMusicLoaded && menuMusic.getStatus() == sf::Music::Playing)
+        {
+            if (currentScreen == 3)
+            {
+                // start fade if not already
+                if (menuFadeFramesRemaining == 0)
+                    menuFadeFramesRemaining = 30; // half-second at 60 fps
+            }
+        }
+
+        if (menuFadeFramesRemaining > 0 && menuMusicLoaded)
+        {
+            menuFadeFramesRemaining--;
+            float vol = menuMusicInitialVolume * (float)menuFadeFramesRemaining / 30.f;
+            if (vol < 0.f) vol = 0.f;
+            menuMusic.setVolume(vol);
+            if (menuFadeFramesRemaining == 0)
+                menuMusic.stop();
+        }
+
+        // Manage per-level music playback via GamePlay/Level helpers
+        if (currentScreen == 3)
+        {
+            int lvl = gameplay.getLevel();
+            // if we just entered gameplay or level changed, (re)start music for this level
+            if (lastScreen != 3 || lastPlayedLevel != lvl)
+            {
+                if (menuMusicLoaded && menuMusic.getStatus() == sf::Music::Playing)
+                    menuMusic.stop();
+                gameplay.playLevelMusic();
+                lastPlayedLevel = lvl;
+            }
+        }
+        else
+        {
+            // if we just left gameplay, stop level music
+            if (lastScreen == 3)
+            {
+                gameplay.stopLevelMusic();
+                lastPlayedLevel = -1;
+            }
+        }
+
         if (currentScreen == 3)
         {
             int result = gameplay.update();
 
             if (result == 5)
             {
+                // Save score to leaderboard before showing Game Over
+                leaderboardScreen.saveScore(authManager.getCurrentUsername(), gameplay.getScore(), gameplay.getLevel());
                 currentScreen = 5;          // Game over
             }
             else if (result == 6)
             {
-                if (gameplay.isGameComplete())
-                {
-                    currentScreen = 7;      // Game complete!
-                }
-                else
-                {
-                    currentScreen = 6;      // Level complete
-                }
+                currentScreen = 6;      // Level complete
+            }
+            else if (result == 7)
+            {
+                // Save final score to leaderboard
+                leaderboardScreen.saveScore(authManager.getCurrentUsername(), gameplay.getScore(), gameplay.getLevel());
+                currentScreen = 7;      // Game complete!
             }
         }
 
@@ -242,6 +349,12 @@ int main()
         else if (currentScreen == 1)
         {
             mainMenu.draw(window, authManager.getCurrentUsername());
+        }
+
+        // ---- LEADERBOARD ----
+        else if (currentScreen == 8)
+        {
+            leaderboardScreen.draw(window);
         }
 
         // ---- CHARACTER SELECT ----
@@ -306,16 +419,23 @@ int main()
         // ---- LEVEL COMPLETE ----
         else if (currentScreen == 6)
         {
-            sf::RectangleShape background(sf::Vector2f(600.f, 600.f));
-            background.setFillColor(sf::Color(0, 50, 0));
-            window.draw(background);
+            if (levelCompleteBgLoaded)
+            {
+                window.draw(levelCompleteBgSprite);
+            }
+            else
+            {
+                sf::RectangleShape background(sf::Vector2f(600.f, 600.f));
+                background.setFillColor(sf::Color(0, 50, 0));
+                window.draw(background);
+            }
 
             sf::Text levelCompleteText;
             levelCompleteText.setFont(font);
             levelCompleteText.setString("LEVEL COMPLETE!");
             levelCompleteText.setCharacterSize(40);
             levelCompleteText.setFillColor(sf::Color::Green);
-            levelCompleteText.setPosition(90.f, 150.f);
+            levelCompleteText.setPosition(120.f, 150.f);
             window.draw(levelCompleteText);
 
             sf::Text scoreText;
@@ -323,7 +443,7 @@ int main()
             scoreText.setString("Score: " + std::to_string(gameplay.getScore()));
             scoreText.setCharacterSize(22);
             scoreText.setFillColor(sf::Color::White);
-            scoreText.setPosition(210.f, 250.f);
+            scoreText.setPosition(230.f, 250.f);
             window.draw(scoreText);
 
             sf::Text gemsText;
@@ -331,7 +451,7 @@ int main()
             gemsText.setString("Gems: " + std::to_string(gameplay.getGems()));
             gemsText.setCharacterSize(22);
             gemsText.setFillColor(sf::Color::Yellow);
-            gemsText.setPosition(225.f, 300.f);
+            gemsText.setPosition(235.f, 300.f);
             window.draw(gemsText);
 
             sf::Text nextLevelText;
@@ -339,7 +459,7 @@ int main()
             nextLevelText.setString("Next Level: " + std::to_string(gameplay.getLevel() + 1));
             nextLevelText.setCharacterSize(22);
             nextLevelText.setFillColor(sf::Color::Cyan);
-            nextLevelText.setPosition(185.f, 350.f);
+            nextLevelText.setPosition(197.f, 350.f);
             window.draw(nextLevelText);
 
             sf::Text pressEnterText;
@@ -347,86 +467,26 @@ int main()
             pressEnterText.setString("Press ENTER to continue");
             pressEnterText.setCharacterSize(18);
             pressEnterText.setFillColor(sf::Color(180, 180, 180));
-            pressEnterText.setPosition(145.f, 430.f);
+            pressEnterText.setPosition(160.f, 430.f);
             window.draw(pressEnterText);
+
+            // Play level-complete music while this screen is active
+            if (levelCompleteLoaded && levelCompleteMusic.getStatus() != sf::Music::Playing)
+            {
+                levelCompleteMusic.play();
+            }
         }
 
         // ---- GAME COMPLETE ----
         else if (currentScreen == 7)
         {
-            sf::RectangleShape background(sf::Vector2f(600.f, 600.f));
-            background.setFillColor(sf::Color(20, 0, 50));
-            window.draw(background);
-
-            sf::Text completeText;
-            completeText.setFont(font);
-            completeText.setString("YOU WIN!");
-            completeText.setCharacterSize(60);
-            completeText.setFillColor(sf::Color::Yellow);
-            completeText.setPosition(150.f, 100.f);
-            window.draw(completeText);
-
-            sf::Text congratsText;
-            congratsText.setFont(font);
-            congratsText.setString("Congratulations!");
-            congratsText.setCharacterSize(25);
-            congratsText.setFillColor(sf::Color::Cyan);
-            congratsText.setPosition(165.f, 200.f);
-            window.draw(congratsText);
-
-            sf::Text finalScoreText;
-            finalScoreText.setFont(font);
-            finalScoreText.setString("Final Score: " + std::to_string(gameplay.getScore()));
-            finalScoreText.setCharacterSize(22);
-            finalScoreText.setFillColor(sf::Color::White);
-            finalScoreText.setPosition(180.f, 280.f);
-            window.draw(finalScoreText);
-
-            sf::Text finalGemsText;
-            finalGemsText.setFont(font);
-            finalGemsText.setString("Total Gems: " + std::to_string(gameplay.getGems()));
-            finalGemsText.setCharacterSize(22);
-            finalGemsText.setFillColor(sf::Color::Yellow);
-            finalGemsText.setPosition(190.f, 330.f);
-            window.draw(finalGemsText);
-
-            sf::Text returnText;
-            returnText.setFont(font);
-            returnText.setString("Press ENTER for Main Menu");
-            returnText.setCharacterSize(18);
-            returnText.setFillColor(sf::Color(180, 180, 180));
-            returnText.setPosition(120.f, 430.f);
-            window.draw(returnText);
+            gameEnd.draw(window, gameplay.getScore(), gameplay.getGems());
         }
 
-        // ---- SHOP PLACEHOLDER ----
+        // ---- SHOP ----
         else if (currentScreen == 9)
         {
-            window.clear(sf::Color(10, 10, 40));
-
-            sf::Text shopText;
-            shopText.setFont(font);
-            shopText.setString("SHOP");
-            shopText.setCharacterSize(50);
-            shopText.setFillColor(sf::Color::Yellow);
-            shopText.setPosition(220.f, 150.f);
-            window.draw(shopText);
-
-            sf::Text comingSoonText;
-            comingSoonText.setFont(font);
-            comingSoonText.setString("Coming Soon!");
-            comingSoonText.setCharacterSize(25);
-            comingSoonText.setFillColor(sf::Color::White);
-            comingSoonText.setPosition(185.f, 250.f);
-            window.draw(comingSoonText);
-
-            sf::Text backText;
-            backText.setFont(font);
-            backText.setString("Press ESC to go back");
-            backText.setCharacterSize(18);
-            backText.setFillColor(sf::Color(180, 180, 180));
-            backText.setPosition(175.f, 380.f);
-            window.draw(backText);
+            gameplay.drawShop(window);
         }
 
         window.display();

@@ -6,6 +6,7 @@ class MogeraChild : public Enemy
 private:
     bool active;
     bool onGround;
+    bool killedBySnowball;
 
 public:
     MogeraChild() : Enemy(0, 0, "MogeraChild")
@@ -14,6 +15,7 @@ public:
         onGround = false;
         velocityX = 0;
         velocityY = 0;
+        killedBySnowball = false;
     }
 
     void spawn(float startX, float startY, float playerX)
@@ -75,6 +77,27 @@ public:
         }
     }
 
+    // Called when hit by a snowball - child dies immediately
+    void instantKill() override
+    {
+        active = false;
+        killedBySnowball = true;
+    }
+
+    // Check collision with player - deactivate and signal hit
+    bool checkPlayerCollision(float playerX, float playerY)
+    {
+        if (!active) return false;
+        sf::FloatRect childBounds(x, y, 20.f, 20.f);
+        sf::FloatRect playerBounds(playerX, playerY, 40.f, 40.f);
+        if (childBounds.intersects(playerBounds))
+        {
+            active = false;
+            return true;
+        }
+        return false;
+    }
+
     void DisplayEnemy(sf::RenderWindow& window) override
     {
         if (!active)
@@ -109,6 +132,11 @@ public:
     void deactivate()
     {
         active = false;
+    }
+
+    float getVelocityY()
+    {
+        return velocityY;
     }
 
     virtual ~MogeraChild()

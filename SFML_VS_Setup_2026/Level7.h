@@ -10,6 +10,7 @@ public:
         loadBackground("assets/bg_level4.jpg");
         loadPlatformTexture("assets/plat_04.png");
 
+        // Platforms
         addPlatform(0, 560, 600, 32);   // Ground
         addPlatform(0, 440, 160, 32);   // Left low
         addPlatform(440, 440, 160, 32);   // Right low
@@ -18,12 +19,16 @@ public:
         addPlatform(460, 240, 140, 32);   // Right upper
         addPlatform(180, 130, 240, 32);   // Top center
 
+        // Enemies - Level7: 4 GreenBotom, 3 GreenFlyingFoogo
         addEnemy(new GreenBotom(80.f, 520.f));
         addEnemy(new GreenBotom(220.f, 520.f));
         addEnemy(new GreenBotom(360.f, 520.f));
         addEnemy(new GreenBotom(500.f, 400.f));
-        addEnemy(new GreenFlyingFoogo(200.f, 320.f));
+        addEnemy(new FlyingFoogaFoog(200.f, 320.f));
         addEnemy(new GreenFlyingFoogo(320.f, 200.f));
         addEnemy(new GreenFlyingFoogo(430.f, 90.f));
+
+        // Level-specific music
+        loadLevelMusic("assets/level_music_7.ogg");
     }
 };

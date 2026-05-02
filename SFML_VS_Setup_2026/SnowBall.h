@@ -2,6 +2,7 @@
 #include "Projectile.h"
 #include "Enemy.h"
 #include <cmath>
+#include <iostream>
 
 class Snowball : public Projectile
 {
@@ -26,8 +27,14 @@ public:
 
 
         shape.setRadius(13.f);
-        shape.setFillColor(sf::Color::White);
+        // Make snowball visually distinct for debugging
+        shape.setFillColor(sf::Color::Red);
+        shape.setOutlineColor(sf::Color::Yellow);
+        shape.setOutlineThickness(2.f);
         shape.setPosition(x, y);
+
+       
+       
     }
 
     void updateTrajactory() override
@@ -40,6 +47,7 @@ public:
         x = x + velocityX;    // As snow ball only moves left right so we just need x -axix...
 
         distanceTravelled = distanceTravelled + abs(velocityX);  // For traking distance coverage......
+        
 
         // Deactivate when max distance reached
         if (distanceTravelled >= maxDistance)

@@ -486,8 +486,7 @@ private:
                     botomEnemies[botomCount] = new GreenBotom(x, y);
                 else if (type == "BlueBotom")
                     botomEnemies[botomCount] = new BlueBotom(x, y);
-                else if (type == "PurpleBotom")
-                    botomEnemies[botomCount] = new PurpleBotom(x, y);
+               
 
                 botomCount++;
             }
@@ -503,8 +502,7 @@ private:
                     flyingEnemies[flyingCount] = new GreenFlyingFoogo(x, y);
                 else if (type == "BlueFlyingFoogo")
                     flyingEnemies[flyingCount] = new BlueFlyingFoogo(x, y);
-                else if (type == "PurpleFlyingFoogo")
-                    flyingEnemies[flyingCount] = new PurpleFlyingFoogo(x, y);
+
 
                 flyingCount++;
             }
@@ -520,8 +518,7 @@ private:
                     tornadoEnemies[tornadoCount] = new GreenTornado(x, y);
                 else if (type == "BlueTornado")
                     tornadoEnemies[tornadoCount] = new BlueTornado(x, y);
-                else if (type == "PurpleTornado")
-                    tornadoEnemies[tornadoCount] = new PurpleTornado(x, y);
+
 
                 tornadoCount++;
             }

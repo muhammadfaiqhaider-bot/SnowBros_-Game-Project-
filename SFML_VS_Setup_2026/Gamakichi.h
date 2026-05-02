@@ -3,6 +3,7 @@
 #include "Rocket.h"
 #include "PLayer.h"
 #include <cmath>
+#include <iostream>
 
 
 
@@ -24,6 +25,7 @@ private:
 
     bool onGround;
     float velocityY;
+    int frameGap;
 
 public:
     Gamakichi(float posX, float posY) : Enemy(posX, posY, "Gamakichi")
@@ -45,6 +47,28 @@ public:
         for (int i = 0; i < MAX_ROCKETS; i++)
         {
             rockets[i] = nullptr;
+        }
+
+        // Sprite-sheet setup for Gamakichi (stationary with 2 frames)
+        // Frame height = 629, total width used = 1086, gap between frames = 230
+        frameWidth =  1086;   
+        frameHeight = 629;
+        totalFrames = 2;
+        currentFrame = 0;
+        animTimer = 0;
+        animSpeed = 20;
+        frameGap = 230;
+
+        if (enemyTexture.loadFromFile("assets/Gamakichi_Face.png"))
+        {
+            textureLoaded = true;
+            enemySprite.setTexture(enemyTexture);
+            enemySprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
+            // scale to roughly 100x120 used previously
+            float sx = 100.f / (float)frameWidth;
+            float sy = 120.f / (float)frameHeight;
+            enemySprite.setScale(sx, sy);
+            enemySprite.setPosition(x, y);
         }
     }
 
@@ -100,6 +124,21 @@ public:
         phaseChanger();
         handleAttack();
         updateRockets();
+
+        // idle animation
+        if (textureLoaded && totalFrames > 1)
+        {
+            animTimer++;
+            if (animTimer >= animSpeed)
+            {
+                animTimer = 0;
+                currentFrame = (currentFrame + 1) % totalFrames;
+            }
+
+            int left = currentFrame * (frameWidth + frameGap);
+            enemySprite.setTextureRect(sf::IntRect(left, 0, frameWidth, frameHeight));
+            enemySprite.setPosition(x, y);
+        }
     }
 
     void phaseChanger()
@@ -186,11 +225,22 @@ public:
             return;
         }
 
-        // Gamakichi - large purple rectangle (bigger than Mogera)
-        sf::RectangleShape gamakichiShape(sf::Vector2f(100.f, 120.f));
-        gamakichiShape.setFillColor(sf::Color(100, 0, 150));    // Dark purple
-        gamakichiShape.setPosition(x, y);
-        window.draw(gamakichiShape);
+        if (textureLoaded)
+        {
+            // ensure frame is updated
+            int left = currentFrame * (frameWidth + frameGap);
+            enemySprite.setTextureRect(sf::IntRect(left, 0, frameWidth, frameHeight));
+            enemySprite.setPosition(x, y);
+            window.draw(enemySprite);
+        }
+        else
+        {
+            // Gamakichi - large purple rectangle (bigger than Mogera)
+            sf::RectangleShape gamakichiShape(sf::Vector2f(100.f, 120.f));
+            gamakichiShape.setFillColor(sf::Color(100, 0, 150));    // Dark purple
+            gamakichiShape.setPosition(x, y);
+            window.draw(gamakichiShape);
+        }
 
         // Health bar background (red)
         sf::RectangleShape healthBarBackground(sf::Vector2f(100.f, 12.f));
@@ -251,6 +301,12 @@ public:
         return isDefeated;
     }
 
+    // Expose death state to Level
+    bool getIsDead() override
+    {
+        return isDefeated;
+    }
+
     void setOnGround(bool value)
     {
         onGround = value;
@@ -292,11 +348,17 @@ public:
             if (rocketBounds.intersects(playerBounds))
             {
                 rockets[i]->deactivate();   // Rocket disappears on hit
+                std::cout << "[Gamakichi] rocket hit player at (" << playerX << "," << playerY << ")\n";
                 return true;
             }
         }
 
         return false;
+    }
+
+    bool isProjectileHittingPlayer(float playerX, float playerY) override
+    {
+        return isRocketHittingPlayer(playerX, playerY);
     }
 
 

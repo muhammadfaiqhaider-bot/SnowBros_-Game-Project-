@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "Player.h"
+#include <iostream>
 
 struct ShopItem
 {
@@ -42,6 +43,12 @@ public:
     void addCoins(int amount)
     {
         coins += amount;
+    }
+
+    // Sync coins from external source (e.g., player's gem count)
+    void syncGems(int gemCount)
+    {
+        coins = gemCount;
     }
 
     int getCoins()
@@ -106,7 +113,8 @@ public:
             if (mx >= 200 && mx <= 400 &&
                 my >= 535 && my <= 575)
             {
-                return 4;   // Back to pause
+                std::cout << "[Shop] Back button clicked" << std::endl;
+                return 3;   // Resume gameplay
             }
         }
 
@@ -114,7 +122,8 @@ public:
         {
             if (event.key.code == sf::Keyboard::Escape)
             {
-                return 4;   // Back to pause
+                std::cout << "[Shop] ESC pressed" << std::endl;
+                return 3;   // Resume gameplay
             }
         }
 
@@ -196,14 +205,17 @@ private:
 
     void tryBuy(int index, Player& player)
     {
-        if (coins < items[index].cost)
+        // Use player's gem balance as source of truth and deduct immediately
+        if (player.getGemCount() < items[index].cost)
         {
             feedbackMessage = "Not enough coins!";
             feedbackTimer = 90;
             return;
         }
 
-        coins -= items[index].cost;
+        // Deduct from player gems and sync internal coins
+        player.spendGems(items[index].cost);
+        coins = player.getGemCount();
 
         switch (index)
         {

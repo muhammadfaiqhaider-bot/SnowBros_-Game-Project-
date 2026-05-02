@@ -18,7 +18,7 @@ public:
 
     Nick(float x, float y) : Player(x, y, "Nick")
     {
-        lives = 50;
+        lives = 20;
         speed = 3.0f;
         snowballPower = 1.0f;
         snowballDistance = 200.0f;

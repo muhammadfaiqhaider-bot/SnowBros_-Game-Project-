@@ -9,8 +9,10 @@ public:
     Level10()
     {
         loadBackground("assets/bg_level6.png");
+        loadPlatformTexture("assets/plat_04.png");
         setEnemyTint(sf::Color(144, 120, 161, 255));
 
+        // Platforms
         addPlatform(0, 560, 600, 32);   // Ground
         addPlatform(0, 470, 120, 32);   // Far left low
         addPlatform(480, 470, 120, 32);   // Far right low
@@ -21,15 +23,16 @@ public:
         addPlatform(470, 210, 130, 32);   // Right upper
         addPlatform(200, 120, 200, 32);   // Top center
 
-        addEnemy(new PurpleBotom(100.f, 520.f));
-        addEnemy(new PurpleBotom(300.f, 520.f));
-        addEnemy(new PurpleBotom(500.f, 520.f));
-        addEnemy(new PurpleFlyingFoogo(180.f, 350.f));
-        addEnemy(new PurpleFlyingFoogo(320.f, 270.f));
-        addEnemy(new PurpleFlyingFoogo(460.f, 170.f));
-        addEnemy(new PurpleTornado(220.f, 80.f));
-        addEnemy(new PurpleTornado(340.f, 80.f));
-        addEnemy(new PurpleTornado(460.f, 80.f));
+        // Enemies - Level10: 3 PurpleBotom, 3 PurpleFlyingFoogo, 3 PurpleTornado + Gamakichi boss top-right
+        addEnemy(new BlueFlyingFoogo(180.f, 350.f));
+        addEnemy(new BlueFlyingFoogo(320.f, 270.f));
+        addEnemy(new BlueFlyingFoogo(460.f, 170.f));
+        addEnemy(new BlueTornado(220.f, 80.f));
+        addEnemy(new BlueTornado(340.f, 80.f));
+        addEnemy(new BlueTornado(460.f, 80.f));
         addEnemy(new Gamakichi(260.f, 80.f));
+
+        // Level-specific music
+        loadLevelMusic("assets/level_music_10.ogg");
     } //Its better if you change this layout faiq -Cheema
 };

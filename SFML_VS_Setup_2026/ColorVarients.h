@@ -14,15 +14,25 @@ public:
     {
         velocityX = velocityX * 1.25f;
         health = health + 1;
+        hitCount = 0;
         name = "GreenBotom";
+
+        // Override texture with orange sprite sheet
+        // Everything else (animation logic, frame sizes) inherited from Botom
+        if (enemyTexture.loadFromFile("assets/Botom_Orange.png"))
+        {
+            textureLoaded = true;
+            enemySprite.setTexture(enemyTexture);
+            enemySprite.setTextureRect(sf::IntRect(0, 136, 88, 88));
+            enemySprite.setScale(40.f / 88.f, 40.f / 88.f);
+        }
     }
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
-        sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-        shape.setFillColor(sf::Color(0, 200, 0));
-        shape.setPosition(x, y);
-        window.draw(shape);
+        // All snow/rolling/encasing display inherited from Botom
+        // Just call parent's DisplayEnemy
+        Botom::DisplayEnemy(window);
     }
 };
 
@@ -38,38 +48,23 @@ public:
         velocityX = velocityX * 1.50f;
         health = health + 2;
         name = "BlueBotom";
+
+        // Override with Pink sprite sheet
+        if (enemyTexture.loadFromFile("assets/Botom_Pink.png"))
+        {
+            textureLoaded = true;
+            enemySprite.setTexture(enemyTexture);
+            enemySprite.setTextureRect(sf::IntRect(0, 136, 88, 88));
+            enemySprite.setScale(40.f / 88.f, 40.f / 88.f);
+        }
     }
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
-        sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-        shape.setFillColor(sf::Color(0, 0, 200));
-        shape.setPosition(x, y);
-        window.draw(shape);
+        Botom::DisplayEnemy(window);    // All animation inherited from Botom
     }
 };
 
-// During level 10 Botom powers increased like 
-// 1- speed increase by 75% 
-// 2- and also health increase means 3 more hit required to shot him down 
-class PurpleBotom : public Botom
-{
-public:
-    PurpleBotom(float posX, float posY) : Botom(posX, posY)
-    {
-        velocityX = velocityX * 1.75f;
-        health = health + 3;
-        name = "PurpleBotom";
-    }
-
-    void DisplayEnemy(sf::RenderWindow& window) override
-    {
-        sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-        shape.setFillColor(sf::Color(128, 0, 128));
-        shape.setPosition(x, y);
-        window.draw(shape);
-    }
-};
 
 
 // During level 6-7 FlyingFoogoFOOG powers increased like 
@@ -80,35 +75,26 @@ class GreenFlyingFoogo : public FlyingFoogaFoog
 public:
     GreenFlyingFoogo(float posX, float posY) : FlyingFoogaFoog(posX, posY)
     {
-        velocityX = velocityX * 1.25f;  // Fixed - multiply not add
+        velocityX = velocityX * 1.25f;
         health = health + 1;
         name = "GreenFlyingFoogo";
+
+        // Override with Orange sprite sheet
+        if (foogaTexture.loadFromFile("assets/FlyingFoogaFoog_Orange.png"))
+        {
+            foogaTextureLoaded = true;
+            foogaSprite.setTexture(foogaTexture);
+            foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
+            foogaSprite.setScale(40.f / WALK_W, 40.f / WALK_H);
+        }
     }
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
-        if (getIsFlying())
-        {
-            // Darker green when flying
-            sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-            shape.setFillColor(sf::Color(0, 180, 0));
-            shape.setPosition(x, y);
-            window.draw(shape);
-        }
-        else
-        {
-            // Lighter green when walking
-            sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-            shape.setFillColor(sf::Color(0, 230, 0));
-            shape.setPosition(x, y);
-            window.draw(shape);
-        }
+        FlyingFoogaFoog::DisplayEnemy(window);  // All animation inherited
     }
 };
 
-// During level 8-9 FlyingFoogaFOOG powers increased like 
-// 1- speed increase by 50% 
-// 2- and also health increase means 2 more hit required to shot him down 
 class BlueFlyingFoogo : public FlyingFoogaFoog
 {
 public:
@@ -117,58 +103,20 @@ public:
         velocityX = velocityX * 1.50f;
         health = health + 2;
         name = "BlueFlyingFoogo";
+
+        // Override with Pink sprite sheet
+        if (foogaTexture.loadFromFile("assets/FlyingFoogaFoog_Red.png"))
+        {
+            foogaTextureLoaded = true;
+            foogaSprite.setTexture(foogaTexture);
+            foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
+            foogaSprite.setScale(40.f / WALK_W, 40.f / WALK_H);
+        }
     }
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
-        if (getIsFlying())
-        {
-            sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-            shape.setFillColor(sf::Color(0, 0, 180));
-            shape.setPosition(x, y);
-            window.draw(shape);
-        }
-        else
-        {
-            sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-            shape.setFillColor(sf::Color(0, 0, 230));
-            shape.setPosition(x, y);
-            window.draw(shape);
-        }
-    }
-};
-
-
-
-// During level 10 FlyingFoogaFOOG powers increased like 
-// 1- speed increase by 75% 
-// 2- and also health increase means 3 more hit required to shot him down 
-class PurpleFlyingFoogo : public FlyingFoogaFoog
-{
-public:
-    PurpleFlyingFoogo(float posX, float posY) : FlyingFoogaFoog(posX, posY)
-    {
-        velocityX = velocityX * 1.75f;
-        health = health + 3;
-        name = "PurpleFlyingFoogo";
-    }
-
-    void DisplayEnemy(sf::RenderWindow& window) override
-    {
-        if (getIsFlying())
-        {
-            sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-            shape.setFillColor(sf::Color(100, 0, 150));
-            shape.setPosition(x, y);
-            window.draw(shape);
-        }
-        else
-        {
-            sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-            shape.setFillColor(sf::Color(150, 0, 200));
-            shape.setPosition(x, y);
-            window.draw(shape);
-        }
+        FlyingFoogaFoog::DisplayEnemy(window);  // All animation inherited
     }
 };
 
@@ -178,7 +126,11 @@ public:
 
 
 
-// Level 6-7: Speed +25%, Health +1, Faster knife
+
+
+
+
+// Level 6-7: Speed +25%, Health +1
 class GreenTornado : public Tornado
 {
 public:
@@ -187,20 +139,24 @@ public:
         velocityX = velocityX * 1.25f;
         health = health + 1;
         name = "GreenTornado";
+
+        // Override with Orange sprite sheet
+        //if (foogaTexture.loadFromFile("assets/FlyingFoogaFoog_Orange.p"))
+        //{
+        //    foogaTextureLoaded = true;
+        //    foogaSprite.setTexture(foogaTexture);
+        //    foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
+        //    foogaSprite.setScale(40.f / WALK_W, 40.f / WALK_H);
+        //}
     }
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
-        sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-        shape.setFillColor(sf::Color(0, 200, 150));     // Teal green
-        shape.setPosition(x, y);
-        window.draw(shape);
+        Tornado::DisplayEnemy(window);  // All animation + knife + snow inherited
     }
 };
 
-
-
-// Level 8-9: Speed +50%, Health +2
+// Level 7-8: Speed +50%, Health +2
 class BlueTornado : public Tornado
 {
 public:
@@ -209,34 +165,22 @@ public:
         velocityX = velocityX * 1.50f;
         health = health + 2;
         name = "BlueTornado";
+
+        // Override with Pink sprite sheet
+        //if (foogaTexture.loadFromFile("assets/FlyingFoogaFoog_Pink.png"))
+        //{
+        //    foogaTextureLoaded = true;
+        //    foogaSprite.setTexture(foogaTexture);
+        //    foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
+        //    foogaSprite.setScale(40.f / WALK_W, 40.f / WALK_H);
+        //}
     }
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
-        sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-        shape.setFillColor(sf::Color(0, 150, 255));     // Light blue
-        shape.setPosition(x, y);
-        window.draw(shape);
+        Tornado::DisplayEnemy(window);  // All animation + knife + snow inherited
     }
 };
 
 
-// Level 10: Speed +75%, Health +3
-class PurpleTornado : public Tornado
-{
-public:
-    PurpleTornado(float posX, float posY) : Tornado(posX, posY)
-    {
-        velocityX = velocityX * 1.75f;
-        health = health + 3;
-        name = "PurpleTornado";
-    }
 
-    void DisplayEnemy(sf::RenderWindow& window) override
-    {
-        sf::RectangleShape shape(sf::Vector2f(40.f, 40.f));
-        shape.setFillColor(sf::Color(180, 0, 255));     // Purple
-        shape.setPosition(x, y);
-        window.draw(shape);
-    }
-};

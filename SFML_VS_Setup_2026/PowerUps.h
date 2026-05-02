@@ -15,6 +15,7 @@ protected:
 
     sf::Sprite powerupSprite;
     sf::Texture powerupTexture;
+    float velocityY;
 
 public:
     PowerUps(float posX, float posY, std::string name)   
@@ -24,9 +25,17 @@ public:
         powerupName = name;
         isActive = true;                                      // Spawns visible on screen
         isCollected = false;
+        velocityY = 0.f; // initialize vertical velocity so gravity works predictably
     }
 
-    virtual void updatePowerUp() = 0;                              // Virtual Function
+    // Default physics: apply gravity to the power-up. Subclasses may override but should call base implementation.
+    virtual void updatePowerUp()
+    {
+        // simple gravity
+        velocityY += 0.5f;
+        if (velocityY > 8.f) velocityY = 8.f;
+        y += velocityY;
+    }
     virtual void DrawPowerUp(sf::RenderWindow& window) = 0;        // Virtual Function
     virtual void applyEffect(Player& player) = 0;
 
@@ -42,6 +51,19 @@ public:
     {
         return sf::FloatRect(x, y, 20.f, 20.f);    // Fixed size hitbox
     }
+
+    void setPosition(float nx, float ny)
+    {
+        x = nx;
+        y = ny;
+    }
+
+    void setVelocityY(float v)
+    {
+        velocityY = v;
+    }
+
+    float getVelocityY() { return velocityY; }
 
     float getX()
     {

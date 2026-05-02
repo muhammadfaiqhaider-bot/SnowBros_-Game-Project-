@@ -43,6 +43,9 @@ private:
     static const int BG_TOTAL_FRAMES = 100;
     static const int BG_FRAME_W = 640;
     static const int BG_FRAME_H = 480;
+    // Audio
+    sf::SoundBuffer clickBuffer;
+    sf::Sound clickSound;
 
 public:
     LoginScreen()
@@ -50,10 +53,11 @@ public:
         font.loadFromFile("assets/Title.ttf");
         text.loadFromFile("assets/Text.ttf");
         subTit.loadFromFile("asstes/Subtitle.ttf");
+
         bgCurrentFrame = 0;
         bgAnimTimer = 0;
         bgAnimLoaded = false;
-
+        // Load your starry background image
         sf::Image fullImage;
         if (fullImage.loadFromFile("assets/login_bg.png"))
         {
@@ -71,10 +75,17 @@ public:
                 bgChunks[c].loadFromImage(fullImage, chunkRect);
             }
 
+        // Load UI click sound buffer (non-fatal)
+        if (clickBuffer.loadFromFile("assets/audio/sfx/ui_click.wav"))
+        {
+            clickSound.setBuffer(clickBuffer);
+        }
+
             bgAnimSprite.setTexture(bgChunks[0]);
             bgAnimSprite.setTextureRect(sf::IntRect(0, 0, BG_FRAME_W, BG_FRAME_H));
             bgAnimSprite.setScale(600.f / BG_FRAME_W, 600.f / BG_FRAME_H);
         }
+
         usernameInput = "";
         passwordInput = "";
         typingUsername = true;
@@ -134,6 +145,8 @@ public:
             else if (mouseX >= 175 && mouseX <= 425 &&
                 mouseY >= 340 && mouseY <= 395)
             {
+                // play click
+                if (clickSound.getBuffer() != nullptr) clickSound.play();
                 if (usernameInput == "" || passwordInput == "")
                 {
                     message = "Please fill all fields!";
@@ -221,70 +234,74 @@ public:
                 }
             }
         }
-
         if (event.type == sf::Event::KeyPressed)
-{
-    if (event.key.code == sf::Keyboard::Tab)
-    {
-        typingUsername = !typingUsername;
-        typingPassword = !typingPassword;
-    }
+        {
+            if (event.key.code == sf::Keyboard::Tab)
+            {
+                typingUsername = !typingUsername;
+                typingPassword = !typingPassword;
+            }
 
-    if (event.key.code == sf::Keyboard::Return)
-    {
-        if (typingUsername)
-        {
-            typingUsername = false;
-            typingPassword = true;
+            if (event.key.code == sf::Keyboard::Return)
+            {
+                if (typingUsername)
+                {
+                    typingUsername = false;
+                    typingPassword = true;
+                }
+                else if (typingPassword)
+                {
+                    if (usernameInput == "" || passwordInput == "")
+                    {
+                        message = "Please fill all fields!";
+                        messageColor = sf::Color(255, 80, 80);
+                    }
+                    else if (showingRegister)
+                    {
+                        if (auth.registerUser(usernameInput, passwordInput, ""))
+                        {
+                            message = "Account created! Now login.";
+                            messageColor = sf::Color(80, 220, 255);
+                            showingRegister = false;
+                            usernameInput = "";
+                            passwordInput = "";
+                            typingUsername = true;
+                            typingPassword = false;
+                        }
+                        else
+                        {
+                            message = "Username already taken!";
+                            messageColor = sf::Color(255, 80, 80);
+                        }
+                    }
+                    else
+                    {
+                        if (auth.loginUser(usernameInput, passwordInput))
+                        {
+                            message = "Welcome!";
+                            messageColor = sf::Color(80, 220, 255);
+                            return 1;
+                        }
+                        else
+                        {
+                            message = "Wrong username or password!";
+                            messageColor = sf::Color(255, 80, 80);
+                        }
+                    }
+                }
+            }
         }
-        else if (typingPassword)
-        {
-            if (usernameInput == "" || passwordInput == "")
-            {
-                message = "Please fill all fields!";
-                messageColor = sf::Color(255, 80, 80);
-            }
-            else if (showingRegister)
-            {
-                if (auth.registerUser(usernameInput, passwordInput, ""))
-                {
-                    message = "Account created! Now login.";
-                    messageColor = sf::Color(80, 220, 255);
-                    showingRegister = false;
-                    usernameInput = "";
-                    passwordInput = "";
-                    typingUsername = true;
-                    typingPassword = false;
-                }
-                else
-                {
-                    message = "Username already taken!";
-                    messageColor = sf::Color(255, 80, 80);
-                }
-            }
-            else
-            {
-                if (auth.loginUser(usernameInput, passwordInput))
-                {
-                    message = "Welcome!";
-                    messageColor = sf::Color(80, 220, 255);
-                    return 1;
-                }
-                else
-                {
-                    message = "Wrong username or password!";
-                    messageColor = sf::Color(255, 80, 80);
-                }
-            }
-        }
-    }
-}
+
         return 0;
     }
+
+
+
 
     // ==========================================
     // DRAW
     // ==========================================
+
     void update()
     {
         if (!bgAnimLoaded) return;
@@ -311,6 +328,7 @@ public:
             window.draw(bgAnimSprite);
         else
         {
+            // Fallback - dark blue if no image
             sf::RectangleShape bg(sf::Vector2f(600.f, 600.f));
             bg.setFillColor(sf::Color(5, 10, 30));
             window.draw(bg);
@@ -337,6 +355,14 @@ public:
         titleLine.setPosition(155.f, 105.f);
         window.draw(titleLine);
 
+        // ---- CENTRE PANEL ----
+        // Outer glow effect
+        sf::RectangleShape panelGlow(sf::Vector2f(268.f, 388.f));
+        panelGlow.setFillColor(sf::Color(0, 0, 0, 0));
+        panelGlow.setOutlineColor(sf::Color(60, 140, 220, 80));
+        panelGlow.setOutlineThickness(6.f);
+        panelGlow.setPosition(165.f, 125.f);
+        window.draw(panelGlow);
 
         // Main panel
         sf::RectangleShape panel(sf::Vector2f(260.f, 380.f));
@@ -366,7 +392,7 @@ public:
         panelTitleText.setPosition(170.f + (260.f - ptWidth) / 2.f, 148.f);
         window.draw(panelTitleText);
 
-
+        
 
         // ---- USERNAME LABEL ----
         sf::Text usernameLabel;

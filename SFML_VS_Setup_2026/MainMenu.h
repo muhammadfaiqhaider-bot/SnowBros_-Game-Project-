@@ -97,14 +97,7 @@ public:
         background.setFillColor(sf::Color(10, 10, 40));
         window.draw(background);
 
-        // ---- SNOW DOTS ----
-        for (int i = 0; i < 30; i++)
-        {
-            sf::CircleShape snowDot(2.f);
-            snowDot.setFillColor(sf::Color(200, 200, 255, 150));
-            snowDot.setPosition(i * 20.f, (i * 37) % 600);
-            window.draw(snowDot);
-        }
+        
 
         // ---- TITLE - SNOW BROS ----
         sf::Text title;
@@ -112,22 +105,22 @@ public:
         title.setString("SNOW BROS");
         title.setCharacterSize(60);
         title.setFillColor(sf::Color::Cyan);
-        title.setPosition(100.f, 60.f);
+        title.setPosition(135.f, 60.f);
         window.draw(title);
 
         // ---- TITLE UNDERLINE ----
         sf::RectangleShape underline(sf::Vector2f(400.f, 3.f));
         underline.setFillColor(sf::Color::Cyan);
-        underline.setPosition(100.f, 130.f);
+        underline.setPosition(110.f, 130.f);
         window.draw(underline);
 
         // ---- WELCOME TEXT ----
         sf::Text welcome;
         welcome.setFont(texts);
-        welcome.setString("Welcome,  " + playerName);
+        welcome.setString("WELCOME,  " + playerName);
         welcome.setCharacterSize(18);
         welcome.setFillColor(sf::Color(180, 180, 255));
-        welcome.setPosition(180.f, 170.f);
+        welcome.setPosition(230.0f, 170.0f);
         window.draw(welcome);
 
         // ---- PLAY BUTTON ----
@@ -142,10 +135,10 @@ public:
         // ---- VERSION TEXT ----
         sf::Text version;
         version.setFont(font);
-        version.setString("v1.0  |  CS1004 OOP Project");
+        version.setString("Made by Cheema The Tuff Guy & Faiq The Danger Man");
         version.setCharacterSize(12);
         version.setFillColor(sf::Color(80, 80, 120));
-        version.setPosition(160.f, 560.f);
+        version.setPosition(120.f, 560.f);
         window.draw(version);
     }
 

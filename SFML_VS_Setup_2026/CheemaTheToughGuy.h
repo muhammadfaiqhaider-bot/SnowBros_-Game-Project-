@@ -1,36 +1,24 @@
 #pragma once
-#include "Player.h"
+#include "AnimatedPlayer.h"
 
-class Cheema : public Player
+class Cheema : public AnimatedPlayer
 {
 public:
-    Cheema(float x, float y) : Player(x, y, "Character2")
+    Cheema(float x, float y)
+        : AnimatedPlayer(x, y, "Cheema", "assets/cheemaling.png")
     {
-        lives = 5;
-        speed = 3.0f;
-        snowballPower = 1.0f;
-        snowballDistance = 400.0f;  // Long range fot Cheema snow ball.........
+        lives = 3;       // fewer lives, offset by range
+        speed = 2.8f;    // slightly slower
+        snowballPower = 1.5f;    // hits harder
+        snowballDistance = 350.0f;  // long range
     }
 
-    void movementsUpdate() override
+    void reset(float nx, float ny)
     {
-        baseMovement();
-    }
-
-    void displayPlayer(sf::RenderWindow& window) override
-    {
-        if (isInvincible)
-        {
-            if (invincibleTimer % 10 < 5)
-            {
-                return;
-            }
-        }
-
-        // Yellow rectangle for Character2
-        sf::RectangleShape charShape(sf::Vector2f(40.f, 40.f));
-        charShape.setFillColor(sf::Color::Yellow);
-        charShape.setPosition(x, y);
-        window.draw(charShape);
+        lives = 3;
+        speed = 2.8f;
+        snowballPower = 1.5f;
+        snowballDistance = 350.0f;
+        resetAnim(nx, ny, "assets/cheemaling.png");
     }
 };

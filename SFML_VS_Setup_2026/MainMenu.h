@@ -13,6 +13,18 @@ private:
     bool leaderboardHovered;
     bool exitHovered;
 
+    static const int FRAMES_PER_CHUNK = 25;  // 25 frames each chunk = 4 chunks for 100 frames
+    static const int CHUNK_COUNT = 4;
+    sf::Texture bgChunks[CHUNK_COUNT];
+    sf::Sprite bgAnimSprite;
+    bool bgAnimLoaded;
+    int bgCurrentFrame;
+    int bgAnimTimer;
+    static const int BG_ANIM_SPEED = 3;
+    static const int BG_TOTAL_FRAMES = 100;
+    static const int BG_FRAME_W = 640;
+    static const int BG_FRAME_H = 480;
+
 public:
     MainMenu()
     {
@@ -23,6 +35,37 @@ public:
         playHovered = false;
         leaderboardHovered = false;
         exitHovered = false;
+
+
+
+        bgCurrentFrame = 0;
+        bgAnimTimer = 0;
+        bgAnimLoaded = false;
+        // Load your starry background image
+        sf::Image fullImage;
+        if (fullImage.loadFromFile("assets/login_bg.png"))
+        {
+            bgAnimLoaded = true;
+
+            for (int c = 0; c < CHUNK_COUNT; c++)
+            {
+                // Each chunk is 25 frames wide
+                sf::IntRect chunkRect(
+                    c * FRAMES_PER_CHUNK * BG_FRAME_W,  // x start
+                    0,                                    // y start
+                    FRAMES_PER_CHUNK * BG_FRAME_W,       // width = 25 * 640 = 16000px
+                    BG_FRAME_H                            // height
+                );
+                bgChunks[c].loadFromImage(fullImage, chunkRect);
+            }
+
+
+
+            bgAnimSprite.setTexture(bgChunks[0]);
+            bgAnimSprite.setTextureRect(sf::IntRect(0, 0, BG_FRAME_W, BG_FRAME_H));
+            bgAnimSprite.setScale(600.f / BG_FRAME_W, 600.f / BG_FRAME_H);
+        }
+
     }
 
     // ==========================================
@@ -89,14 +132,36 @@ public:
     // ==========================================
     // DRAW
     // ==========================================
+    void update()
+    {
+        if (!bgAnimLoaded) return;
 
+        bgAnimTimer++;
+        if (bgAnimTimer >= BG_ANIM_SPEED)
+        {
+            bgAnimTimer = 0;
+            bgCurrentFrame = (bgCurrentFrame + 1) % BG_TOTAL_FRAMES;
+
+            int chunk = bgCurrentFrame / FRAMES_PER_CHUNK;
+            int frameInChunk = bgCurrentFrame % FRAMES_PER_CHUNK;
+
+            bgAnimSprite.setTexture(bgChunks[chunk]);
+            bgAnimSprite.setTextureRect(sf::IntRect(
+                frameInChunk * BG_FRAME_W, 0, BG_FRAME_W, BG_FRAME_H
+            ));
+        }
+    }
     void draw(sf::RenderWindow& window, std::string playerName)
     {
-        // ---- BACKGROUND ----
-        sf::RectangleShape background(sf::Vector2f(600.f, 600.f));
-        background.setFillColor(sf::Color(10, 10, 40));
-        window.draw(background);
-
+        if (bgAnimLoaded)
+            window.draw(bgAnimSprite);
+        else
+        {
+            // Fallback - dark blue if no image
+            sf::RectangleShape bg(sf::Vector2f(600.f, 600.f));
+            bg.setFillColor(sf::Color(5, 10, 30));
+            window.draw(bg);
+        }
         
 
         // ---- TITLE - SNOW BROS ----
@@ -104,13 +169,13 @@ public:
         title.setFont(font);
         title.setString("SNOW BROS");
         title.setCharacterSize(60);
-        title.setFillColor(sf::Color::Cyan);
+        title.setFillColor(sf::Color(218, 152, 227));
         title.setPosition(135.f, 60.f);
         window.draw(title);
 
         // ---- TITLE UNDERLINE ----
         sf::RectangleShape underline(sf::Vector2f(400.f, 3.f));
-        underline.setFillColor(sf::Color::Cyan);
+        underline.setFillColor(sf::Color(188, 109, 199));
         underline.setPosition(110.f, 130.f);
         window.draw(underline);
 
@@ -152,14 +217,14 @@ private:
 
         if (hovered)
         {
-            button.setFillColor(sf::Color(0, 100, 180));    // Brighter when hovered
-            button.setOutlineColor(sf::Color::Cyan);
+            button.setFillColor(sf::Color(46, 17, 51));    // Brighter when hovered
+            button.setOutlineColor(sf::Color(218, 152, 227));
             button.setOutlineThickness(2.f);
         }
         else
         {
-            button.setFillColor(sf::Color(0, 50, 100));     // Normal color
-            button.setOutlineColor(sf::Color(0, 100, 180));
+            button.setFillColor(sf::Color(41, 14, 46));     // Normal color
+            button.setOutlineColor(sf::Color(102, 54, 112));
             button.setOutlineThickness(1.f);
         }
 
@@ -171,7 +236,7 @@ private:
         buttonText.setFont(texts);
         buttonText.setString(text);
         buttonText.setCharacterSize(18);
-        buttonText.setFillColor(sf::Color::White);
+        buttonText.setFillColor(sf::Color(218, 152, 227));
 
         // Center text in button
         float textWidth = text.length() * 10.f;

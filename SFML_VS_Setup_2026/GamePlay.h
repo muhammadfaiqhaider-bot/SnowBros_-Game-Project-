@@ -2,8 +2,10 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "Shop.h"
-#include <iostream>
 #include "Nick.h"
+#include <iostream>
+#include "CheemaTheToughGuy.h"
+#include "FaiqTheDangerMan.h"
 #include "HUD.h"
 #include "levels.h"
 #include "Level1.h"
@@ -29,14 +31,31 @@ private:
     Level* levels[10];
     int totalLevels;
 
-
     std::string saveMessage;
     int saveMessageTimer;
 
     sf::Font font;
 
+    // ---- TWO PLAYER ----
+    Player* player2;        // nullptr in 1P mode
+    bool twoPlayerMode;
+    bool p2Alive;           // tracks if P2 is still in the game
+
+    // Mirrors one shop slot's effect onto any player without touching gems
+    void applyShopItemToPlayer(int index, Player& p)
+    {
+        switch (index)
+        {
+        case 0: p.applySpeedBoost();       break;
+        case 1: p.applySnowballPower();    break;
+        case 2: p.applyDistanceIncrease(); break;
+        case 3: p.applyBalloonMode();      break;
+        case 4: p.addLife();               break;
+        }
+    }
+
 public:
-    GamePlay() : nick(100.f, 520.f)
+    GamePlay() : nick(100.f, 520.f), player2(nullptr), twoPlayerMode(false), p2Alive(false)
     {
         font.loadFromFile("assets/text.ttf");
 
@@ -48,123 +67,215 @@ public:
         totalLevels = 10;
         for (int i = 0; i < 10; i++)
             levels[i] = nullptr;
-        // create first level lazily
         levels[0] = new Level1();
     }
+
+    ~GamePlay()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            if (levels[i] != nullptr)
+            {
+                delete levels[i];
+                levels[i] = nullptr;
+            }
+        }
+        if (player2 != nullptr)
+        {
+            delete player2;
+            player2 = nullptr;
+        }
+    }
+
+    // ==========================================
+    // Call this from main.cpp right after gameplay.reset()
+    // when transitioning from CharacterSelect -> Gameplay
+    // ==========================================
+    void setTwoPlayerMode(bool enabled, int p1Char, int p2Char)
+    {
+        twoPlayerMode = enabled;
+        p2Alive = enabled;  // P2 starts alive only in 2P mode
+
+        // Always clean up any old P2
+        if (player2 != nullptr)
+        {
+            delete player2;
+            player2 = nullptr;
+        }
+
+        if (!enabled) return;
+
+        // Spawn P2 offset from P1 so they don't overlap
+        switch (p2Char)
+        {
+        case 0: player2 = new Nick(400.f, 520.f);   break;
+        case 1: player2 = new Faiq(400.f, 520.f);   break;
+        case 2: player2 = new Cheema(400.f, 520.f); break;
+        default: player2 = new Nick(400.f, 520.f);  break;
+        }
+
+        if (player2 != nullptr)
+            player2->setAsPlayer2();    // switches controls to arrow keys
+    }
+
+    int getPlayerMode() const { return twoPlayerMode ? 2 : 1; }
 
     void loadCurrentLevel()
     {
         int idx = currentLevelNumber - 1;
-        if (idx < 0 || idx >= 10)
-        {
-            std::cout << "[GamePlay] loadCurrentLevel: invalid level index " << idx << std::endl;
-            return;
-        }
+        if (idx < 0 || idx >= 10) return;
+        if (levels[idx] != nullptr) return;
 
-        if (levels[idx] != nullptr)
-            return;  // already loaded
-        std::cout << "[GamePlay] Loading level " << currentLevelNumber << std::endl;
         switch (currentLevelNumber)
         {
-        case 1: levels[idx] = new Level1(); break;
-        case 2: levels[idx] = new Level2(); break;
-        case 3: levels[idx] = new Level3(); break;
-        case 4: levels[idx] = new Level4(); break;
-        case 5: levels[idx] = new Level5(); break;
-        case 6: levels[idx] = new Level6(); break;
-        case 7: levels[idx] = new Level7(); break;
-        case 8: levels[idx] = new Level8(); break;
-        case 9: levels[idx] = new Level9(); break;
+        case 1:  levels[idx] = new Level1();  break;
+        case 2:  levels[idx] = new Level2();  break;
+        case 3:  levels[idx] = new Level3();  break;
+        case 4:  levels[idx] = new Level4();  break;
+        case 5:  levels[idx] = new Level5();  break;
+        case 6:  levels[idx] = new Level6();  break;
+        case 7:  levels[idx] = new Level7();  break;
+        case 8:  levels[idx] = new Level8();  break;
+        case 9:  levels[idx] = new Level9();  break;
         case 10: levels[idx] = new Level10(); break;
         default: break;
         }
     }
+
     int handleEvents(sf::Event& event)
     {
         if (event.type == sf::Event::KeyPressed)
         {
             if (event.key.code == sf::Keyboard::Space)
-            {
                 nick.throwSnowball();
+
+            // P2 throw — only if P2 is still alive
+            if (twoPlayerMode && player2 != nullptr && p2Alive)
+            {
+                if (event.key.code == sf::Keyboard::Numpad0)
+                    player2->throwSnowball();
             }
 
             if (event.key.code == sf::Keyboard::Escape)
-            {
                 return 4;
-            }
         }
-
         return 3;
     }
 
-    // Forward shop events so purchases apply to the active player
     int handleShopEvents(sf::Event& event)
     {
-        int r = shop.handleEvents(event, nick);
-        return r;
+        // Let the shop run normally against P1 (deducts gems, applies effect)
+        int result = shop.handleEvents(event, nick);
+
+        // If a purchase just happened, mirror the effect onto P2
+        if (twoPlayerMode && player2 != nullptr && p2Alive)
+        {
+            if (event.type == sf::Event::MouseButtonPressed)
+            {
+                float mx = event.mouseButton.x;
+                float my = event.mouseButton.y;
+
+                // Same hit-test as Shop::handleEvents item buttons
+                // Items are at y = 160 + i*70, height 55, x 150-450
+                for (int i = 0; i < 5; i++)
+                {
+                    float btnY = 160.f + i * 70.f;
+                    if (mx >= 150 && mx <= 450 && my >= btnY && my <= btnY + 55.f)
+                    {
+                        // Apply the matching effect to P2 — no gem deduction
+                        applyShopItemToPlayer(i, *player2);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
+
 
     void drawShop(sf::RenderWindow& window)
     {
         shop.draw(window);
     }
 
+    // ==========================================
+    // UPDATE
+    // ==========================================
     int update()
     {
         loadCurrentLevel();
-        handlePlayerPlatformCollision();
-
-    
-
         Level* current = levels[currentLevelNumber - 1];
+
+        // ---- P1 update ----
+        nick.movementsUpdate();
+        handlePlayerPlatformCollision(&nick);
 
         if (current != nullptr)
         {
-            // Pass player pointer so Level::update can award score and gems
             current->update(nick.getPositionX(), nick.getPositionY(), &nick);
-
-            // Sync shop coins with player's gems every frame
             shop.syncGems(nick.getGemCount());
-
-            // Ensure snowball is moved before running collision checks so hits are detected
             nick.updateSnowball();
 
             if (nick.getSnowball() != nullptr)
-            {
-                if (current->checkSnowballCollision(nick.getSnowball()))
-                {
-
-                }
-            }
+                current->checkSnowballCollision(nick.getSnowball());
 
             if (current->isPlayerHit(nick.getPositionX(), nick.getPositionY()))
-            {
                 nick.loseLife();
-            }
-
-            if (current->isLevelComplete())
-            {
-                std::cout << "[GamePlay] Level " << currentLevelNumber << " is complete" << std::endl;
-                // If this was the last level, indicate game complete (7)
-                if (currentLevelNumber >= totalLevels)
-                    return 7;
-                return 6;
-            }
         }
 
-        if (!nick.getIsAlive())
+        // ---- P2 update (only when alive) ----
+        if (twoPlayerMode && player2 != nullptr && p2Alive)
+        {
+            player2->movementsUpdate();
+            handlePlayerPlatformCollision(player2);
+
+            if (current != nullptr)
+            {
+                // P2 shares the same level; pass P2 position for enemy/powerup logic
+                // Note: calling update again would double-update enemies, so we only
+                // check hits and snowball collision for P2 separately.
+                player2->updateSnowball();
+
+                if (player2->getSnowball() != nullptr)
+                    current->checkSnowballCollision(player2->getSnowball());
+
+                if (current->isPlayerHit(player2->getPositionX(), player2->getPositionY()))
+                    player2->loseLife();
+            }
+
+            // Check if P2 just died this frame
+            if (!player2->getIsAlive())
+                p2Alive = false;
+        }
+
+        // ---- Level complete ----
+        if (current != nullptr && current->isLevelComplete())
+        {
+            if (currentLevelNumber >= totalLevels)
+                return 7;
+            return 6;
+        }
+
+        // ---- Game over: P1 dead AND (P2 dead or not in use) ----
+        bool p1Dead = !nick.getIsAlive();
+        bool p2Dead = !twoPlayerMode || !p2Alive;
+
+        if (p1Dead && p2Dead)
             return 5;
 
-        // snowball already updated before collision checks
+        // HUD: show whoever is still alive (P1 stats; P2 shown separately in draw)
         hud.update(nick.getScore(), nick.getLives(), nick.getGemCount(), currentLevelNumber);
 
         if (saveMessageTimer > 0)
             saveMessageTimer--;
 
-        nick.movementsUpdate();
-
         return 3;
     }
+
+    // ==========================================
+    // DRAW
+    // ==========================================
     void draw(sf::RenderWindow& window)
     {
         loadCurrentLevel();
@@ -174,23 +285,38 @@ public:
         if (current != nullptr)
             current->draw(window);
 
-        // Debug / fallback: if level has no platforms (blank) draw gameplay's platforms
         if (current == nullptr || current->getPlatformCount() == 0)
         {
             for (int i = 0; i < 6; i++)
                 window.draw(platforms[i]);
         }
 
+        // Draw P1 snowball and player
         nick.drawSnowball(window);
-        nick.displayPlayer(window);
+        if (nick.getIsAlive())
+            nick.displayPlayer(window);
+
+        // Draw P2 snowball and player (only while alive)
+        if (twoPlayerMode && player2 != nullptr && p2Alive)
+        {
+            player2->drawSnowball(window);
+            player2->displayPlayer(window);
+        }
+
+        // Main HUD (P1)
         hud.draw(window);
 
-        // Draw current level number and platform count for debugging
+        // P2 HUD shown at the right side of the HUD bar when in 2P mode
+        if (twoPlayerMode && player2 != nullptr)
+            drawP2HUD(window);
+
+        // Debug level info
         sf::Text lvlText;
         lvlText.setFont(font);
         int platformCount = 0;
         if (current != nullptr) platformCount = current->getPlatformCount();
-        lvlText.setString(std::string("Level: ") + std::to_string(currentLevelNumber) + " P: " + std::to_string(platformCount));
+        lvlText.setString(std::string("Level: ") + std::to_string(currentLevelNumber) +
+            " P: " + std::to_string(platformCount));
         lvlText.setCharacterSize(14);
         lvlText.setFillColor(sf::Color::Yellow);
         lvlText.setPosition(10.f, 560.f);
@@ -207,7 +333,6 @@ public:
             window.draw(saveText);
         }
 
-        // Draw power-up pickup message (from player)
         if (nick.getPowerupMessageTimer() > 0 && !nick.getPowerupMessage().empty())
         {
             sf::Text pText;
@@ -223,47 +348,45 @@ public:
     void drawOnly(sf::RenderWindow& window)
     {
         window.clear(sf::Color(200, 150, 150));
-
         Level* current = levels[currentLevelNumber - 1];
         if (current != nullptr)
             current->draw(window);
 
         nick.displayPlayer(window);
+
+        if (twoPlayerMode && player2 != nullptr && p2Alive)
+            player2->displayPlayer(window);
+
         hud.draw(window);
+        if (twoPlayerMode && player2 != nullptr)
+            drawP2HUD(window);
     }
 
     void goNextLevel()
     {
-        std::cout << "[GamePlay] goNextLevel from " << currentLevelNumber << std::endl;
         int idx = currentLevelNumber - 1;
         if (levels[idx] != nullptr)
         {
             delete levels[idx];
             levels[idx] = nullptr;
         }
-
         currentLevelNumber++;
-        nick.snapToGround(520.f);   // Reset player position
+        nick.snapToGround(520.f);
+        if (twoPlayerMode && player2 != nullptr && p2Alive)
+            player2->snapToGround(520.f);
     }
 
     bool isGameComplete()
     {
-        // Consider game complete when we've progressed past the last level
-        // or when the current (last) level is already marked complete.
-        if (currentLevelNumber > totalLevels)
-            return true;
-
+        if (currentLevelNumber > totalLevels) return true;
         if (currentLevelNumber == totalLevels)
         {
             Level* current = levels[currentLevelNumber - 1];
             if (current != nullptr && current->isLevelComplete())
                 return true;
         }
-
         return false;
     }
-
-
 
     void showSaveMessage()
     {
@@ -277,32 +400,36 @@ public:
     int getGems() { return nick.getGemCount(); }
     int getLevel() { return currentLevelNumber; }
 
-    // Play/stop per-level music (wrappers that call into current Level)
     void playLevelMusic()
     {
         int idx = currentLevelNumber - 1;
         if (idx < 0 || idx >= 10) return;
-        if (levels[idx] == nullptr)
-            loadCurrentLevel();
-        if (levels[idx] != nullptr)
-            levels[idx]->playLevelMusic();
+        if (levels[idx] == nullptr) loadCurrentLevel();
+        if (levels[idx] != nullptr) levels[idx]->playLevelMusic();
     }
 
     void stopLevelMusic()
     {
         int idx = currentLevelNumber - 1;
         if (idx < 0 || idx >= 10) return;
-        if (levels[idx] != nullptr)
-            levels[idx]->stopLevelMusic();
+        if (levels[idx] != nullptr) levels[idx]->stopLevelMusic();
     }
 
     void reset()
     {
         currentLevelNumber = 1;
-        nick = Nick(100.f, 520.f);
+        nick.reset(100.f, 520.f);
         saveMessage = "";
         saveMessageTimer = 0;
-        // levelTimer = 0;
+
+        // Clean up P2 — will be re-created by setTwoPlayerMode if needed
+        if (player2 != nullptr)
+        {
+            delete player2;
+            player2 = nullptr;
+        }
+        twoPlayerMode = false;
+        p2Alive = false;
 
         for (int i = 0; i < 10; i++)
         {
@@ -312,86 +439,109 @@ public:
                 levels[i] = nullptr;
             }
         }
-        // only recreate first level; others will be created lazily
         levels[0] = new Level1();
         totalLevels = 10;
     }
 
-    ~GamePlay()
+private:
+
+    // ==========================================
+    // P2 mini-HUD — lives shown on the right of the HUD bar
+    // ==========================================
+    void drawP2HUD(sf::RenderWindow& window)
     {
-        for (int i = 0; i < 10; i++)
+        sf::Font& f = font;
+
+        // "P2" label
+        sf::Text p2Label;
+        p2Label.setFont(f);
+        p2Label.setString("P2:");
+        p2Label.setCharacterSize(12);
+        p2Label.setFillColor(p2Alive ? sf::Color(255, 140, 0) : sf::Color(100, 100, 100));
+        p2Label.setPosition(360.f, 45.f);
+        window.draw(p2Label);
+
+        int p2Lives = (player2 != nullptr) ? player2->getLives() : 0;
+
+        for (int i = 0; i < 5; i++)
         {
-            if (levels[i] != nullptr)
-            {
-                delete levels[i];
-                levels[i] = nullptr;
-            }
+            sf::CircleShape heart(8.f);
+            if (i < p2Lives && p2Alive)
+                heart.setFillColor(sf::Color(255, 100, 0));   // orange hearts for P2
+            else
+                heart.setFillColor(sf::Color(60, 60, 60));
+            heart.setPosition(390.f + i * 22.f, 43.f);
+            window.draw(heart);
+        }
+
+        // "DEAD" label if P2 is gone
+        if (!p2Alive)
+        {
+            sf::Text deadText;
+            deadText.setFont(f);
+            deadText.setString("DEAD");
+            deadText.setCharacterSize(11);
+            deadText.setFillColor(sf::Color(180, 60, 60));
+            deadText.setPosition(390.f, 45.f);
+            window.draw(deadText);
         }
     }
 
-private:
-
-
-    void setupPlatforms()
-    {
-        // Platform 1 - Ground
-        platforms[0].setSize(sf::Vector2f(600.f, 20.f));
-        platforms[0].setFillColor(sf::Color(128, 0, 128));
-        platforms[0].setPosition(0.f, 560.f);
-
-        // Platform 2 - Middle Left
-        platforms[1].setSize(sf::Vector2f(250.f, 20.f));
-        platforms[1].setFillColor(sf::Color(128, 0, 128));
-        platforms[1].setPosition(0.f, 420.f);
-
-        // Platform 3 - Middle Right
-        platforms[2].setSize(sf::Vector2f(250.f, 20.f));
-        platforms[2].setFillColor(sf::Color(128, 0, 128));
-        platforms[2].setPosition(350.f, 420.f);
-
-        // Platform 4 - Upper Middle
-        platforms[3].setSize(sf::Vector2f(300.f, 20.f));
-        platforms[3].setFillColor(sf::Color(128, 0, 128));
-        platforms[3].setPosition(150.f, 280.f);
-
-        // Platform 5 - Top Left
-        platforms[4].setSize(sf::Vector2f(200.f, 20.f));
-        platforms[4].setFillColor(sf::Color(128, 0, 128));
-        platforms[4].setPosition(0.f, 140.f);
-
-        // Platform 6 - Top Right
-        platforms[5].setSize(sf::Vector2f(200.f, 20.f));
-        platforms[5].setFillColor(sf::Color(128, 0, 128));
-        platforms[5].setPosition(400.f, 140.f);
-    }
-
-
-    void handlePlayerPlatformCollision()
+    // ==========================================
+    // Platform collision — works for any Player*
+    // ==========================================
+    void handlePlayerPlatformCollision(Player* p)
     {
         if (levels[currentLevelNumber - 1] == nullptr) return;
-
-        sf::RectangleShape* platforms = levels[currentLevelNumber - 1]->getPlatforms();
+        sf::RectangleShape* plats = levels[currentLevelNumber - 1]->getPlatforms();
         int count = levels[currentLevelNumber - 1]->getPlatformCount();
 
-        nick.setOnGround(false);
+        p->setOnGround(false);
 
         for (int i = 0; i < count; i++)
         {
-            sf::FloatRect nickBounds(nick.getPositionX(), nick.getPositionY(), 40.f, 40.f);
-            sf::FloatRect platformBounds = platforms[i].getGlobalBounds();
+            sf::FloatRect playerBounds(p->getPositionX(), p->getPositionY(), 40.f, 50.f);
+            sf::FloatRect platBounds = plats[i].getGlobalBounds();
 
-            if (nickBounds.intersects(platformBounds))
+            if (playerBounds.intersects(platBounds))
             {
-                float platformTop = platforms[i].getPosition().y;
+                float platTop = plats[i].getPosition().y;
+                float playerBot = p->getPositionY() + 50.f;
 
-                if (nick.getPositionY() + 40.f <= platformTop + 10.f)
+                if (playerBot >= platTop && p->getPositionY() < platTop && p->getVelocityY() >= 0.f)
                 {
-                    nick.setOnGround(true);
-                    nick.setJump(0);
-                    nick.snapToGround(platformTop - 40.f);
+                    p->setOnGround(true);
+                    p->setJump(0);
+                    p->snapToGround(platTop - 49.9f);
                 }
             }
         }
     }
 
+    void setupPlatforms()
+    {
+        platforms[0].setSize(sf::Vector2f(600.f, 20.f));
+        platforms[0].setFillColor(sf::Color(128, 0, 128));
+        platforms[0].setPosition(0.f, 560.f);
+
+        platforms[1].setSize(sf::Vector2f(250.f, 20.f));
+        platforms[1].setFillColor(sf::Color(128, 0, 128));
+        platforms[1].setPosition(0.f, 420.f);
+
+        platforms[2].setSize(sf::Vector2f(250.f, 20.f));
+        platforms[2].setFillColor(sf::Color(128, 0, 128));
+        platforms[2].setPosition(350.f, 420.f);
+
+        platforms[3].setSize(sf::Vector2f(300.f, 20.f));
+        platforms[3].setFillColor(sf::Color(128, 0, 128));
+        platforms[3].setPosition(150.f, 280.f);
+
+        platforms[4].setSize(sf::Vector2f(200.f, 20.f));
+        platforms[4].setFillColor(sf::Color(128, 0, 128));
+        platforms[4].setPosition(0.f, 140.f);
+
+        platforms[5].setSize(sf::Vector2f(200.f, 20.f));
+        platforms[5].setFillColor(sf::Color(128, 0, 128));
+        platforms[5].setPosition(400.f, 140.f);
+    }
 };

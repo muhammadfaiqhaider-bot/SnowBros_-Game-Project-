@@ -8,6 +8,11 @@ public:
     SnowballPower(float posX, float posY) : PowerUps(posX, posY, "SnowballPower")   // Take x, y positions as spawning point......
     {
         isActive = true;
+		powerupTexture.loadFromFile("assets/SnowballPower.png"); // Load the texture for the snowball power-up
+        powerupSprite.setTexture(powerupTexture);
+        powerupSprite.setScale(30.f / powerupTexture.getSize().x, 30.f / powerupTexture.getSize().y); // Scale to desired size
+		powerupSprite.setPosition(x, y);
+
     }
 
     void updatePowerUp() override
@@ -23,12 +28,9 @@ public:
     void DrawPowerUp(sf::RenderWindow& window) override
     {
         if (isActive && !isCollected)
-        {
-            // White circle - snowball power
-            sf::CircleShape shape(15.0f);
-            shape.setFillColor(sf::Color::White);
-            shape.setPosition(x, y);
-            window.draw(shape);
+        {   
+			window.draw(powerupSprite);
+
         }
     }
 };

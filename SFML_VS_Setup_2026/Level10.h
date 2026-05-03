@@ -9,7 +9,7 @@ public:
     Level10()
     {
         loadBackground("assets/bg_level6.png");
-        loadPlatformTexture("assets/plat_04.png");
+        loadPlatformTexture("assets/plat_05.png");
         setEnemyTint(sf::Color(144, 120, 161, 255));
 
         // Platforms

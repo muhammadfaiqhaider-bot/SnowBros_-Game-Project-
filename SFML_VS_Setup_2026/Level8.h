@@ -30,7 +30,7 @@ public:
 
         addEnemy(new BlueTornado(420.f, 90.f));
 
-        // Level-specific music
-        loadLevelMusic("assets/level_music_8.ogg");
+        loadLevelMusic("assets/level_music_7.ogg");
+
     }
 };

@@ -9,7 +9,7 @@ public:
     Level6()
     {
         loadBackground("assets/bg_level3.png");
-        loadPlatformTexture("assets/plat_04.png");
+        loadPlatformTexture("assets/plat_03.png");
         setEnemyTint(sf::Color(255, 177, 153, 255)); //The shyt that makes sprites a bit darker in places with darker backgrounds
         //SetTint is a virt func in enemy, override it in other monsters to set their sprite to an sf::color as i did in fooga
 
@@ -29,7 +29,7 @@ public:
         addEnemy(new FlyingFoogaFoog(480.f, 200.f));
 
         // Level-specific music
-        loadLevelMusic("assets/level_music_6.ogg");
+        loadLevelMusic("assets/level_music_5.ogg");
 
     }
 };

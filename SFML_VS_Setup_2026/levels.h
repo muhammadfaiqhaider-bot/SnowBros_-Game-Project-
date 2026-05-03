@@ -99,7 +99,7 @@ public:
         if (levelMusicLoaded)
         {
             levelMusic.setLoop(true);
-            levelMusic.setVolume(70.f);
+            levelMusic.setVolume(20.f);
         }
     }
 

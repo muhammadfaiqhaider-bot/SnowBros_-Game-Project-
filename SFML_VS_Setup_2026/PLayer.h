@@ -43,6 +43,7 @@ protected:
 
     sf::Sprite playerSprite;
     sf::Texture playerTexture;
+    bool isPlayer2;
 
 
 
@@ -63,6 +64,7 @@ public:
         speed = 3.0f;
         snowballPower = 1.0f;
         snowballDistance = 200.0f;  // Medium range
+        isPlayer2 = false;
 
         // Economy
         score = 0;
@@ -150,6 +152,9 @@ public:
     {
         lives++;
     }
+
+    void setAsPlayer2() { isPlayer2 = true; }
+
 
     void applyBalloonMode()
     {
@@ -343,29 +348,46 @@ public:
     {
         velocityX = 0;
 
-        // Horizontal movement
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        if (!isPlayer2)
         {
-            velocityX = -speed;
-            direction = -1;
+            // Player 1 - WASD
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+            {
+                velocityX = -speed;
+                direction = -1;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            {
+                velocityX = speed;
+                direction = 1;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && !isJumping)
+            {
+                velocityY = -13.0f;
+                onGround = false;
+                isJumping = true;
+            }
         }
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        else
         {
-            velocityX = speed;
-            direction = 1;
+            // Player 2 - Arrow keys
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            {
+                velocityX = -speed;
+                direction = -1;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            {
+                velocityX = speed;
+                direction = 1;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && !isJumping)
+            {
+                velocityY = -13.0f;
+                onGround = false;
+                isJumping = true;
+            }
         }
-
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && isJumping == 0) //added ts jumping conditition so that bro doesn't infinite jump -Cheema 
-
-
-        {
-            velocityY = -13.0f; //increased jump velo - Cheema
-            onGround = false;
-            isJumping = true;
-        }
-
         // Gravity - only when NOT on ground
         if (!onGround)
         {
@@ -411,6 +433,7 @@ public:
     }
 
 
+    float getVelocityY() const { return velocityY; }
 
 
     void throwSnowball()

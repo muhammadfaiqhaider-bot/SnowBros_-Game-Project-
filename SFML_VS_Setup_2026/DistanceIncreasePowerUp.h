@@ -8,6 +8,11 @@ public:
     DistanceIncrease(float posX, float posY) : PowerUps(posX, posY, "DistanceIncrease")    // Take x, y positions as spawning point......
     {
         isActive = true;
+        powerupTexture.loadFromFile("assets/DistanceIncrease.png");
+		powerupSprite.setTexture(powerupTexture);
+        powerupSprite.setScale(30.f / powerupTexture.getSize().x, 30.f / powerupTexture.getSize().y);
+        powerupSprite.setPosition(x, y);
+
     }
 
     void updatePowerUp() override
@@ -25,11 +30,8 @@ public:
     {
         if (isActive && !isCollected)
         {
-            // Blue circle - distance increase
-            sf::CircleShape shape(15.0f);
-            shape.setFillColor(sf::Color::Blue);
-            shape.setPosition(x, y);
-            window.draw(shape);
+
+            window.draw(powerupSprite);
         }
     }
 };

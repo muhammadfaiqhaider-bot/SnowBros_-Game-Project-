@@ -8,6 +8,11 @@ public:
     SpeedBoost(float posX, float posY) : PowerUps(posX, posY, "SpeedBoost")    // Take x, y positions as spawning point......
     {
         isActive = true;
+		powerupTexture.loadFromFile("assets/SpeedBoost.png");
+		powerupSprite.setTexture(powerupTexture);
+		powerupSprite.setScale(30.f / powerupTexture.getSize().x, 30.f / powerupTexture.getSize().y); // scale to 30x30 pixels
+		powerupSprite.setPosition(x, y);
+
     }
 
     void updatePowerUp() override
@@ -25,11 +30,8 @@ public:
     {
         if (isActive && !isCollected)
         {
-            // Yellow circle - speed boost
-            sf::CircleShape shape(15.0f);
-            shape.setFillColor(sf::Color::Yellow);
-            shape.setPosition(x, y);
-            window.draw(shape);
+
+            window.draw(powerupSprite);
         }
     }
 };

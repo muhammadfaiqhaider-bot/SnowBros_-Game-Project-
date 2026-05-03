@@ -39,13 +39,13 @@ public:
         items[4] = { "Extra Life",         "+1 Life",                    80,  false };
     }
 
-    // ---- COIN MANAGEMENT ----
+    //  COIN MANAGEMENT 
     void addCoins(int amount)
     {
         coins += amount;
     }
 
-    // Sync coins from external source (e.g., player's gem count)
+    // Sync coins 
     void syncGems(int gemCount)
     {
         coins = gemCount;
@@ -62,7 +62,7 @@ public:
         coins += 5;
     }
 
-    // Called when level complete - bonus based on time
+
     void onLevelComplete(int secondsTaken)
     {
         if (secondsTaken < 60)
@@ -73,11 +73,7 @@ public:
         }
     }
 
-    // ==========================================
-    // HANDLE EVENTS
-    // Returns:
-    // 4  = stay in shop (back to pause)
-    // ==========================================
+
     int handleEvents(sf::Event& event, Player& player)
     {
         if (event.type == sf::Event::MouseMoved)
@@ -113,7 +109,6 @@ public:
             if (mx >= 200 && mx <= 400 &&
                 my >= 535 && my <= 575)
             {
-                std::cout << "[Shop] Back button clicked" << std::endl;
                 return 3;   // Resume gameplay
             }
         }
@@ -122,7 +117,6 @@ public:
         {
             if (event.key.code == sf::Keyboard::Escape)
             {
-                std::cout << "[Shop] ESC pressed" << std::endl;
                 return 3;   // Resume gameplay
             }
         }
@@ -130,9 +124,7 @@ public:
         return 9;   // Stay in shop
     }
 
-    // ==========================================
-    // DRAW
-    // ==========================================
+  
     void draw(sf::RenderWindow& window)
     {
         // Background

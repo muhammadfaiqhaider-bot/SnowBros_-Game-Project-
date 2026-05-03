@@ -30,7 +30,7 @@ public:
         addEnemy(new BlueTornado(220.f, 80.f));
         addEnemy(new BlueTornado(340.f, 80.f));
         addEnemy(new BlueTornado(460.f, 80.f));
-        addEnemy(new Gamakichi(260.f, 80.f));
+        addEnemy(new Gamakichi(253.f, 225.f));
 
         // Level-specific music
         loadLevelMusic("assets/level_music_10.ogg");

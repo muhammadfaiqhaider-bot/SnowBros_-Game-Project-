@@ -10,18 +10,16 @@
 #include "AuthenticationSystem.h"
 #include "DataBase.h"
 #include "LeaderboardScreen.h"
+#include "LevelNavigator.h"
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(600, 600), "Snow Bros");
     window.setFramerateLimit(60);
-
     sf::Font font;
     font.loadFromFile("assets/Title.ttf");
-
     DatabaseManager dbManager;
     AuthManager authManager(&dbManager);
-
     LoginScreen loginScreen;
     MainMenu mainMenu;
     LeaderboardScreen leaderboardScreen;
@@ -30,17 +28,28 @@ int main()
     GamePlay gameplay;
     GameEnd gameEnd;
 
-    // Cache the logged-in username here so it's never lost mid-session
-    std::string currentUsername = "";
 
-    // 0=Login  1=MainMenu  2=CharSelect  3=Gameplay
-    // 4=Pause  5=GameOver  6=LevelComplete  7=GameComplete
-    // 8=Leaderboard  9=Shop
+    std::string currentUsername = "";
+    // Code Runs sb se  pehle start with the Login screen 
+    // login screen = 0
+    // main menu = 1
+    // CharacterSelection screen =2
+    // Gameplay=3             main screen for camplay all levels scroing system and HUD linked with it
+    // Pause screen=4  U can pause game to go back or buy stuff 
+    // game over screen =5
+    // Level Complete = 6
+    // game complete = 7
+    // leaderboard =8
+        //shop =9
+
     int currentScreen = 0;
 
+
+
+    // SOund implementation logic here 
     sf::Music menuMusic;
     bool menuMusicLoaded = false;
-    const float menuMusicInitialVolume = 20.f;
+    const float menuMusicInitialVolume = 20.f;   // Volume indicator setted to low ...
     int menuFadeFramesRemaining = 0;
 
     if (menuMusic.openFromFile("assets/menu.ogg"))
@@ -75,31 +84,31 @@ int main()
     int lastScreen = -1;
     int lastPlayedLevel = -1;
 
+    
+
+
+    // This while loop is so important  all game loop happens in here ..........
+    // screen repeat it selp many times and we see them as moving persons........
     while (window.isOpen())
     {
-        // ==========================================
         // 1. EVENTS
-        // ==========================================
         sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 window.close();
-
-            // ---- LOGIN ----
-            if (currentScreen == 0)
+            
+            if (currentScreen == 0)          // LOging Screen......
             {
                 int result = loginScreen.handleEvents(event, authManager);
                 if (result == 1)
                 {
-                    // Cache username immediately on successful login
                     currentUsername = authManager.getCurrentUsername();
                     currentScreen = 1;
                 }
             }
 
-            // ---- MAIN MENU ----
-            else if (currentScreen == 1)
+            else if (currentScreen == 1)     // Main menu........
             {
                 int result = mainMenu.handleEvents(event, window);
                 if (result == 2)  currentScreen = 2;
@@ -107,8 +116,7 @@ int main()
                 else if (result == -1) window.close();
             }
 
-            // ---- CHARACTER SELECT ----
-            else if (currentScreen == 2)
+            else if (currentScreen == 2) // Character Selection screen..........
             {
                 int result = charSelect.handleEvents(event);
                 if (result == 3)
@@ -128,16 +136,18 @@ int main()
                     currentScreen = 1;
             }
 
-            // ---- GAMEPLAY ----
-            else if (currentScreen == 3)
+            else if (currentScreen == 3) //Game play screen...........
             {
+
+                LevelNavigator::handleEvent(event, gameplay); // This feature is added as per requirement for navigating through diffentr screens with numpad
+
                 int result = gameplay.handleEvents(event);
                 if (result == 4)
                     currentScreen = 4;
             }
 
-            // ---- PAUSE ----
-            else if (currentScreen == 4)
+ 
+            else if (currentScreen == 4) // Pause
             {
                 int result = pauseMenu.handleEvents(event);
                 if (result == 3)
@@ -160,16 +170,16 @@ int main()
                     currentScreen = 1;
             }
 
-            // ---- GAME OVER ----
-            else if (currentScreen == 5)
+
+            else if (currentScreen == 5)  // Gameover screen
             {
                 if (event.type == sf::Event::KeyPressed &&
                     event.key.code == sf::Keyboard::Return)
                     currentScreen = 1;
             }
 
-            // ---- LEVEL COMPLETE ----
-            else if (currentScreen == 6)
+  
+            else if (currentScreen == 6) //Level Complete
             {
                 if (event.type == sf::Event::KeyPressed &&
                     event.key.code == sf::Keyboard::Return)
@@ -183,7 +193,6 @@ int main()
                 }
             }
 
-            // ---- GAME COMPLETE ----
             else if (currentScreen == 7)
             {
                 if (event.type == sf::Event::KeyPressed &&
@@ -191,16 +200,16 @@ int main()
                     currentScreen = 1;
             }
 
-            // ---- SHOP ----
-            else if (currentScreen == 9)
+
+            else if (currentScreen == 9) // Shop screen
             {
                 int shopResult = gameplay.handleShopEvents(event);
                 if (shopResult == 3)
                     currentScreen = 3;
             }
 
-            // ---- LEADERBOARD ----
-            else if (currentScreen == 8)
+
+            else if (currentScreen == 8)             // LEADERBOARD 
             {
                 int lbResult = leaderboardScreen.handleEvents(event);
                 if (lbResult == 1)
@@ -208,14 +217,9 @@ int main()
             }
         }
 
-        // ==========================================
-        // 2. UPDATE
-        // ==========================================
 
         // Menu music fade when entering gameplay
-        if (menuMusicLoaded &&
-            menuMusic.getStatus() == sf::Music::Playing &&
-            currentScreen == 3)
+        if (menuMusicLoaded &&  menuMusic.getStatus() == sf::Music::Playing && currentScreen == 3)
         {
             if (menuFadeFramesRemaining == 0)
                 menuFadeFramesRemaining = 30;
@@ -229,7 +233,7 @@ int main()
                 menuMusic.stop();
         }
 
-        // Per-level music
+        // Per level music
         if (currentScreen == 3)
         {
             int lvl = gameplay.getLevel();
@@ -247,14 +251,14 @@ int main()
             lastPlayedLevel = -1;
         }
 
-        // ---- GAMEPLAY UPDATE + SCREEN TRANSITIONS ----
+        //  GAMEPLAY UPDATE + SCREEN TRANSITIONS 
         if (currentScreen == 3)
         {
             int result = gameplay.update();
 
             if (result == 5)
             {
-                // Game over — save score using cached username
+                // Game over  save score 
                 if (!currentUsername.empty())
                     leaderboardScreen.saveScore(currentUsername,
                         gameplay.getScore(),
@@ -263,7 +267,7 @@ int main()
             }
             else if (result == 6)
             {
-                // Level complete — also save so progress isn't lost on quit
+                // Level complete  also save so progress isn't lost on quit
                 if (!currentUsername.empty())
                     leaderboardScreen.saveScore(currentUsername,
                         gameplay.getScore(),
@@ -283,9 +287,6 @@ int main()
 
         lastScreen = currentScreen;
 
-        // ==========================================
-        // 3. DRAW
-        // ==========================================
         window.clear();
 
         if (currentScreen == 0)

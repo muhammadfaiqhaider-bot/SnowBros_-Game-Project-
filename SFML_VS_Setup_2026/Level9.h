@@ -31,7 +31,7 @@ public:
         addEnemy(new BlueFlyingFoogo(420.f, 140.f));
         addEnemy(new BlueTornado(220.f, 90.f));
         addEnemy(new BlueTornado(460.f, 90.f));
-        // spawn a star on a random platform for this level
-        spawnStarOnRandomPlatform();
+        // spawn 4 stars on random platforms for this level (project requirement)
+        for (int i = 0; i < 4; ++i) spawnStarOnRandomPlatform();
     }
 };

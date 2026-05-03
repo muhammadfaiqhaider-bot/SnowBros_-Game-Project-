@@ -29,6 +29,6 @@ public:
         addEnemy(new GreenFlyingFoogo(430.f, 90.f));
 
         // Level-specific music
-        loadLevelMusic("assets/level_music_7.ogg");
+        loadLevelMusic("assets/level_music_3.wav");
     }
 };

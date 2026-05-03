@@ -46,9 +46,8 @@ public:
         loadFromFile();
     }
 
-    // ==========================================
     // SAVE NEW SCORE
-    // ==========================================
+ 
     void saveScore(const std::string& playerName, int score, int levelReached)
     {
         // Ignore empty/invalid names
@@ -91,10 +90,8 @@ public:
         saveToFile();
     }
 
-    // ==========================================
     // HANDLE EVENTS
-    // 1 = back to main menu,  8 = stay
-    // ==========================================
+
     int handleEvents(sf::Event& event)
     {
         if (event.type == sf::Event::MouseMoved)

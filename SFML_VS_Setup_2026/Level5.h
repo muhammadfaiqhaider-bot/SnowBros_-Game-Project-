@@ -27,7 +27,7 @@ public:
         addEnemy(new FlyingFoogaFoog(420.f, 120.f));
 
         // Boss on top-right platform
-        addEnemy(new Mogera(280.f, 150.f));
+        addEnemy(new Mogera(280.f, 160.f));
 
         // Level-specific music
         loadLevelMusic("assets/level_music_5.ogg");

@@ -41,7 +41,7 @@ public:
         bgCurrentFrame = 0;
         bgAnimTimer = 0;
         bgAnimLoaded = false;
-        // Load your starry background image
+
         sf::Image fullImage;
         if (fullImage.loadFromFile("assets/login_bg.png"))
         {
@@ -49,7 +49,7 @@ public:
 
             for (int c = 0; c < CHUNK_COUNT; c++)
             {
-                // Each chunk is 25 frames wide
+
                 sf::IntRect chunkRect(
                     c * FRAMES_PER_CHUNK * BG_FRAME_W,  // x start
                     0,                                    // y start
@@ -68,14 +68,7 @@ public:
 
     }
 
-    // ==========================================
-    // HANDLE EVENTS
-    // Returns:
-    // 1  = stay on main menu
-    // 2  = go to character select (Play clicked)
-    // 8  = go to leaderboard
-    // -1 = exit game
-    // ==========================================
+
 
     int handleEvents(sf::Event& event, sf::RenderWindow& window)
     {
@@ -129,9 +122,6 @@ public:
         return 1;       // Stay on main menu
     }
 
-    // ==========================================
-    // DRAW
-    // ==========================================
     void update()
     {
         if (!bgAnimLoaded) return;
@@ -164,7 +154,7 @@ public:
         }
         
 
-        // ---- TITLE - SNOW BROS ----
+        //  TITLE SNOW BROS 
         sf::Text title;
         title.setFont(font);
         title.setString("SNOW BROS");
@@ -173,13 +163,13 @@ public:
         title.setPosition(135.f, 60.f);
         window.draw(title);
 
-        // ---- TITLE UNDERLINE ----
+        //  TITLE UNDERLINE 
         sf::RectangleShape underline(sf::Vector2f(400.f, 3.f));
         underline.setFillColor(sf::Color(188, 109, 199));
         underline.setPosition(110.f, 130.f);
         window.draw(underline);
 
-        // ---- WELCOME TEXT ----
+        //  WELCOME TEXT 
         sf::Text welcome;
         welcome.setFont(texts);
         welcome.setString("WELCOME,  " + playerName);
@@ -188,16 +178,16 @@ public:
         welcome.setPosition(230.0f, 170.0f);
         window.draw(welcome);
 
-        // ---- PLAY BUTTON ----
+        //  PLAY BUTTON 
         drawMenuButton(window, "PLAY", 200.f, 250.f, playHovered);
 
-        // ---- LEADERBOARD BUTTON ----
+        //  LEADERboard BUTTON 
         drawMenuButton(window, "LEADERBOARD", 200.f, 330.f, leaderboardHovered);
 
-        // ---- EXIT BUTTON ----
+        //  EXIT BUTN 
         drawMenuButton(window, "EXIT", 200.f, 410.f, exitHovered);
 
-        // ---- VERSION TEXT ----
+        //  verision text
         sf::Text version;
         version.setFont(font);
         version.setString("Made by Cheema The Tuff Guy & Faiq The Danger Man");

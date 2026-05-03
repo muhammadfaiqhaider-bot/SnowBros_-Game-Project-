@@ -2,23 +2,16 @@
 #include "Player.h"
 #include <SFML/Graphics.hpp>
 
-// ============================================================
-// AnimatedPlayer
-// Sits between Player and the concrete character classes.
-// Holds ALL the sprite-sheet animation logic so Nick, Faiq,
-// and Cheema don't duplicate it.  Each subclass only needs to:
-//   1. Call AnimatedPlayer(x, y, name, "assets/mysheet.png")
-//   2. Set its own stats (lives, speed, etc.)
-// ============================================================
+
 class AnimatedPlayer : public Player
 {
 protected:
-    // ---- DISPLAY SIZE (26:41 ratio, scaled up) ----
+    //  DISPLAY SIZE (26:41 ratio, scaled up) 
     static constexpr float DISPLAY_W = 32.5f;
     static constexpr float DISPLAY_H = 51.25f;
 
 private:
-    // ---- ANIMATION STATE ----
+    //  ANIMATION STATE 
     enum class AnimState { IDLE, WALK, THROW, JUMP, FALL, HIT, KNOCKBACK, DEAD };
 
     AnimState currentState;
@@ -58,7 +51,7 @@ public:
         loadSheet(spriteSheetPath);
     }
 
-    // ---- Called by Nick::reset() / Faiq::reset() etc. ----
+    //  Called by Nick::reset() / Faiq::reset() etc
     void resetAnim(float nx, float ny, const std::string& spriteSheetPath)
     {
         x = nx;  y = ny;
@@ -79,7 +72,7 @@ public:
         loadSheet(spriteSheetPath);
     }
 
-    // ---- Trigger throw animation when a snowball is thrown ----
+    //  Trigger throw animation when a snowball is thrown 
     void triggerThrowAnim()
     {
         isThrowingAnim = true;
@@ -102,7 +95,7 @@ public:
         hitTimer = 0;
     }
 
-    // ---- movementsUpdate / displayPlayer (satisfy Player pure virtuals) ----
+    // movementsUpdate / displayPlayer (satisfy Player pure virtuals) 
     void movementsUpdate() override
     {
         if (isDead) return;
@@ -173,7 +166,7 @@ private:
         playerSprite.setPosition(x, y);
     }
 
-    // ---- Sets the sprite rect and handles left/right flipping ----
+    //  Sets the sprite rect and handles left/right flipping 
     void setFrame(int fx, int fy, int fw, int fh)
     {
         playerSprite.setTextureRect(sf::IntRect(fx, fy, fw, fh));
@@ -200,14 +193,14 @@ private:
         if (onGround)
             wasAscending = false;
 
-        // ---- DEAD ----
+        //  DEAD 
         if (isDead)
         {
             setFrame(0, 939, 37, 37);
             return;
         }
 
-        // ---- KNOCKBACK ----
+        //  KNOCKBACK 
         if (isKnockbackAnim)
         {
             knockbackTimer++;
@@ -224,7 +217,7 @@ private:
             return;
         }
 
-        // ---- HIT ----
+        //  HIT 
         if (isHitAnim)
         {
             hitTimer++;
@@ -246,7 +239,7 @@ private:
             return;
         }
 
-        // ---- THROW ----
+        // THROW 
         if (isThrowingAnim)
         {
             throwTimer++;
@@ -266,7 +259,7 @@ private:
             }
         }
 
-        // ---- JUMP (ascending) ----
+        // JUMP (ascending) 
         if (!onGround && velocityY < 0)
         {
             wasAscending = true;
@@ -276,7 +269,7 @@ private:
             return;
         }
 
-        // ---- FALL (descending after a real jump) ----
+        //  FALL (descending after a real jump)
         if (!onGround && velocityY >= 0 && wasAscending)
         {
             setFrame(208, 414, 26, 44);
@@ -285,14 +278,14 @@ private:
             return;
         }
 
-        // ---- WALK ----
+        //  WALK
         if (velocityX != 0)
         {
             setFrame(384, 85, 26, 41);
             return;
         }
 
-        // ---- IDLE ----
+        //  IDLE 
         animTimer++;
         if (animTimer >= ANIM_SPEED) { animTimer = 0; currentFrame = (currentFrame + 1) % 6; }
         setFrame(currentFrame * 24, 85, 24, 41);

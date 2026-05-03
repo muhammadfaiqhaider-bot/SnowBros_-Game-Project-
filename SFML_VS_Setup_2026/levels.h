@@ -8,7 +8,7 @@
 #include "Tornado.h"
 #include "PLayer.h"
 #include "Mogera.h"
-// Power-up types
+
 #include "PowerUps.h"
 #include "SpeedBoost.h"
 #include "SnowballPower.h"
@@ -18,23 +18,23 @@
 class Level
 {
 protected:
-    // ---- ENEMIES ----
+    //  ENEMIES 
     static const int MAX_ENEMIES = 20;
     Enemy* enemies[MAX_ENEMIES];
     int enemyCount;
     bool prevAlive[MAX_ENEMIES];
 
-    // ---- PLATFORMS ----
+    //  PLATFORMS 
     static const int MAX_PLATFORMS = 10;
     sf::RectangleShape platforms[MAX_PLATFORMS];
     int platformCount;
 
-    // ---- BACKGROUND ----
+    // BACKGROUND 
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     bool backgroundLoaded;
 
-    // ---- POWERUPS ----
+    // POWERUPS
     static const int MAX_POWERUPS = 6;
     PowerUps* activePowerUps[MAX_POWERUPS];
     int powerupCount;
@@ -66,7 +66,7 @@ public:
         platformTextureLoaded = false;
         enemyTint = sf::Color::White;
         levelMusicLoaded = false;
-        // seed random for scoring randomness
+
         srand((unsigned)time(NULL));
     }
 
@@ -123,13 +123,12 @@ public:
     }
 
 
-    // ---- CALLED BY SUBCLASS TO REGISTER ENEMIES ----
-    void addEnemy(Enemy* e)
+    void addEnemy(Enemy* e) // association here 
     {
         if (enemyCount < MAX_ENEMIES)
         {
             enemies[enemyCount] = e;
-            prevAlive[enemyCount] = true; // newly added enemy considered alive
+            prevAlive[enemyCount] = true; 
             enemyCount++;
         }
     }
@@ -139,7 +138,7 @@ public:
         enemyTint = color;
     }
 
-    // ---- CALLED BY SUBCLASS TO REGISTER PLATFORMS ----
+  
     void addPlatform(float x, float y, float w, float h,
         sf::Color color = sf::Color::White)
     {
@@ -152,12 +151,12 @@ public:
         }
         if (platformTextureLoaded)
         {
-            // apply texture to the platform we just added (index = platformCount - 1)
+
             int idx = platformCount - 1;
             if (idx >= 0 && idx < MAX_PLATFORMS) {
                 platforms[idx].setFillColor(sf::Color::White);
                 platforms[idx].setTexture(&platformTexture);
-                // Tile the texture across the platform width
+
                 platforms[idx].setTextureRect(sf::IntRect(0, 0, (int)w, (int)h));
             }
         }
@@ -176,9 +175,7 @@ public:
         }
     }
 
-    // ==========================================
-    // UPDATE — handles ALL enemy logic and awards score when enemies die
-    // ==========================================
+
     void update(float playerX, float playerY, Player* player = nullptr)
     {
         int deathsThisFrame = 0;
@@ -187,7 +184,7 @@ public:
             if (enemies[i] == nullptr || enemies[i]->getIsDead())
                 continue;
 
-            // Platform collision
+
             enemies[i]->setOnGround(false);
 
             for (int j = 0; j < platformCount; j++)
@@ -221,7 +218,7 @@ public:
                 enemies[i]->setHitWall(true);
             }
 
-            // Give enemies current player position (some enemies like Tornado use it)
+
             enemies[i]->setPlayerPosition(playerX, playerY);
 
             // Special handling: if this enemy is a Mogera, snap its children to platforms
@@ -270,7 +267,7 @@ public:
             enemies[i]->movementsUpdate();
         }
 
-        // ---- PLAYER KICKS ENCASED ENEMY ----
+        // PLAYER KICKS ENCASED ENEMY 
         sf::FloatRect playerBounds(playerX, playerY, 40.f, 40.f);
 
         for (int i = 0; i < enemyCount; i++)
@@ -294,7 +291,7 @@ public:
             }
         }
 
-        // ---- ROLLING ENEMY CHAIN KILLS ----
+        // ROLLING ENEMY CHAIN KILS ----
         for (int i = 0; i < enemyCount; i++)
         {
             if (enemies[i] == nullptr || !enemies[i]->getIsRolling())
@@ -328,9 +325,7 @@ public:
             }
         }
 
-        // ==========================================
-        // REWARD: detect newly dead enemies and reward player
-        // ==========================================
+
         for (int i = 0; i < enemyCount; i++)
         {
             if (enemies[i] == nullptr)
@@ -460,9 +455,9 @@ public:
             }
         }
 
-        // ==========================================
-        // ENEMY PROJECTILE HITS (e.g., Tornado knives)
-        // ==========================================
+
+        // ENEMY PROJECTILE HITS ( Tornado knives)
+
         for (int i = 0; i < enemyCount; i++)
         {
             if (enemies[i] == nullptr || enemies[i]->getIsDead())
@@ -472,7 +467,6 @@ public:
             {
                 if (enemies[i]->isProjectileHittingPlayer(playerX, playerY) || enemies[i]->isKnifeHittingPlayer(playerX, playerY))
                 {
-                    // damage player and continue; the enemy should deactivate its projectile
                     player->loseLife();
                 }
             }
@@ -506,9 +500,7 @@ public:
         }
     }
 
-    // ==========================================
-    // SNOWBALL COLLISION
-    // ==========================================
+
     bool checkSnowballCollision(Snowball* snowball)
     {
         if (snowball == nullptr) return false;
@@ -544,7 +536,7 @@ public:
             }
         }
 
-        // Special: if this enemy is a Mogera, check its children too
+        // Special if this enemy is a Mogera, check its children too
         for (int i = 0; i < enemyCount; i++)
         {
             Mogera* mog = dynamic_cast<Mogera*>(enemies[i]);
@@ -567,9 +559,7 @@ public:
         return false;
     }
 
-    // ==========================================
-    // PLAYER HIT CHECK
-    // ==========================================
+
     bool isPlayerHit(float playerX, float playerY)
     {
         sf::FloatRect playerBounds(playerX, playerY, 40.f, 40.f);
@@ -611,9 +601,9 @@ public:
         return false;
     }
 
-    // ==========================================
-    // LEVEL COMPLETE
-    // ==========================================
+
+
+// Level complete
     bool isLevelComplete()
     {
         for (int i = 0; i < enemyCount; i++)
@@ -624,9 +614,7 @@ public:
         return true;
     }
 
-    // ==========================================
-    // DRAW
-    // ==========================================
+
     void draw(sf::RenderWindow& window)
     {
         if (backgroundLoaded)

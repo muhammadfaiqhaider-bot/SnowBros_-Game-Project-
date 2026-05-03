@@ -36,10 +36,10 @@ private:
 
     sf::Font font;
 
-    // ---- TWO PLAYER ----
-    Player* player2;        // nullptr in 1P mode
+    //  TWO PLAYER 
+    Player* player2;       
     bool twoPlayerMode;
-    bool p2Alive;           // tracks if P2 is still in the game
+    bool p2Alive;          
 
     // Mirrors one shop slot's effect onto any player without touching gems
     void applyShopItemToPlayer(int index, Player& p)
@@ -87,16 +87,13 @@ public:
         }
     }
 
-    // ==========================================
-    // Call this from main.cpp right after gameplay.reset()
-    // when transitioning from CharacterSelect -> Gameplay
-    // ==========================================
+   
     void setTwoPlayerMode(bool enabled, int p1Char, int p2Char)
     {
         twoPlayerMode = enabled;
         p2Alive = enabled;  // P2 starts alive only in 2P mode
 
-        // Always clean up any old P2
+
         if (player2 != nullptr)
         {
             delete player2;
@@ -105,7 +102,7 @@ public:
 
         if (!enabled) return;
 
-        // Spawn P2 offset from P1 so they don't overlap
+  
         switch (p2Char)
         {
         case 0: player2 = new Nick(400.f, 520.f);   break;
@@ -162,6 +159,35 @@ public:
         return 3;
     }
 
+
+    void jumpToLevel(int level)
+    {
+        if (level < 1 || level > totalLevels) return;
+
+
+        int curIdx = currentLevelNumber - 1;
+        if (curIdx >= 0 && curIdx < totalLevels && levels[curIdx] != nullptr)
+        {
+            delete levels[curIdx];
+            levels[curIdx] = nullptr;
+        }
+
+        currentLevelNumber = level;
+        int tgt = currentLevelNumber - 1;
+        if (levels[tgt] != nullptr)
+        {
+            delete levels[tgt];
+            levels[tgt] = nullptr;
+        }
+
+
+        loadCurrentLevel();
+
+        nick.snapToGround(520.f);
+        if (twoPlayerMode && player2 != nullptr)
+            player2->snapToGround(520.f);
+    }
+
     int handleShopEvents(sf::Event& event)
     {
         // Let the shop run normally against P1 (deducts gems, applies effect)
@@ -176,13 +202,13 @@ public:
                 float my = event.mouseButton.y;
 
                 // Same hit-test as Shop::handleEvents item buttons
-                // Items are at y = 160 + i*70, height 55, x 150-450
+                // Items are at y = 160 + i*70, height 55, x 150-450 - cheema
                 for (int i = 0; i < 5; i++)
                 {
                     float btnY = 160.f + i * 70.f;
                     if (mx >= 150 && mx <= 450 && my >= btnY && my <= btnY + 55.f)
                     {
-                        // Apply the matching effect to P2 — no gem deduction
+                        // Apply the matching effect to P2  no gem deduction - cheema
                         applyShopItemToPlayer(i, *player2);
                         break;
                     }
@@ -199,9 +225,6 @@ public:
         shop.draw(window);
     }
 
-    // ==========================================
-    // UPDATE
-    // ==========================================
     int update()
     {
         loadCurrentLevel();
@@ -224,7 +247,7 @@ public:
                 nick.loseLife();
         }
 
-        // ---- P2 update (only when alive) ----
+        //  P2 update (only when alive)
         if (twoPlayerMode && player2 != nullptr && p2Alive)
         {
             player2->movementsUpdate();
@@ -233,7 +256,7 @@ public:
             if (current != nullptr)
             {
                 // P2 shares the same level; pass P2 position for enemy/powerup logic
-                // Note: calling update again would double-update enemies, so we only
+                // Note: calling update again would double gubdate enemies, so we only
                 // check hits and snowball collision for P2 separately.
                 player2->updateSnowball();
 
@@ -249,7 +272,7 @@ public:
                 p2Alive = false;
         }
 
-        // ---- Level complete ----
+        //  Level complet
         if (current != nullptr && current->isLevelComplete())
         {
             if (currentLevelNumber >= totalLevels)
@@ -257,14 +280,14 @@ public:
             return 6;
         }
 
-        // ---- Game over: P1 dead AND (P2 dead or not in use) ----
+        //  Game over: P1 dead AND 
         bool p1Dead = !nick.getIsAlive();
         bool p2Dead = !twoPlayerMode || !p2Alive;
 
         if (p1Dead && p2Dead)
             return 5;
 
-        // HUD: show whoever is still alive (P1 stats; P2 shown separately in draw)
+        // HUD: show whoever is still alive 
         hud.update(nick.getScore(), nick.getLives(), nick.getGemCount(), currentLevelNumber);
 
         if (saveMessageTimer > 0)
@@ -273,9 +296,7 @@ public:
         return 3;
     }
 
-    // ==========================================
-    // DRAW
-    // ==========================================
+
     void draw(sf::RenderWindow& window)
     {
         loadCurrentLevel();
@@ -445,14 +466,12 @@ public:
 
 private:
 
-    // ==========================================
-    // P2 mini-HUD — lives shown on the right of the HUD bar
-    // ==========================================
+
     void drawP2HUD(sf::RenderWindow& window)
     {
         sf::Font& f = font;
 
-        // "P2" label
+      
         sf::Text p2Label;
         p2Label.setFont(f);
         p2Label.setString("P2:");
@@ -487,9 +506,6 @@ private:
         }
     }
 
-    // ==========================================
-    // Platform collision — works for any Player*
-    // ==========================================
     void handlePlayerPlatformCollision(Player* p)
     {
         if (levels[currentLevelNumber - 1] == nullptr) return;

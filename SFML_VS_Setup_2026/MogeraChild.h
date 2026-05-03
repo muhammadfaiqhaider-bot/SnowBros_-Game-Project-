@@ -16,6 +16,26 @@ public:
         velocityX = 0;
         velocityY = 0;
         killedBySnowball = false;
+
+        // Sprite sheet setup for MogeraChild (single frame - 135x153)
+        // Only 1 frame so no animation switching needed, just load and draw
+        frameWidth = 135;
+        frameHeight = 153;
+        totalFrames = 1;
+        currentFrame = 0;
+        animTimer = 0;
+        animSpeed = 1;      // Doesnt matter bcz only 1 frame anyway
+
+        if (enemyTexture.loadFromFile("assets/Mogera.png"))
+        {
+            textureLoaded = true;
+            enemySprite.setTexture(enemyTexture);
+            enemySprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
+            // Scale to 20x20 to match the original orange rectangle size
+            float sx = 20.f / (float)frameWidth;
+            float sy = 20.f / (float)frameHeight;
+            enemySprite.setScale(sx, sy);
+        }
     }
 
     void spawn(float startX, float startY, float playerX)
@@ -75,6 +95,12 @@ public:
             y = 520;
             onGround = true;
         }
+
+        // Update sprite position every frame (single frame so no rect switching needed)
+        if (textureLoaded)
+        {
+            enemySprite.setPosition(x, y);
+        }
     }
 
     // Called when hit by a snowball - child dies immediately
@@ -105,10 +131,17 @@ public:
             return;
         }
 
-        sf::RectangleShape childShape(sf::Vector2f(20.f, 20.f));   // Orange Rectangle is used to denote Child Mogera's 
-        childShape.setFillColor(sf::Color(255, 165, 0));
-        childShape.setPosition(x, y);
-        window.draw(childShape);
+        if (textureLoaded)
+        {
+            window.draw(enemySprite);
+        }
+        else
+        {
+            sf::RectangleShape childShape(sf::Vector2f(20.f, 20.f));   // Orange Rectangle is used to denote Child Mogera's 
+            childShape.setFillColor(sf::Color(255, 165, 0));
+            childShape.setPosition(x, y);
+            window.draw(childShape);
+        }
     }
 
     bool isActive()

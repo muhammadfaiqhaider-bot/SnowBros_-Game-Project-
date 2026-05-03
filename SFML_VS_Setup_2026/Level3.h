@@ -26,6 +26,6 @@ public:
         addEnemy(new Tornado(420.f, 100.f));
 
         // Level-specific music
-        loadLevelMusic("assets/level_music_3.ogg");
+        loadLevelMusic("assets/level_music_3.wav");
     }
 };

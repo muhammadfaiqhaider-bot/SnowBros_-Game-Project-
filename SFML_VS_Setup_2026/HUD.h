@@ -25,9 +25,6 @@ public:
         level = 1;
     }
 
-    // ==========================================
-    // UPDATE DATA - call every frame
-    // ==========================================
 
     void update(int currentScore, int currentLives, int currentGems, int currentLevel)
     {
@@ -37,19 +34,17 @@ public:
         level = currentLevel;
     }
 
-    // ==========================================
-    // DRAW - call after drawing gameplay
-    // ==========================================
+
 
     void draw(sf::RenderWindow& window)
     {
-        // ---- HUD BACKGROUND BAR ----
+        //  HUD BACKGROUND BAR 
         sf::RectangleShape hudBar(sf::Vector2f(600.f, 40.f));
         hudBar.setFillColor(sf::Color(0, 0, 0, 180));   // Semi transparent black
         hudBar.setPosition(0.f, 0.f);
         window.draw(hudBar);
 
-        // ---- SCORE - TOP LEFT ----
+        //  SCORE  Top kleft
         sf::Text scoreText;
         scoreText.setFont(font);
         scoreText.setString("Score: " + std::to_string(score));
@@ -58,10 +53,10 @@ public:
         scoreText.setPosition(10.f, 10.f);
         window.draw(scoreText);
 
-        // ---- LIVES - TOP LEFT (below score) ----
+        // LIVES  TOp left (below score)
         drawLives(window);
 
-        // ---- LEVEL - TOP CENTER ----
+        // LEVEL - TOP CENTER
         sf::Text levelText;
         levelText.setFont(font);
         levelText.setString("Level  " + std::to_string(level) + " / 10");
@@ -72,7 +67,7 @@ public:
         levelText.setPosition(230.f, 12.f);
         window.draw(levelText);
 
-        // ---- GEMS - TOP RIGHT ----
+        //  GEMS - TOP RIGHT 
         drawGems(window);
     }
 
@@ -89,7 +84,7 @@ private:
         livesLabel.setPosition(10.f, 45.f);
         window.draw(livesLabel);
 
-        // Draw heart icons for each life
+        // Draw heart 
         for (int i = 0; i < lives; i++)
         {
             sf::CircleShape heart(8.f);
@@ -98,8 +93,8 @@ private:
             window.draw(heart);
         }
 
-        // Grey hearts for lost lives (max 5 shown)
-        for (int i = lives; i < 5; i++)
+        // Grey hearts for lost lives 10
+        for (int i = lives; i < 10; i++)
         {
             sf::CircleShape heart(8.f);
             heart.setFillColor(sf::Color(60, 60, 60));

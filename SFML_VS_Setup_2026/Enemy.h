@@ -127,7 +127,7 @@ public:
 
     // CHEEEMA This is a hitbox function that returns the invisible rectangular boundary around my sprite which is used for collision detection.
     // Nilla i aint blind - Cheema
-    sf::FloatRect getHitBox()
+    virtual sf::FloatRect getHitBox()
     {
         return enemySprite.getGlobalBounds();
     }

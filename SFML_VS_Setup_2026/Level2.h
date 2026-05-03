@@ -28,6 +28,6 @@ public:
         addEnemy(new FlyingFoogaFoog(100.f, 100.f));
 
         // Level-specific music
-        loadLevelMusic("assets/level_music_2.ogg");
+        loadLevelMusic("assets/level_music_2.wav");
     }
 };

@@ -147,12 +147,10 @@ public:
                 velocityY = 0;
             }
 
-            return;     // Exit early - stationary snowball
+            return;     // Exit early  stationary snowball
         }
 
-        // ============================================================
-        // NORMAL MOVEMENT (only runs if NOT dead/rolling/encased)
-        // ============================================================
+
 
         if (isFlying)
         {

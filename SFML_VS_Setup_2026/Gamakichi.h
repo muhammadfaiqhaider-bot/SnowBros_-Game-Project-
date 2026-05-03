@@ -41,7 +41,8 @@ public:
         playerX = 0;
         playerY = 0;
 
-        onGround = false;
+        // Gamakichi should be fixed to platforms (no gravity)
+        onGround = true;
         velocityY = 0;
 
         for (int i = 0; i < MAX_ROCKETS; i++)
@@ -91,19 +92,10 @@ public:
             x = 0;
         }
 
-        if (!onGround)
-        {
-            velocityY += 0.5f;
-            if (velocityY > 8.f)
-            {
-                velocityY = 8.f;
-            }
-            y += velocityY;
-        }
-        else
-        {
-            velocityY = 0;
-        }
+        // Gamakichi is a large boss that should not be affected by gravity.
+        // Keep onGround true and do not modify y here.
+        velocityY = 0.f;
+        onGround = true;
 
         if (x > 520)        // 600 - 80 (boss width)
         {
@@ -236,7 +228,7 @@ public:
         else
         {
             // Gamakichi - large purple rectangle (bigger than Mogera)
-            sf::RectangleShape gamakichiShape(sf::Vector2f(100.f, 120.f));
+            sf::RectangleShape gamakichiShape(sf::Vector2f(40.f, 40.f));
             gamakichiShape.setFillColor(sf::Color(100, 0, 150));    // Dark purple
             gamakichiShape.setPosition(x, y);
             window.draw(gamakichiShape);
@@ -348,7 +340,6 @@ public:
             if (rocketBounds.intersects(playerBounds))
             {
                 rockets[i]->deactivate();   // Rocket disappears on hit
-                std::cout << "[Gamakichi] rocket hit player at (" << playerX << "," << playerY << ")\n";
                 return true;
             }
         }

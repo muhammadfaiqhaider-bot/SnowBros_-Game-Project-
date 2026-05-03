@@ -94,7 +94,7 @@ public:
             }
         }
 
-        // ESC key - resume
+        // ESC key  resume
         if (event.type == sf::Event::KeyPressed)
         {
             if (event.key.code == sf::Keyboard::Escape)
@@ -106,18 +106,16 @@ public:
         return 4;       // Stay on pause
     }
 
-    // ==========================================
-    // DRAW
-    // ==========================================
+  
 
     void draw(sf::RenderWindow& window)
     {
-        // ---- DARK OVERLAY ----
+        //  DARK OVERLAY 
         sf::RectangleShape overlay(sf::Vector2f(600.f, 600.f));
         overlay.setFillColor(sf::Color(0, 0, 0, 170));
         window.draw(overlay);
 
-        // ---- PAUSE BOX ----
+        //  PAUSE BOX 
         sf::RectangleShape pauseBox(sf::Vector2f(320.f, 340.f));
         pauseBox.setFillColor(sf::Color(10, 10, 40));
         pauseBox.setOutlineColor(sf::Color::Cyan);
@@ -125,28 +123,28 @@ public:
         pauseBox.setPosition(140.f, 130.f);
         window.draw(pauseBox);
 
-        // ---- TITLE ----
+        //  TITLE 
         sf::Text pauseTitle;
         pauseTitle.setFont(font);
         pauseTitle.setString("PAUSED");
         pauseTitle.setCharacterSize(35);
         pauseTitle.setFillColor(sf::Color::Cyan);
-        pauseTitle.setPosition(210.f, 148.f);
+        pauseTitle.setPosition(240.f, 148.f);
         window.draw(pauseTitle);
 
-        // ---- UNDERLINE ----
+        //  UNDERLINE 
         sf::RectangleShape underline(sf::Vector2f(280.f, 2.f));
         underline.setFillColor(sf::Color::Cyan);
         underline.setPosition(160.f, 195.f);
         window.draw(underline);
 
-        // ---- BUTTONS ----
+        //  BUTTONS 
         drawPauseButton(window, "RESUME", 200.f, 220.f, sf::Color(0, 130, 0), resumeHovered);
         drawPauseButton(window, "SHOP", 200.f, 290.f, sf::Color(150, 100, 0), shopHovered);
         drawPauseButton(window, "SAVE GAME", 200.f, 360.f, sf::Color(0, 0, 130), saveHovered);
         drawPauseButton(window, "MAIN MENU", 200.f, 430.f, sf::Color(130, 0, 0), exitHovered);
 
-        // ---- HINT ----
+        //  HINT 
         sf::Text hint;
         hint.setFont(font);
         hint.setString("ESC to resume");

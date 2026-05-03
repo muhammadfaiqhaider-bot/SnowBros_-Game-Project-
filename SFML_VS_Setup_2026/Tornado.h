@@ -17,6 +17,10 @@ private:
     float playerY;
     Knives* churi;
 
+    // Sprite sheet info for Tornado
+    // Total sheet: 248x115, frame width: 110, frame height: 115, gap between frames: 28
+    int frameGap;
+
 public:
     Tornado(float posX, float posY) : FlyingFoogaFoog(posX, posY)
     {
@@ -33,6 +37,28 @@ public:
         churi = nullptr;
 
         name = "Tornado";
+
+        // Sprite sheet setup for Tornado (2 frames
+        // Sheet: 248x115 total, each frame: 110x115, gap between frames: 28
+        frameWidth = 110;
+        frameHeight = 115;
+        totalFrames = 2;
+        currentFrame = 0;
+        animTimer = 0;
+        animSpeed = 15;         // Switch frame every 15 ticks - smooth flying animation
+        frameGap = 28;
+
+        if (enemyTexture.loadFromFile("assets/Tornado_Blue.png"))
+        {
+            textureLoaded = true;
+            enemySprite.setTexture(enemyTexture);
+            enemySprite.setTextureRect(sf::IntRect(0, 0, frameWidth, frameHeight));
+            // Scale to 40x40 display size (same as tornado shape was before)
+            float sx = 40.f / (float)frameWidth;
+            float sy = 40.f / (float)frameHeight;
+            enemySprite.setScale(sx, sy);
+            enemySprite.setPosition(x, y);
+        }
     }
 
     void setPlayerPosition(float pX, float pY)
@@ -43,10 +69,7 @@ public:
 
     void movementsUpdate() override
     {
-        // ============================================================
-        // CRITICAL FIX: Check dead/encased/rolling FIRST before any movement
-        // This prevents teleporting/attacking when snowball should be stationary
-        // ============================================================
+ 
 
         // If dead - do nothing and clean up knife
         if (isDead)
@@ -109,7 +132,7 @@ public:
             rollTimer++;
             if (rollTimer >= rollDuration)
             {
-                // Vanish after 3 seconds — ensure rolling state is cleared to avoid ghost collisions
+                // Vanish after 3 seconds - ensure rolling state is cleared to avoid ghost collisions
                 isDead = true;
                 isRolling = false;
                 rollVelocityX = 0;
@@ -159,7 +182,7 @@ public:
             return;     // Exit early - stationary snowball
         }
 
-        // Ensure we never leave a lingering rolling flag when dead — safety guard
+        // Ensure we never leave a lingering rolling flag when dead - safety guard
         if (isDead)
         {
             isRolling = false;
@@ -172,9 +195,6 @@ public:
             return;
         }
 
-        // ============================================================
-        // NORMAL MOVEMENT (only runs if NOT dead/rolling/encased)
-        // ============================================================
 
         teleportTimer++;
 
@@ -206,8 +226,6 @@ public:
             {
                 float newX = x + (rand() % 400) - 200;         // X coordinate teleportation Point
                 float newY = y + (rand() % 400) - 200;         // Y coordinate telepotation Point
-
-
 
                 if (newX < 0)
                 {
@@ -248,6 +266,22 @@ public:
                     teleportTimer = 0;
                 }
             }
+        }
+
+        // Flying animation - switch between 2 frames (frame 0 and frame 1)
+        // Same logic as Botom: currentFrame * (frameWidth + frameGap) gives correct x offset
+        if (textureLoaded)
+        {
+            animTimer++;
+            if (animTimer >= animSpeed)
+            {
+                animTimer = 0;
+                currentFrame = (currentFrame + 1) % totalFrames;    // Toggles between 0 and 1
+            }
+
+            int left = currentFrame * (frameWidth + frameGap);      // Frame 0: x=0, Frame 1: x=138
+            enemySprite.setTextureRect(sf::IntRect(left, 0, frameWidth, frameHeight));
+            enemySprite.setPosition(x, y);
         }
 
         // Knife Throwing Thing
@@ -324,11 +358,19 @@ public:
         }
 
         // NORMAL DISPLAY (alive, not encased)
-        // Tornado is cyan colored rectangle
-        sf::RectangleShape tornadoShape(sf::Vector2f(40.f, 40.f));
-        tornadoShape.setFillColor(sf::Color::Cyan);
-        tornadoShape.setPosition(x, y);
-        window.draw(tornadoShape);
+        if (textureLoaded)
+        {
+            // Frame rect is already updated in movementsUpdate so just draw
+            window.draw(enemySprite);
+        }
+        else
+        {
+            // Fallback - cyan rectangle if texture not loaded
+            sf::RectangleShape tornadoShape(sf::Vector2f(40.f, 40.f));
+            tornadoShape.setFillColor(sf::Color::Cyan);
+            tornadoShape.setPosition(x, y);
+            window.draw(tornadoShape);
+        }
 
         // Show snow overlay based on hit count (partially hit)
         if (hitCount == 1)
@@ -388,7 +430,7 @@ public:
     }
 
 
-    
+
     bool getEncaedStatusTor()
     {
         return snowCovered;

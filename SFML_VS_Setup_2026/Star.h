@@ -22,7 +22,9 @@ public:
 
     void applyEffect(Player& player) override
     {
-        // handled by level
+        // Grant score for collecting a star and show a pickup message
+        player.addScore(200);
+        player.showPowerupMessage(std::string("Star +200"), 120);
     }
 
     void DrawPowerUp(sf::RenderWindow& window) override

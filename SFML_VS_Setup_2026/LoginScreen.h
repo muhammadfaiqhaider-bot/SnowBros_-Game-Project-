@@ -97,12 +97,7 @@ public:
         switchButtonHovered = false;
     }
 
-    // ==========================================
-    // HANDLE EVENTS
-    // Returns:
-    // 0 = stay on login
-    // 1 = go to main menu
-    // ==========================================
+
 
     int handleEvents(sf::Event& event, AuthManager& auth)
     {
@@ -198,7 +193,7 @@ public:
                 typingPassword = false;
             }
 
-            // Clicked elsewhere - deselect
+            // Clicked elsewhere  deselect
             else
             {
                 typingUsername = false;
@@ -298,10 +293,6 @@ public:
 
 
 
-    // ==========================================
-    // DRAW
-    // ==========================================
-
     void update()
     {
         if (!bgAnimLoaded) return;
@@ -334,13 +325,13 @@ public:
             window.draw(bg);
         }
 
-        // ---- SUBTLE DARK OVERLAY ----
+        //  SUBTLE DARK OVERLAY
         // Makes text readable over the starry background
         sf::RectangleShape overlay(sf::Vector2f(600.f, 600.f));
         overlay.setFillColor(sf::Color(0, 5, 20, 80));
         window.draw(overlay);
 
-        // ---- GAME TITLE above box ----
+        //  GAME TITLE above box 
         sf::Text title;
         title.setFont(font);
         title.setString("SNOW BROS");
@@ -355,7 +346,7 @@ public:
         titleLine.setPosition(155.f, 105.f);
         window.draw(titleLine);
 
-        // ---- CENTRE PANEL ----
+        //  CENTRE PANEL 
         // Outer glow effect
         sf::RectangleShape panelGlow(sf::Vector2f(268.f, 388.f));
         panelGlow.setFillColor(sf::Color(0, 0, 0, 0));
@@ -378,7 +369,7 @@ public:
         topAccent.setPosition(170.f, 130.f);
         window.draw(topAccent);
 
-        // ---- PANEL TITLE ----
+        // PANEL TITLE
         std::string panelTitle = showingRegister ? "CREATE ACCOUNT" : "SIGN IN";
 
         sf::Text panelTitleText;
@@ -403,7 +394,7 @@ public:
         usernameLabel.setPosition(178.f, 183.f);
         window.draw(usernameLabel);
 
-        // ---- USERNAME BOX ----
+        //  USERNAME BOX 
         sf::RectangleShape usernameBox(sf::Vector2f(240.f, 36.f));
         if (typingUsername)
         {
@@ -437,7 +428,7 @@ public:
         usernameContent.setPosition(185.f, 212.f);
         window.draw(usernameContent);
 
-        // ---- PASSWORD LABEL ----
+        //  PASSWORD LABEL 
         sf::Text passwordLabel;
         passwordLabel.setFont(text);
         passwordLabel.setString("Password");
@@ -446,7 +437,7 @@ public:
         passwordLabel.setPosition(178.f, 255.f);
         window.draw(passwordLabel);
 
-        // ---- PASSWORD BOX ----
+        //  PASSWORD BOX 
         sf::RectangleShape passwordBox(sf::Vector2f(240.f, 36.f));
         if (typingPassword)
         {
@@ -485,7 +476,7 @@ public:
         passwordContent.setPosition(185.f, 282.f);
         window.draw(passwordContent);
 
-        // ---- PASSWORD HINT ----
+        // PASSWORD HINT
         sf::Text hint;
         hint.setFont(text);
         hint.setString("Use 6 or more characters");
@@ -494,13 +485,13 @@ public:
         hint.setPosition(178.f, 315.f);
         window.draw(hint);
 
-        // ---- DIVIDER LINE ----
+        // DIVIDER LINE 
         sf::RectangleShape divider(sf::Vector2f(240.f, 1.f));
         divider.setFillColor(sf::Color(30, 70, 120, 150));
         divider.setPosition(178.f, 340.f);
         window.draw(divider);
 
-        // ---- MAIN BUTTON (LOGIN or REGISTER) ----
+        //  MAIN BUTTON (LOGIN or REGISTER) 
         sf::RectangleShape mainButton(sf::Vector2f(240.f, 40.f));
         if (mainButtonHovered)
         {
@@ -529,7 +520,7 @@ public:
         mainBtnText.setPosition(178.f + (240.f - btnTextWidth) / 2.f, 367.f);
         window.draw(mainBtnText);
 
-        // ---- SWITCH BUTTON ----
+        //  SWITCH BUTTON
         sf::RectangleShape switchButton(sf::Vector2f(240.f, 35.f));
         if (switchButtonHovered)
         {

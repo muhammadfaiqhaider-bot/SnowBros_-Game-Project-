@@ -140,14 +140,7 @@ public:
         health = health + 1;
         name = "GreenTornado";
 
-        // Override with Orange sprite sheet
-        //if (foogaTexture.loadFromFile("assets/FlyingFoogaFoog_Orange.p"))
-        //{
-        //    foogaTextureLoaded = true;
-        //    foogaSprite.setTexture(foogaTexture);
-        //    foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
-        //    foogaSprite.setScale(40.f / WALK_W, 40.f / WALK_H);
-        //}
+    
     }
 
     void DisplayEnemy(sf::RenderWindow& window) override
@@ -166,14 +159,6 @@ public:
         health = health + 2;
         name = "BlueTornado";
 
-        // Override with Pink sprite sheet
-        //if (foogaTexture.loadFromFile("assets/FlyingFoogaFoog_Pink.png"))
-        //{
-        //    foogaTextureLoaded = true;
-        //    foogaSprite.setTexture(foogaTexture);
-        //    foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
-        //    foogaSprite.setScale(40.f / WALK_W, 40.f / WALK_H);
-        //}
     }
 
     void DisplayEnemy(sf::RenderWindow& window) override

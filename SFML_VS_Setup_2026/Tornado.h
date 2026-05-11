@@ -38,14 +38,14 @@ public:
 
         name = "Tornado";
 
-        // Sprite sheet setup for Tornado (2 frames
+        // Sprite sheet setup for Tornado only 2 frames bcz i m lazy ....
         // Sheet: 248x115 total, each frame: 110x115, gap between frames: 28
         frameWidth = 110;
         frameHeight = 115;
         totalFrames = 2;
         currentFrame = 0;
         animTimer = 0;
-        animSpeed = 15;         // Switch frame every 15 ticks - smooth flying animation
+        animSpeed = 15;         // Switch frame every 15 ticks  smooth flying animation
         frameGap = 28;
 
         if (enemyTexture.loadFromFile("assets/Tornado_Blue.png"))
@@ -63,7 +63,7 @@ public:
 
     void setPlayerPosition(float pX, float pY)
     {                           // Cheema Use this function for updating player position in every
-        playerX = pX;           // Frame.......bcz churi will sent according to it 
+        playerX = pX;           // Frame.......bcz churi will be sent according to it 
         playerY = pY;
     }
 
@@ -71,7 +71,7 @@ public:
     {
  
 
-        // If dead - do nothing and clean up knife
+        // If dead  do nothing and clean up knife
         if (isDead)
         {
             // Stop all attacks when dead
@@ -83,22 +83,23 @@ public:
             return;
         }
 
-        // If rolling - ONLY do rolling physics (no teleporting, no attacks)
+        // If rolling only do rolling physics no teleporting no attacks
         if (isRolling)
         {
-            // Stop teleporting when rolling
+            // stop teleporting when rolling
             isTeleporting = false;
             teleportTimer = 0;
             attackTimer = 0;
 
-            // Delete knife if exists
+            // delete knife if exists    very importacnt to delete things i have fae cocequences......I wnpn't this sht ever again....
+            // soo cheema be carefull......
             if (churi != nullptr)
             {
                 delete churi;
                 churi = nullptr;
             }
 
-            // Apply rolling physics (same as Botom)
+            // Apply rolling physics
             if (!onGround)
             {
                 velocityY = velocityY + 1.4f;
@@ -145,10 +146,10 @@ public:
                 }
             }
 
-            return;     // Exit early - don't do normal movement
+            return;    
         }
 
-        // If encased (but not rolling yet) - STOP all movement
+        // If encased  STOP all movement
         if (snowCovered)
         {
             // Stop everything when encased
@@ -164,13 +165,13 @@ public:
                 churi = nullptr;
             }
 
-            // Just fall to ground
+            // Just fall to ground in short gravity dali hai.....
             if (!onGround)
             {
                 velocityY = velocityY + 0.5f;
-                if (velocityY > 8.f)
+                if (velocityY > 8.0f)
                 {
-                    velocityY = 8.f;
+                    velocityY = 8.0f;
                 }
                 y = y + velocityY;
             }
@@ -179,10 +180,9 @@ public:
                 velocityY = 0;
             }
 
-            return;     // Exit early - stationary snowball
+            return;     
         }
 
-        // Ensure we never leave a lingering rolling flag when dead - safety guard
         if (isDead)
         {
             isRolling = false;
@@ -200,7 +200,6 @@ public:
 
         if (isTeleporting)
         {
-            // Apply gravity while waiting to teleport
             if (!onGround)
             {
                 velocityY = velocityY + 0.5f;
@@ -268,7 +267,7 @@ public:
             }
         }
 
-        // Flying animation - switch between 2 frames (frame 0 and frame 1)
+        // Flying animation  switch between 2 frames (frame 0 and frame 1)
         // Same logic as Botom: currentFrame * (frameWidth + frameGap) gives correct x offset
         if (textureLoaded)
         {
@@ -318,54 +317,39 @@ public:
         // Don't draw if dead
         if (isDead)
         {
+            // death ke sprite sheet's aye gi yahan pr
             return;
         }
 
-        // ROLLING SNOWBALL (kicked and moving)
+        // rolling snowball....
         if (isRolling)
         {
-            sf::CircleShape rollingBall(22.0f);
+            sf::CircleShape rollingBall(15.0f);
             rollingBall.setFillColor(sf::Color::White);
-            rollingBall.setOutlineColor(sf::Color(180, 220, 255));
-            rollingBall.setOutlineThickness(3.0f);
             rollingBall.setPosition(x, y);
             window.draw(rollingBall);
             return;
         }
 
-        // FULLY ENCASED (stationary) 
+        // fully encased...
         if (snowCovered)
         {
             sf::CircleShape snowBall(20.0f);
             snowBall.setFillColor(sf::Color::White);
-            snowBall.setOutlineColor(sf::Color(180, 220, 255));
-            snowBall.setOutlineThickness(2.0f);
             snowBall.setPosition(x, y);
             window.draw(snowBall);
-
-            // Small indicator showing its kickable
-            sf::RectangleShape leftArrow(sf::Vector2f(8.0f, 3.0f));
-            leftArrow.setFillColor(sf::Color::Cyan);
-            leftArrow.setPosition(x - 12.0f, y + 18.0f);
-            window.draw(leftArrow);
-
-            sf::RectangleShape rightArrow(sf::Vector2f(8.0f, 3.0f));
-            rightArrow.setFillColor(sf::Color::Cyan);
-            rightArrow.setPosition(x + 44.0f, y + 18.0f);
-            window.draw(rightArrow);
 
             return;
         }
 
-        // NORMAL DISPLAY (alive, not encased)
+        // normal zinda contion wala display........
         if (textureLoaded)
         {
-            // Frame rect is already updated in movementsUpdate so just draw
             window.draw(enemySprite);
         }
         else
         {
-            // Fallback - cyan rectangle if texture not loaded
+            // if by any chance sprite sheet doesn't load so recatgnle apears
             sf::RectangleShape tornadoShape(sf::Vector2f(40.f, 40.f));
             tornadoShape.setFillColor(sf::Color::Cyan);
             tornadoShape.setPosition(x, y);
@@ -381,14 +365,7 @@ public:
             snowOverlay.setPosition(x, y);
             window.draw(snowOverlay);
         }
-        else if (hitCount == 2)
-        {
-            // Heavy snow - 65% covered
-            sf::CircleShape snowOverlay(20.f);
-            snowOverlay.setFillColor(sf::Color(255, 255, 255, 160));
-            snowOverlay.setPosition(x, y);
-            window.draw(snowOverlay);
-        }
+ 
 
         // Draw Knives Sprite shyt implementation
         if (churi != nullptr)

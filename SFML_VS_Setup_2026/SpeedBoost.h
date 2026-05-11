@@ -30,7 +30,6 @@ public:
     {
         if (isActive && !isCollected)
         {
-
             window.draw(powerupSprite);
         }
     }

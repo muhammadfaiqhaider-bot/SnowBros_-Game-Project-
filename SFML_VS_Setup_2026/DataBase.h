@@ -191,24 +191,7 @@ public:
         return nullptr;     // No progress found for this user
     }
 
-
-
-
-
-
-
-    void saveLeaderboard(int userId, int score, int levelReached)
-    {
-        // NILL not implemented yet
-    }
-
-    void loadLeaderboard()
-    {
-        // NILL not implemented yet 
-    }
-
-
-
+  
 
     // Getters
     int getUserCount()
@@ -219,12 +202,6 @@ public:
     {
         return progressCount;
     }
-
-
-
-
-
-
 
 
 private:

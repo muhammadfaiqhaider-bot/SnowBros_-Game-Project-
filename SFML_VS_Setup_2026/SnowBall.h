@@ -27,14 +27,10 @@ public:
 
 
         shape.setRadius(13.f);
-        // Make snowball visually distinct for debugging
         shape.setFillColor(sf::Color::Red);
-        shape.setOutlineColor(sf::Color::Yellow);
+        shape.setOutlineColor(sf::Color::Red);
         shape.setOutlineThickness(2.f);
-        shape.setPosition(x, y);
-
-       
-       
+        shape.setPosition(x, y); 
     }
 
     void updateTrajactory() override
@@ -47,7 +43,6 @@ public:
         x = x + velocityX;    // As snow ball only moves left right so we just need x -axix...
 
         distanceTravelled = distanceTravelled + abs(velocityX);  // For traking distance coverage......
-        
 
         // Deactivate when max distance reached
         if (distanceTravelled >= maxDistance)
@@ -55,8 +50,6 @@ public:
             deactivate();
             return;
         }
-
-
         if (x > screenWidth)
         {
             x = 0;
@@ -70,7 +63,6 @@ public:
 
         shape.setPosition(x, y);
     }
-
     void drawProjectiles(sf::RenderWindow& window) override
     {
         if (!active)
@@ -80,7 +72,6 @@ public:
 
         window.draw(shape);
     }
-
     // Called when snowball hits enemy
     void onHitEnemy(Enemy* enemy)
     {
@@ -90,26 +81,14 @@ public:
         }
         deactivate();
     }
-
     sf::FloatRect getHitBox()
     {
         return shape.getGlobalBounds();
     }
-
-
-
-
-
-
-
     int getDirection()
     {
         return direction;   
     }
-
-
-
-
     ~Snowball()
     {
     }

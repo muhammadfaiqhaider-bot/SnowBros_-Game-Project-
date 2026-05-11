@@ -52,7 +52,7 @@ public:
     {
         font.loadFromFile("assets/Title.ttf");
         text.loadFromFile("assets/Text.ttf");
-        subTit.loadFromFile("asstes/Subtitle.ttf");
+
 
         bgCurrentFrame = 0;
         bgAnimTimer = 0;
@@ -75,11 +75,7 @@ public:
                 bgChunks[c].loadFromImage(fullImage, chunkRect);
             }
 
-        // Load UI click sound buffer (non-fatal)
-        if (clickBuffer.loadFromFile("assets/audio/sfx/ui_click.wav"))
-        {
-            clickSound.setBuffer(clickBuffer);
-        }
+  
 
             bgAnimSprite.setTexture(bgChunks[0]);
             bgAnimSprite.setTextureRect(sf::IntRect(0, 0, BG_FRAME_W, BG_FRAME_H));
@@ -141,7 +137,7 @@ public:
                 mouseY >= 340 && mouseY <= 395)
             {
                 // play click
-                if (clickSound.getBuffer() != nullptr) clickSound.play();
+  
                 if (usernameInput == "" || passwordInput == "")
                 {
                     message = "Please fill all fields!";
@@ -319,19 +315,18 @@ public:
             window.draw(bgAnimSprite);
         else
         {
-            // Fallback - dark blue if no image
+            //this si backup if background doesn't load so this image loads............
             sf::RectangleShape bg(sf::Vector2f(600.f, 600.f));
             bg.setFillColor(sf::Color(5, 10, 30));
             window.draw(bg);
         }
 
-        //  SUBTLE DARK OVERLAY
         // Makes text readable over the starry background
         sf::RectangleShape overlay(sf::Vector2f(600.f, 600.f));
         overlay.setFillColor(sf::Color(0, 5, 20, 80));
         window.draw(overlay);
 
-        //  GAME TITLE above box 
+        //  snowbross title above box 
         sf::Text title;
         title.setFont(font);
         title.setString("SNOW BROS");
@@ -385,7 +380,7 @@ public:
 
         
 
-        // ---- USERNAME LABEL ----
+        //  username LABEL 
         sf::Text usernameLabel;
         usernameLabel.setFont(text);
         usernameLabel.setString("Username");
@@ -394,7 +389,7 @@ public:
         usernameLabel.setPosition(178.f, 183.f);
         window.draw(usernameLabel);
 
-        //  USERNAME BOX 
+        //  username BOX 
         sf::RectangleShape usernameBox(sf::Vector2f(240.f, 36.f));
         if (typingUsername)
         {
@@ -428,16 +423,16 @@ public:
         usernameContent.setPosition(185.f, 212.f);
         window.draw(usernameContent);
 
-        //  PASSWORD LABEL 
+        //  password LABEL 
         sf::Text passwordLabel;
         passwordLabel.setFont(text);
-        passwordLabel.setString("Password");
+        passwordLabel.setString("Password.....");
         passwordLabel.setCharacterSize(13);
         passwordLabel.setFillColor(sf::Color(218, 152, 227));
         passwordLabel.setPosition(178.f, 255.f);
         window.draw(passwordLabel);
 
-        //  PASSWORD BOX 
+        //  passwordd BOX 
         sf::RectangleShape passwordBox(sf::Vector2f(240.f, 36.f));
         if (typingPassword)
         {
@@ -454,7 +449,7 @@ public:
         passwordBox.setPosition(178.f, 272.f);
         window.draw(passwordBox);
 
-        // Password content or placeholder
+        // pass content or placeholder
         sf::Text passwordContent;
         passwordContent.setFont(text);
         passwordContent.setCharacterSize(13);
@@ -476,7 +471,7 @@ public:
         passwordContent.setPosition(185.f, 282.f);
         window.draw(passwordContent);
 
-        // PASSWORD HINT
+        // password HINT
         sf::Text hint;
         hint.setFont(text);
         hint.setString("Use 6 or more characters");
@@ -485,7 +480,7 @@ public:
         hint.setPosition(178.f, 315.f);
         window.draw(hint);
 
-        // DIVIDER LINE 
+        // divide LINE 
         sf::RectangleShape divider(sf::Vector2f(240.f, 1.f));
         divider.setFillColor(sf::Color(30, 70, 120, 150));
         divider.setPosition(178.f, 340.f);
@@ -520,7 +515,7 @@ public:
         mainBtnText.setPosition(178.f + (240.f - btnTextWidth) / 2.f, 367.f);
         window.draw(mainBtnText);
 
-        //  SWITCH BUTTON
+        //  seith button.......
         sf::RectangleShape switchButton(sf::Vector2f(240.f, 35.f));
         if (switchButtonHovered)
         {
@@ -551,7 +546,7 @@ public:
         switchText.setPosition(178.f + (240.f - switchTextWidth) / 2.f, 418.f);
         window.draw(switchText);
 
-        // ---- MESSAGE ----
+        //  MESSAGE 
         if (message != "")
         {
             sf::RectangleShape msgBg(sf::Vector2f(240.f, 26.f));
@@ -570,7 +565,7 @@ public:
             window.draw(messageText);
         }
 
-        // ---- CURSOR in active box ----
+        //  CURSOR in active box 
         if (typingUsername)
         {
             sf::RectangleShape cursor(sf::Vector2f(2.f, 18.f));

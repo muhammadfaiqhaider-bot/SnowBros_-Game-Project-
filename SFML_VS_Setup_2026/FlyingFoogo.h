@@ -56,7 +56,6 @@ public:
         {
             foogaTextureLoaded = true;
             foogaSprite.setTexture(foogaTexture);
-            // Start with idle frame
             foogaSprite.setTextureRect(sf::IntRect(WALK_X, WALK_Y, WALK_W, WALK_H));
             foogaSprite.setScale(40.f / WALK_W, 40.f / WALK_H);
         }
@@ -64,27 +63,24 @@ public:
 
     void movementsUpdate() override
     {
-        // ============================================================
-        // CRITICAL FIX: Check dead/encased/rolling FIRST before any movement
-        // This prevents flying/walking when snowball should be stationary
-        // ============================================================
 
-        // If dead - do nothing
+
+        // If dead  do nothing
         if (isDead)
         {
-            return;
+            return;      // this is the most importanct check to verify first if dead than leave the function .....
         }
 
-        // If rolling - ONLY do rolling physics (no flying, no walking)
+        // If rolling  ONLY do rolling physics no flying thingy no walking shooking.....
         if (isRolling)
         {
             // Stop flying when rolling
             isFlying = false;
-            flyingTimer = 0;
-            walkingTimer = 0;
+            flyingTimer = 0;       // timer reset to zeroooo..
+            walkingTimer = 0;        // smae walking..
 
             // Apply gravity while rolling
-            if (!onGround)
+            if (!onGround) // apply gravity on rolling only when not on lplatform..... encased enemy......so that move to the bottom.....
             {
                 velocityY = velocityY + 1.4f;
                 if (velocityY > 8.0f)
@@ -101,11 +97,11 @@ public:
             x = x + rollVelocityX;
             y = y + velocityY;
 
-            // change dir on colliding upon wall.......
+            // change direction  on colliding upon wall.......
             if (x <= 0)
             {
                 x = 0;
-                rollVelocityX = -rollVelocityX;
+                rollVelocityX = -rollVelocityX;    // negative negative = positive......
             }
             if (x >= 560)
             {
@@ -120,10 +116,10 @@ public:
                 isDead = true;      // Vanish after 3 seconds
             }
 
-            return;     // Exit early - don't do normal movement
+            return; 
         }
 
-        // If encased (but not rolling yet) - STOP all movement, just fall with gravity
+        // If encased but no rolling started.....stop all left right uper neeche moments........
         if (snowCovered)
         {
             // Stop flying when encased
@@ -147,20 +143,20 @@ public:
                 velocityY = 0;
             }
 
-            return;     // Exit early  stationary snowball
+            return; 
         }
 
 
 
         if (isFlying)
         {
-            // Flying movement - NO gravity, NO Botom physics
+            // Flying movement  no gravity no  Botom physics
             flyingTimer++;
 
             x = x + velocityX;
             y = y + velocityY;
 
-            // Screen boundary bounce
+            // Screen boundary checks for verificatinon not move outside the screen........
             if (x < 0)
             {
                 x = 0;
@@ -182,12 +178,12 @@ public:
                 velocityY = -velocityY;
             }
 
-            if (flyingTimer > flyingDuration)
+            if (flyingTimer > flyingDuration) // flying timer is like stop watch for flying and duration is the targeted time.....
             {
-                isFlying = false;
+                isFlying = false;       // flying satus off 
                 flyingTimer = 0;
 
-                // Reset to ground walking speed
+                // give his walking moment backs
                 int direction;
                 if (rand() % 2 == 0)
                 {
@@ -203,11 +199,11 @@ public:
         }
         else
         {
-            // Ground movement - use Botom physics normally
+            // Ground movement  use Botom physics normally ....... polimorphism happens here.........
             Botom::movementsUpdate();
 
             walkingTimer++;
-            if (walkingTimer > walkingDuration)
+            if (walkingTimer > walkingDuration)// there is walking timer same like flying timer......
             {
                 isFlying = true;
                 walkingTimer = 0;
@@ -233,7 +229,7 @@ public:
                     dirY = -1;
                 }
 
-                float speed = 2.5f;         // Increased speed for visible diagonal
+                float speed = 2.5f;  // flying speed is setted thora sa fast......
                 velocityX = speed * dirX;
                 velocityY = speed * dirY;
             }
@@ -244,44 +240,31 @@ public:
 
     void DisplayEnemy(sf::RenderWindow& window) override
     {
-        // Don't draw if dead
         if (isDead)
         {
+            // Death wali sprite sheet dalne ka no time.........
             return;
         }
 
-        // ROLLING SNOWBALL (kicked and moving)
+        // rolling snowball...... (kicked and moving)
         if (isRolling)
         {
-            sf::CircleShape rollingBall(22.0f);
+            sf::CircleShape rollingBall(15.0f);
             rollingBall.setFillColor(sf::Color::White);
             rollingBall.setOutlineColor(sf::Color(180, 220, 255));
-            rollingBall.setOutlineThickness(3.0f);
             rollingBall.setPosition(x, y);
             window.draw(rollingBall);
             return;
         }
 
-        // FULLY ENCASED (stationary) 
+        // dully encased...... (stationary) 
         if (snowCovered)
         {
-            sf::CircleShape snowBall(20.0f);
+            sf::CircleShape snowBall(15.0f);
             snowBall.setFillColor(sf::Color::White);
             snowBall.setOutlineColor(sf::Color(180, 220, 255));
-            snowBall.setOutlineThickness(2.0f);
             snowBall.setPosition(x, y);
             window.draw(snowBall);
-
-            // Small indicator showing its kickable
-            sf::RectangleShape leftArrow(sf::Vector2f(8.0f, 3.0f));
-            leftArrow.setFillColor(sf::Color::Cyan);
-            leftArrow.setPosition(x - 12.0f, y + 18.0f);
-            window.draw(leftArrow);
-
-            sf::RectangleShape rightArrow(sf::Vector2f(8.0f, 3.0f));
-            rightArrow.setFillColor(sf::Color::Cyan);
-            rightArrow.setPosition(x + 44.0f, y + 18.0f);
-            window.draw(rightArrow);
 
             return;
         }
@@ -289,7 +272,6 @@ public:
 
         if (!foogaTextureLoaded)
         {
-            // Fallback rectangles
             sf::RectangleShape temp(sf::Vector2f(30.f, 30.f));
             temp.setFillColor(isFlying ? sf::Color::Blue : sf::Color::Green);
             temp.setPosition(x, y);
@@ -297,7 +279,7 @@ public:
             return;
         }
 
-        // ---- ANIMATION ----
+        //  animation thin
         if (isFlying)
         {
             // Cycle between fly frame 1 and 2
@@ -363,14 +345,6 @@ public:
             // Light snow - 25% covered
             sf::CircleShape snowOverlay(15.f);
             snowOverlay.setFillColor(sf::Color(255, 255, 255, 80));
-            snowOverlay.setPosition(x, y);
-            window.draw(snowOverlay);
-        }
-        else if (hitCount == 2)
-        {
-            // Heavy snow - 65% covered
-            sf::CircleShape snowOverlay(15.f);
-            snowOverlay.setFillColor(sf::Color(255, 255, 255, 160));
             snowOverlay.setPosition(x, y);
             window.draw(snowOverlay);
         }

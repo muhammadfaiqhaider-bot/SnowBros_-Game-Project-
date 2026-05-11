@@ -54,6 +54,105 @@ private:
         }
     }
 
+    void drawP2HUD(sf::RenderWindow& window)
+    {
+        sf::Font& f = font;
+
+
+        sf::Text p2Label;
+        p2Label.setFont(f);
+        p2Label.setString("P2:");
+        p2Label.setCharacterSize(12);
+        p2Label.setFillColor(p2Alive ? sf::Color(255, 140, 0) : sf::Color(100, 100, 100));
+        p2Label.setPosition(360.f, 45.f);
+        window.draw(p2Label);
+
+        int p2Lives = (player2 != nullptr) ? player2->getLives() : 0;
+
+        for (int i = 0; i < 5; i++)
+        {
+            sf::CircleShape heart(8.f);
+            if (i < p2Lives && p2Alive)
+                heart.setFillColor(sf::Color(255, 100, 0));   // orange hearts for P2
+            else
+                heart.setFillColor(sf::Color(60, 60, 60));
+            heart.setPosition(390.f + i * 22.f, 43.f);
+            window.draw(heart);
+        }
+
+        // "DEAD" label if P2 is gone
+        if (!p2Alive)
+        {
+            sf::Text deadText;
+            deadText.setFont(f);
+            deadText.setString("DEAD");
+            deadText.setCharacterSize(11);
+            deadText.setFillColor(sf::Color(180, 60, 60));
+            deadText.setPosition(390.f, 45.f);
+            window.draw(deadText);
+        }
+    }
+
+    void handlePlayerPlatformCollision(Player* p)
+    {
+        if (levels[currentLevelNumber - 1] == nullptr) return;
+        sf::RectangleShape* plats = levels[currentLevelNumber - 1]->getPlatforms();
+        int count = levels[currentLevelNumber - 1]->getPlatformCount();
+
+        p->setOnGround(false);
+
+        for (int i = 0; i < count; i++)
+        {
+            sf::FloatRect playerBounds(p->getPositionX(), p->getPositionY(), 40.f, 50.f);
+            sf::FloatRect platBounds = plats[i].getGlobalBounds();
+
+            if (playerBounds.intersects(platBounds))
+            {
+                float platTop = plats[i].getPosition().y;
+                float playerBot = p->getPositionY() + 50.f;
+
+                if (playerBot >= platTop && p->getPositionY() < platTop && p->getVelocityY() >= 0.f)
+                {
+                    p->setOnGround(true);
+                    p->setJump(0);
+                    p->snapToGround(platTop - 49.9f);
+                }
+            }
+        }
+    }
+
+    void setupPlatforms()
+    {
+        platforms[0].setSize(sf::Vector2f(600.f, 20.f));
+        platforms[0].setFillColor(sf::Color(128, 0, 128));
+        platforms[0].setPosition(0.f, 560.f);
+
+        platforms[1].setSize(sf::Vector2f(250.f, 20.f));
+        platforms[1].setFillColor(sf::Color(128, 0, 128));
+        platforms[1].setPosition(0.f, 420.f);
+
+        platforms[2].setSize(sf::Vector2f(250.f, 20.f));
+        platforms[2].setFillColor(sf::Color(128, 0, 128));
+        platforms[2].setPosition(350.f, 420.f);
+
+        platforms[3].setSize(sf::Vector2f(300.f, 20.f));
+        platforms[3].setFillColor(sf::Color(128, 0, 128));
+        platforms[3].setPosition(150.f, 280.f);
+
+        platforms[4].setSize(sf::Vector2f(200.f, 20.f));
+        platforms[4].setFillColor(sf::Color(128, 0, 128));
+        platforms[4].setPosition(0.f, 140.f);
+
+        platforms[5].setSize(sf::Vector2f(200.f, 20.f));
+        platforms[5].setFillColor(sf::Color(128, 0, 128));
+        platforms[5].setPosition(400.f, 140.f);
+    }
+
+
+
+
+
+
 public:
     GamePlay() : nick(100.f, 520.f), player2(nullptr), twoPlayerMode(false), p2Alive(false)
     {
@@ -68,23 +167,6 @@ public:
         for (int i = 0; i < 10; i++)
             levels[i] = nullptr;
         levels[0] = new Level1();
-    }
-
-    ~GamePlay()
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            if (levels[i] != nullptr)
-            {
-                delete levels[i];
-                levels[i] = nullptr;
-            }
-        }
-        if (player2 != nullptr)
-        {
-            delete player2;
-            player2 = nullptr;
-        }
     }
 
    
@@ -230,7 +312,7 @@ public:
         loadCurrentLevel();
         Level* current = levels[currentLevelNumber - 1];
 
-        // ---- P1 update ----
+        //  P1 update 
         nick.movementsUpdate();
         handlePlayerPlatformCollision(&nick);
 
@@ -443,7 +525,7 @@ public:
         saveMessage = "";
         saveMessageTimer = 0;
 
-        // Clean up P2 — will be re-created by setTwoPlayerMode if needed
+        // Clean up P2  will be re-created by setTwoPlayerMode if needed
         if (player2 != nullptr)
         {
             delete player2;
@@ -464,100 +546,26 @@ public:
         totalLevels = 10;
     }
 
-private:
 
-
-    void drawP2HUD(sf::RenderWindow& window)
+    ~GamePlay()
     {
-        sf::Font& f = font;
-
-      
-        sf::Text p2Label;
-        p2Label.setFont(f);
-        p2Label.setString("P2:");
-        p2Label.setCharacterSize(12);
-        p2Label.setFillColor(p2Alive ? sf::Color(255, 140, 0) : sf::Color(100, 100, 100));
-        p2Label.setPosition(360.f, 45.f);
-        window.draw(p2Label);
-
-        int p2Lives = (player2 != nullptr) ? player2->getLives() : 0;
-
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 10; i++)
         {
-            sf::CircleShape heart(8.f);
-            if (i < p2Lives && p2Alive)
-                heart.setFillColor(sf::Color(255, 100, 0));   // orange hearts for P2
-            else
-                heart.setFillColor(sf::Color(60, 60, 60));
-            heart.setPosition(390.f + i * 22.f, 43.f);
-            window.draw(heart);
-        }
-
-        // "DEAD" label if P2 is gone
-        if (!p2Alive)
-        {
-            sf::Text deadText;
-            deadText.setFont(f);
-            deadText.setString("DEAD");
-            deadText.setCharacterSize(11);
-            deadText.setFillColor(sf::Color(180, 60, 60));
-            deadText.setPosition(390.f, 45.f);
-            window.draw(deadText);
-        }
-    }
-
-    void handlePlayerPlatformCollision(Player* p)
-    {
-        if (levels[currentLevelNumber - 1] == nullptr) return;
-        sf::RectangleShape* plats = levels[currentLevelNumber - 1]->getPlatforms();
-        int count = levels[currentLevelNumber - 1]->getPlatformCount();
-
-        p->setOnGround(false);
-
-        for (int i = 0; i < count; i++)
-        {
-            sf::FloatRect playerBounds(p->getPositionX(), p->getPositionY(), 40.f, 50.f);
-            sf::FloatRect platBounds = plats[i].getGlobalBounds();
-
-            if (playerBounds.intersects(platBounds))
+            if (levels[i] != nullptr)
             {
-                float platTop = plats[i].getPosition().y;
-                float playerBot = p->getPositionY() + 50.f;
-
-                if (playerBot >= platTop && p->getPositionY() < platTop && p->getVelocityY() >= 0.f)
-                {
-                    p->setOnGround(true);
-                    p->setJump(0);
-                    p->snapToGround(platTop - 49.9f);
-                }
+                delete levels[i];
+                levels[i] = nullptr;
             }
         }
+        if (player2 != nullptr)
+        {
+            delete player2;
+            player2 = nullptr;
+        }
     }
 
-    void setupPlatforms()
-    {
-        platforms[0].setSize(sf::Vector2f(600.f, 20.f));
-        platforms[0].setFillColor(sf::Color(128, 0, 128));
-        platforms[0].setPosition(0.f, 560.f);
 
-        platforms[1].setSize(sf::Vector2f(250.f, 20.f));
-        platforms[1].setFillColor(sf::Color(128, 0, 128));
-        platforms[1].setPosition(0.f, 420.f);
 
-        platforms[2].setSize(sf::Vector2f(250.f, 20.f));
-        platforms[2].setFillColor(sf::Color(128, 0, 128));
-        platforms[2].setPosition(350.f, 420.f);
 
-        platforms[3].setSize(sf::Vector2f(300.f, 20.f));
-        platforms[3].setFillColor(sf::Color(128, 0, 128));
-        platforms[3].setPosition(150.f, 280.f);
 
-        platforms[4].setSize(sf::Vector2f(200.f, 20.f));
-        platforms[4].setFillColor(sf::Color(128, 0, 128));
-        platforms[4].setPosition(0.f, 140.f);
-
-        platforms[5].setSize(sf::Vector2f(200.f, 20.f));
-        platforms[5].setFillColor(sf::Color(128, 0, 128));
-        platforms[5].setPosition(400.f, 140.f);
-    }
 };

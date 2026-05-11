@@ -14,7 +14,7 @@ protected:
     int directionTimer;     // for random direction switches
     int directionCooldown;
 
-    // Snow/encasing system
+    // Snowencasing system
     int hitCount;               // How many times hit (max 3)
     bool isRolling;             // Is encased snowball rolling?
     float rollVelocityX;        // Rolling speed and direction
@@ -25,8 +25,8 @@ protected:
 public:
     Botom(float xPos, float yPos) : Enemy(xPos, yPos, "Botom")   // This is parametrized Function whenever in main my Botom is created it 
     {                                                            // Does demand its X and Y coordinate for object creation 
-        health = 3;             // 3 hits to encase
-        hitWall = false;
+        health = 3;             // 3 hits to encase.... hit him 3 times it get encased ....
+        hitWall = false;        // Hitwall is needed to change directioon when enemy collide with wall....
         onGround = false;
 
 
@@ -49,7 +49,7 @@ public:
         isRolling = false;
         rollVelocityX = 0;
         rollTimer = 0;
-        rollDuration = 180;     // 3 seconds at 60 FPS
+        rollDuration = 120;     // 2 seconds at 60 FPS
         isDead = false;
 
         if (enemyTexture.loadFromFile("assets/Botom_Blue.png")) //Animation shyt, setting texture to the botom png. - cheema
@@ -82,16 +82,16 @@ public:
         if (isDead || isRolling)
         {
             return;     // Already dead or rolling ignore hits
-        }
+        }               // This is important check bcz if he is encased ot rolling hitting him makes no sense ......
 
         hitCount++;
 
         if (hitCount >= 3)
         {
-            // Fully encased!
-            snowCovered = true;
+            // Fully encased...........
+            snowCovered = true; // Status get true.....
             health = 0;
-            velocityX = 0;
+            velocityX = 0; // Velocity gets  0 .....
             velocityY = 0;
         }
         else
@@ -99,7 +99,7 @@ public:
             // Partially hit - slow down
             health--;
 
-            if (hitCount == 1)
+            if (hitCount == 1)// Typa special feature when i hit botom his speed gets sloww a bit
             {
                 velocityX = velocityX * 0.7f;   // 30% slower after 1st hit
             }
@@ -110,7 +110,7 @@ public:
         }
     }
 
- //26
+   //26/4/2026
 
     void kickRoll(int direction)
     {
@@ -121,23 +121,22 @@ public:
 
         isRolling = true;
         rollTimer = 0;
-        rollVelocityX = 6.0f * direction;   // Fast roll speed
+        rollVelocityX = 6.0f * direction;   // Fast roll speed...........
     }
 
     // 26 updates.....
     void movementsUpdate() override // Ovverriden Function........
     {
-        // If dead - do nothing
+        // If dead  do nothing
         if (isDead)
         {
             return;
         }
 
-
         if (isRolling)
         {
             // Apply gravity while rolling
-            if (!onGround)
+            if (!onGround)// Essential so it bring encased enemy to the botom.......
             {
                 velocityY = velocityY + 1.4f;
                 if (velocityY > 8.0f)
@@ -150,7 +149,7 @@ public:
                 velocityY = 0;
             }
 
-            // Move rolling snowball
+            // Move rolling snowball....
             x = x + rollVelocityX;
             y = y + velocityY;
 
@@ -322,46 +321,31 @@ public:
             rollingBall.setOutlineThickness(3.0f);
             rollingBall.setPosition(x, y);
             window.draw(rollingBall);
-
-            
-
             return;
         }
 
-        // FULLY ENCASED (stationary) 
+        // fulli encased .... 
         if (snowCovered)
         {
-            sf::CircleShape snowBall(20.0f);
+            sf::CircleShape snowBall(16.0f);               // this shape is inbuild class from sfml library 20 indicate radius of 15 radius....
             snowBall.setFillColor(sf::Color::White);
             snowBall.setOutlineColor(sf::Color(180, 220, 255));
-            snowBall.setOutlineThickness(2.0f);
+            snowBall.setOutlineThickness(1.0f);
             snowBall.setPosition(x, y);
             window.draw(snowBall);
 
-            // Small indicator showing its kickable
-            sf::Text kickText;
-            // No font here - just draw arrow indicators
-            sf::RectangleShape leftArrow(sf::Vector2f(8.0f, 3.0f));
-            leftArrow.setFillColor(sf::Color::Cyan);
-            leftArrow.setPosition(x - 12.0f, y + 18.0f);
-            window.draw(leftArrow);
-
-            sf::RectangleShape rightArrow(sf::Vector2f(8.0f, 3.0f));
-            rightArrow.setFillColor(sf::Color::Cyan);
-            rightArrow.setPosition(x + 44.0f, y + 18.0f);
-            window.draw(rightArrow);
 
             return;
         }
 
-        // PARTIALLY HIT  snow overlay 
-        if (textureLoaded)
+        // partiallyy hit  visual effect
+        if (textureLoaded)             // this check was added later after implemting sprite sheett if somehow error occurs than rectangle box appears.....
         {
             window.draw(enemySprite);
         }
         else
         {
-            sf::RectangleShape tempShape(sf::Vector2f(40.f, 40.f));
+            sf::RectangleShape tempShape(sf::Vector2f(40.0f, 40.0f));
             tempShape.setFillColor(sf::Color::Red);
             tempShape.setPosition(x, y);
             window.draw(tempShape);
@@ -370,16 +354,16 @@ public:
         // Show snow overlay based on hit count
         if (hitCount == 1)
         {
-            // Light snow - 25% covered
-            sf::CircleShape snowOverlay(20.f);
+            //   lightttt sa  covered effect transparent
+            sf::CircleShape snowOverlay(15.0f);
             snowOverlay.setFillColor(sf::Color(255, 255, 255, 80));
             snowOverlay.setPosition(x, y);
             window.draw(snowOverlay);
         }
         else if (hitCount == 2)
         {
-            // Heavy snow - 65% covered
-            sf::CircleShape snowOverlay(20.f);
+            //  thora zada sa  covered effect transparent
+            sf::CircleShape snowOverlay(15.0f);
             snowOverlay.setFillColor(sf::Color(255, 255, 255, 160));
             snowOverlay.setPosition(x, y);
             window.draw(snowOverlay);

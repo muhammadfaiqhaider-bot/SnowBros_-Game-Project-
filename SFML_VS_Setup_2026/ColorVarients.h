@@ -4,10 +4,8 @@
 #include "Tornado.h"
 
 
-// During level 6-7 Botom powers increased like 
-// 1- speed increase by 25% 
-// 2- and also health increase means 1 more hit required to shot him down 
-class GreenBotom : public Botom
+//Color variant with special features.......
+class GreenBotom : public Botom       // sameee shyt just upgraded health by 1 and speed a bit.........
 {
 public:
     GreenBotom(float posX, float posY) : Botom(posX, posY)
@@ -37,16 +35,13 @@ public:
 };
 
 
-// During level 8-9 Botom powers increased like 
-// 1- speed increase by 50% 
-// 2- and also health increase means 2 more hit required to shot him down 
 class BlueBotom : public Botom
 {
 public:
     BlueBotom(float posX, float posY) : Botom(posX, posY)
     {
         velocityX = velocityX * 1.50f;
-        health = health + 2;
+        health = health + 2;         // Health increase by 2 and Increase speed slightly more...
         name = "BlueBotom";
 
         // Override with Pink sprite sheet

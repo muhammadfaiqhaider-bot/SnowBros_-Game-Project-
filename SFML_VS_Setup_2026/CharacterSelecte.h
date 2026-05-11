@@ -149,7 +149,6 @@ public:
                     selectedCharacter = 0;
             }
 
-            // --- Speedy box ---
             if (mx >= 240 && mx <= 360 && my >= 175 && my <= 330)
             {
                 if (!onePlayerSelected && selectedCharacter != 1)
@@ -160,7 +159,7 @@ public:
                     selectedCharacter = 1;
             }
 
-            // --- Ranger box ---
+
             if (mx >= 425 && mx <= 545 && my >= 175 && my <= 330)
             {
                 if (!onePlayerSelected && selectedCharacter != 2)
@@ -171,7 +170,7 @@ public:
                     selectedCharacter = 2;
             }
 
-            // --- Mode buttons ---
+            //  Mode buttons 
             onePlayerHovered = (mx >= 130 && mx <= 230 && my >= 470 && my <= 505);
             twoPlayerHovered = (mx >= 358 && mx <= 468 && my >= 470 && my <= 505);
 
@@ -183,7 +182,7 @@ public:
             if (mx >= 358 && mx <= 468 && my >= 470 && my <= 505)
                 onePlayerSelected = false;
 
-            // --- Start button ---
+            //  Start button 
             if (mx >= 200 && mx <= 400 && my >= 525 && my <= 570)
             {
                 if (!onePlayerSelected && selectedCharacter2 == -1)
@@ -201,9 +200,7 @@ public:
         return 2;
     }
 
-    // ==========================================
-    // DRAW
-    // ==========================================
+
     void update()
     {
         if (!bgAnimLoaded) return;
@@ -308,7 +305,7 @@ public:
         }
         window.draw(onePText);
 
-        // --- 2P button ---
+        //  2P button 
         sf::RectangleShape twoPBtn(sf::Vector2f(110.f, 35.f));
         twoPBtn.setPosition(358.f, 470.f);
         if (!onePlayerSelected)
@@ -338,7 +335,7 @@ public:
         }
         window.draw(twoPText);
 
-        // --- Start button ---
+        //  Start button 
         sf::RectangleShape startButton(sf::Vector2f(200.f, 45.f));
         // Use same theme as MainMenu buttons
         if (startHovered)
@@ -381,7 +378,8 @@ public:
         return selectedCharacter; 
     }
     int getP2Character()       const 
-    { return 
+    {
+        return 
         selectedCharacter2; 
     }
     int getPlayerMode()        const 

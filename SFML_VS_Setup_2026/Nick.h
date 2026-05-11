@@ -7,7 +7,7 @@ public:
     Nick(float x, float y)
         : AnimatedPlayer(x, y, "Nick", "assets/sonic.png")
     {
-        lives = 50;
+        lives = 10;
         speed = 3.0f;
         snowballPower = 1.0f;
         snowballDistance = 200.0f;

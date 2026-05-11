@@ -41,7 +41,7 @@ public:
         playerX = 0;
         playerY = 0;
 
-        // Gamakichi should be fixed to platforms (no gravity)
+        // Gamakichi should be fixed to platforms
         onGround = true;
         velocityY = 0;
 
@@ -97,7 +97,7 @@ public:
         velocityY = 0.f;
         onGround = true;
 
-        if (x > 520)        // 600 - 80 (boss width)
+        if (x > 520)       
         {
             x = 520;
         }
@@ -105,7 +105,7 @@ public:
         {
             y = 0;
         }
-        if (y > 480)        // 600 - 120 (boss height)
+        if (y > 480)      
         {
             y = 480;
         }
@@ -117,7 +117,6 @@ public:
         handleAttack();
         updateRockets();
 
-        // idle animation
         if (textureLoaded && totalFrames > 1)
         {
             animTimer++;
@@ -219,7 +218,7 @@ public:
 
         if (textureLoaded)
         {
-            // ensure frame is updated
+
             int left = currentFrame * (frameWidth + frameGap);
             enemySprite.setTextureRect(sf::IntRect(left, 0, frameWidth, frameHeight));
             enemySprite.setPosition(x, y);
@@ -227,44 +226,13 @@ public:
         }
         else
         {
-            // Gamakichi - large purple rectangle (bigger than Mogera)
+            // Gamakichi  large purple rectangle (bigger than Mogera)
             sf::RectangleShape gamakichiShape(sf::Vector2f(40.f, 40.f));
             gamakichiShape.setFillColor(sf::Color(100, 0, 150));    // Dark purple
             gamakichiShape.setPosition(x, y);
             window.draw(gamakichiShape);
         }
 
-        // Health bar background (red)
-        sf::RectangleShape healthBarBackground(sf::Vector2f(100.f, 12.f));
-        healthBarBackground.setFillColor(sf::Color::Red);
-        healthBarBackground.setPosition(x, y - 20.f);
-        window.draw(healthBarBackground);
-
-        // Health bar foreground (shrinks as health decreases)
-        float healthPercent = (float)health / 35.0f;
-        sf::RectangleShape healthBarForeground(sf::Vector2f(100.f * healthPercent, 12.f));
-        healthBarForeground.setFillColor(sf::Color::Green);
-        healthBarForeground.setPosition(x, y - 20.f);
-        window.draw(healthBarForeground);
-
-        // Phase indicator - small colored box shows current phase
-        sf::RectangleShape phaseIndicator(sf::Vector2f(20.f, 10.f));
-
-        if (phase == 1)
-        {
-            phaseIndicator.setFillColor(sf::Color::Green);
-        }
-        if (phase == 2)
-        {
-            phaseIndicator.setFillColor(sf::Color::Yellow);
-        }
-        if (phase == 3)
-        {
-            phaseIndicator.setFillColor(sf::Color::Red);
-        }
-
-        phaseIndicator.setPosition(x, y - 35.f);
-        window.draw(phaseIndicator);
 
         // Draw all active rockets
         for (int i = 0; i < MAX_ROCKETS; i++)

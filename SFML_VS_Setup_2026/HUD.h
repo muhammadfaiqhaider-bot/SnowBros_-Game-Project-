@@ -13,65 +13,7 @@ private:
     int gems;
     int level;
 
-public:
-    HUD()
-    {
 
-        font.loadFromFile("assets/Text.ttf");
-
-        score = 0;
-        lives = 2;
-        gems = 0;
-        level = 1;
-    }
-
-
-    void update(int currentScore, int currentLives, int currentGems, int currentLevel)
-    {
-        score = currentScore;
-        lives = currentLives;
-        gems = currentGems;
-        level = currentLevel;
-    }
-
-
-
-    void draw(sf::RenderWindow& window)
-    {
-        //  HUD BACKGROUND BAR 
-        sf::RectangleShape hudBar(sf::Vector2f(600.f, 40.f));
-        hudBar.setFillColor(sf::Color(0, 0, 0, 180));   // Semi transparent black
-        hudBar.setPosition(0.f, 0.f);
-        window.draw(hudBar);
-
-        //  SCORE  Top kleft
-        sf::Text scoreText;
-        scoreText.setFont(font);
-        scoreText.setString("Score: " + std::to_string(score));
-        scoreText.setCharacterSize(14);
-        scoreText.setFillColor(sf::Color::White);
-        scoreText.setPosition(10.f, 10.f);
-        window.draw(scoreText);
-
-        // LIVES  TOp left (below score)
-        drawLives(window);
-
-        // LEVEL - TOP CENTER
-        sf::Text levelText;
-        levelText.setFont(font);
-        levelText.setString("Level  " + std::to_string(level) + " / 10");
-        levelText.setCharacterSize(14);
-        levelText.setFillColor(sf::Color::Cyan);
-
-        // Center it
-        levelText.setPosition(230.f, 12.f);
-        window.draw(levelText);
-
-        //  GEMS - TOP RIGHT 
-        drawGems(window);
-    }
-
-private:
 
     void drawLives(sf::RenderWindow& window)
     {
@@ -121,4 +63,64 @@ private:
         gemText.setPosition(530.f, 10.f);
         window.draw(gemText);
     }
+
+public:
+    HUD()
+    {
+
+        font.loadFromFile("assets/Text.ttf");
+
+        score = 0;
+        lives = 2;
+        gems = 0;
+        level = 1;
+    }
+
+
+    void update(int currentScore, int currentLives, int currentGems, int currentLevel)
+    {
+        score = currentScore;
+        lives = currentLives;
+        gems = currentGems;
+        level = currentLevel;
+    }
+
+
+
+    void draw(sf::RenderWindow& window)
+    {
+        //  HUD BACKGROUND BAR 
+        sf::RectangleShape hudBar(sf::Vector2f(600.f, 40.f));
+        hudBar.setFillColor(sf::Color(0, 0, 0, 180));   // Semi transparent black
+        hudBar.setPosition(0.f, 0.f);
+        window.draw(hudBar);
+
+        //  SCORE  Top kleft
+        sf::Text scoreText;
+        scoreText.setFont(font);
+        scoreText.setString("Score: " + std::to_string(score));
+        scoreText.setCharacterSize(14);
+        scoreText.setFillColor(sf::Color::White);
+        scoreText.setPosition(10.f, 10.f);
+        window.draw(scoreText);
+
+        // LIVES  TOp left (below score)
+        drawLives(window);
+
+        // LEVEL TOP CENTER
+        sf::Text levelText;
+        levelText.setFont(font);
+        levelText.setString("Level  " + std::to_string(level) + " / 10");
+        levelText.setCharacterSize(14);
+        levelText.setFillColor(sf::Color::Cyan);
+
+        levelText.setPosition(230.f, 12.f);
+        window.draw(levelText);
+
+        //  GEMS  TOP RIGHT 
+        drawGems(window);
+    }
+
+
+    
 };

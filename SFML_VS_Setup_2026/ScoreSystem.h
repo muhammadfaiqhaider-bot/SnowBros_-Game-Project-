@@ -54,7 +54,7 @@ public:
     {
         chaincount++;
 
-        float bonus = lastscore * 0.10f * chaincount;
+        float bonus =  0.10f * chaincount;
         currentscore = currentscore + bonus;
     }
 
@@ -77,20 +77,6 @@ public:
         else if (bossType == "Gamakichi")
             gemcount += 500;
     }
-
-
-
-    // Leaderboard  File handling implement Shyt will do later (okyyy)
-    void saveToLeaderboard()
-    {
-
-    }
-    void loadLeaderboard()
-    {
-
-    }
-
-
 
 
     // Getters functions here ......

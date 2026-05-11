@@ -36,7 +36,7 @@ public:
 
         // Setup animation for Mogera: sprite sheet is a single row with 3 frames.
         // Sprite sheet settings (updated): single row with 3 frames.
-        // New sheet resolution: total ~1660x457, frame width = 529, frame height = 457, gap between frames = 15
+        // New sheet resolution: total 1660x457, frame width = 529, frame height = 457, gap between frames = 15
         frameWidth = 529;
         frameHeight = 457;
         totalFrames = 3;
@@ -80,9 +80,9 @@ public:
         if (!onGround)
         {
             velocityY += 0.5f;
-            if (velocityY > 8.f)
+            if (velocityY > 8.0f)
             {
-                velocityY = 8.f;
+                velocityY = 8.0f;
             }
             y += velocityY;
         }
@@ -120,7 +120,6 @@ public:
             }
         }
 
-        // Handle idle animation (single row sprite sheet)
         if (textureLoaded && totalFrames > 1)
         {
             animTimer++;
@@ -197,19 +196,7 @@ public:
         }
 
 
-        sf::RectangleShape healthBarBackground(sf::Vector2f(80.0f, 10.0f));         // Red Bar on the Top of Mogera indicating his health 
-        healthBarBackground.setFillColor(sf::Color::Red);                           // Decreasing Health........which is overlapped by 
-        healthBarBackground.setPosition(x, y - 15.0f);                              // Green bar which is shring with the health decreasing
-        window.draw(healthBarBackground);
-
-
-        float healthPercent = (float)health / 10.0f;
-        sf::RectangleShape healthBarForeground(sf::Vector2f(80.f * healthPercent, 10.f));
-        healthBarForeground.setFillColor(sf::Color::Green);
-        healthBarForeground.setPosition(x, y - 15.f);
-        window.draw(healthBarForeground);
-
-
+      
 
         for (int i = 0; i < numberOfChilds; i++)
         {
@@ -264,7 +251,6 @@ public:
         {
             return child[index].getPositionX();
         }
-        return -1;
     }
 
 

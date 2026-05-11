@@ -56,11 +56,6 @@ public:
         rocketShape.setPosition(x, y);
         window.draw(rocketShape);
 
-        // Explosion effect - small red circle at front
-        sf::CircleShape explosionTip(5.f);
-        explosionTip.setFillColor(sf::Color::Red);
-        explosionTip.setPosition(x + 10.f, y - 1.f);
-        window.draw(explosionTip);
     }
 
     ~Rocket()

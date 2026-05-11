@@ -24,6 +24,6 @@ public:
         addEnemy(new Botom(500.f, 180.f));
 
         // Level-specific music
-        loadLevelMusic("assets/level_music_1.ogg");
+        loadLevelMusic("assets/level_music_3.wav");
     }
 };

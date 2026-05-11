@@ -69,21 +69,6 @@ public:
             return false;               // Wrong password
         }
     }
-
-
-
-
-    // Logout phasee 
-    void logoutUser()
-    {
-        isLogin = false;
-        currusername = "";
-        currentUserId = -1;
-    }
-
-
-
-
     // Getters
     bool getIsLoggedIn()
     {

@@ -45,9 +45,6 @@ public:
 
         loadFromFile();
     }
-
-    // SAVE NEW SCORE
- 
     void saveScore(const std::string& playerName, int score, int levelReached)
     {
         // Ignore empty/invalid names
@@ -69,7 +66,7 @@ public:
             }
         }
 
-        // New entry — add to bottom or replace lowest if board is full
+        // New entry 
         if (entryCount < MAX_ENTRIES)
         {
             entries[entryCount].playerName = playerName;
@@ -90,7 +87,6 @@ public:
         saveToFile();
     }
 
-    // HANDLE EVENTS
 
     int handleEvents(sf::Event& event)
     {
@@ -116,9 +112,6 @@ public:
         return 8;
     }
 
-    // ==========================================
-    // DRAW
-    // ==========================================
     void draw(sf::RenderWindow& window)
     {
         // Background
@@ -191,14 +184,7 @@ public:
                 if (i == 1) rankColor = sf::Color(200, 200, 200);
                 if (i == 2) rankColor = sf::Color(180, 100, 40);
 
-                // Crown for #1
-                if (i == 0)
-                {
-                    sf::CircleShape crown(8.f, 3);
-                    crown.setFillColor(sf::Color::Yellow);
-                    crown.setPosition(55.f, rowY + 2.f);
-                    window.draw(crown);
-                }
+               
 
                 auto makeCell = [&](const std::string& s, float x)
                     {
@@ -262,9 +248,6 @@ private:
                 }
     }
 
-    // ==========================================
-    // SAVE — writes cleanly, no trailing newline issues
-    // ==========================================
     void saveToFile()
     {
         std::ofstream file(leaderboardFile, std::ios::trunc);
@@ -283,9 +266,7 @@ private:
         file.close();
     }
 
-    // ==========================================
-    // LOAD — safe parsing, never crashes on bad data
-    // ==========================================
+
     void loadFromFile()
     {
         std::ifstream file(leaderboardFile);
@@ -302,24 +283,24 @@ private:
             std::stringstream ss(line);
             std::string token;
 
-            // ---- name ----
+            //  name \
             if (!std::getline(ss, token, ',')) continue;
             std::string name = token;
             if (name.empty()) continue;   // skip nameless entries
 
-            // ---- score ----
+            //  score 
             if (!std::getline(ss, token, ',')) continue;
             int score = 0;
             try { score = std::stoi(token); }
             catch (...) { continue; }   // bad integer → skip whole line
 
-            // ---- level ----
+            //  level 
             if (!std::getline(ss, token, ',')) continue;
             int level = 0;
             try { level = std::stoi(token); }
             catch (...) { continue; }
 
-            // ---- date (optional — don't crash if missing) ----
+            //  date (optional — don't crash if missing) 
             std::string date = "2025";
             if (std::getline(ss, token, ',') && !token.empty())
                 date = token;

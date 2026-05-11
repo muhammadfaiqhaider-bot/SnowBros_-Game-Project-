@@ -25,8 +25,8 @@ protected:
     int gemsCount;
 
     bool lifeStatus;
-    bool isInvincible;
-    int invincibleTimer;
+    bool isInvincible;            // this is important shyt like if eney collide player or somemprojectile
+    int invincibleTimer;          // player has some invisible blinking effect so that he won't recive more damage..
 
     bool SpeedBoostStatus;
     bool powerBallactiveStatus;
@@ -34,7 +34,7 @@ protected:
     bool hasBalloonMode;
     int powerUpTimer;
 
-    // Message to show when a power-up is collected
+    // Message to show when a power up is collected
     std::string powerupMessage;
     int powerupMessageTimer;
 
@@ -66,7 +66,7 @@ public:
         snowballDistance = 200.0f;  // Medium range
         isPlayer2 = false;
 
-        // Economy
+        // Economy  need for scoring system...........
         score = 0;
         gemsCount = 0;
 
@@ -133,7 +133,7 @@ public:
     {
         SpeedBoostStatus = true;
         speed = speed * 1.5f;       // 50% speed increase from spec
-        powerUpTimer = 900;         // 15 seconds at 60 FPS
+        powerUpTimer = 600;         // 10 seconds at 60 FPS
     }
 
     void applySnowballPower()
@@ -162,7 +162,7 @@ public:
         powerUpTimer = 600;         // 10 seconds at 60 FPS
     }
 
-    // Update powerup timers - called every frame
+    // Update powerup timers  called every frame
     void updatePowerUps()
     {
         if ( hasBalloonMode)
@@ -197,7 +197,6 @@ public:
                 powerUpTimer = 0;
             }
         }
-
         // Powerup pickup message timer (decrements each frame)
         if (!powerupMessage.empty())
         {
@@ -211,7 +210,7 @@ public:
     }
 
     // Economy
-    void addGems(int amount)
+    void addGems(int amount)    // this is need when i ll be doing scroing system 
     {
         gemsCount = gemsCount + amount;
     }
@@ -221,15 +220,13 @@ public:
         score = score + amount;
     }
 
-    void spendGems(int amount)
+    void spendGems(int amount)      // if spend gems in shop so deduct accordingly...........
     {
         if (gemsCount >= amount)
         {
             gemsCount = gemsCount - amount;
         }
     }
-
-
     void applyGravity()
     {
         float gravity = 0.5f;
@@ -350,7 +347,7 @@ public:
 
         if (!isPlayer2)
         {
-            // Player 1 - WASD
+            // Player 1  WASD
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
             {
                 velocityX = -speed;
@@ -370,7 +367,7 @@ public:
         }
         else
         {
-            // Player 2 - Arrow keys
+            // Player 2  Arrow keys
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             {
                 velocityX = -speed;
@@ -388,7 +385,7 @@ public:
                 isJumping = true;
             }
         }
-        // Gravity - only when NOT on ground
+        // Gravity  only when NOT on ground
         if (!onGround)
         {
             velocityY += 0.5f;
@@ -401,7 +398,7 @@ public:
         }
         else
         {
-            velocityY = 0;    // On ground - no falling
+            velocityY = 0;    // On ground  no falling
         }
 
         // Apply movement
@@ -470,10 +467,6 @@ public:
     {
         return snowball;
     }
-
-
-
-
 
 
     virtual ~Player()

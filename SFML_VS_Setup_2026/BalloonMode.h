@@ -24,7 +24,7 @@ public:
     {
         if (isActive && !isCollected)
         {
-            // Pink circle - balloon mode
+            // Pink circleballoon mode
             sf::CircleShape shape(15.0f);
             shape.setFillColor(sf::Color(255, 105, 180));   // Pink
             shape.setPosition(x, y);

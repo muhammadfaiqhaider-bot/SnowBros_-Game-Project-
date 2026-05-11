@@ -25,6 +25,48 @@ private:
     static const int BG_FRAME_W = 640;
     static const int BG_FRAME_H = 480;
 
+
+
+
+
+
+    void drawMenuButton(sf::RenderWindow& window, std::string text,
+        float x, float y, bool hovered)
+    {
+        // Button background
+        sf::RectangleShape button(sf::Vector2f(200.f, 45.f));
+
+        if (hovered)
+        {
+            button.setFillColor(sf::Color(46, 17, 51));    // Brighter when hovered
+            button.setOutlineColor(sf::Color(218, 152, 227));
+            button.setOutlineThickness(2.f);
+        }
+        else
+        {
+            button.setFillColor(sf::Color(41, 14, 46));     // Normal color
+            button.setOutlineColor(sf::Color(102, 54, 112));
+            button.setOutlineThickness(1.f);
+        }
+
+        button.setPosition(x, y);
+        window.draw(button);
+
+        // Button text
+        sf::Text buttonText;
+        buttonText.setFont(texts);
+        buttonText.setString(text);
+        buttonText.setCharacterSize(18);
+        buttonText.setFillColor(sf::Color(218, 152, 227));
+
+        // Center text in button
+        float textWidth = text.length() * 10.f;
+        float textX = x + (200.f - textWidth) / 2.f;
+        buttonText.setPosition(textX, y + 12.f);
+        window.draw(buttonText);
+    }
+
+
 public:
     MainMenu()
     {
@@ -72,21 +114,21 @@ public:
 
     int handleEvents(sf::Event& event, sf::RenderWindow& window)
     {
-        // Mouse movement - hover effect
+        // Mouse movement  hover effect
         if (event.type == sf::Event::MouseMoved)
         {
             float mouseX = event.mouseMove.x;
             float mouseY = event.mouseMove.y;
 
-            // Check play button hover (x:200-400, y:250-300)
+            // Check play button hover
             playHovered = (mouseX >= 200 && mouseX <= 400 &&
                 mouseY >= 250 && mouseY <= 300);
 
-            // Check leaderboard hover (x:200-400, y:330-380)
+            // Check leaderboard hover
             leaderboardHovered = (mouseX >= 200 && mouseX <= 400 &&
                 mouseY >= 330 && mouseY <= 380);
 
-            // Check exit hover (x:200-400, y:410-460)
+            // Check exit hover
             exitHovered = (mouseX >= 200 && mouseX <= 400 &&
                 mouseY >= 410 && mouseY <= 460);
         }
@@ -147,14 +189,14 @@ public:
             window.draw(bgAnimSprite);
         else
         {
-            // Fallback - dark blue if no image
+            //backup if background deosn't load somehow
             sf::RectangleShape bg(sf::Vector2f(600.f, 600.f));
             bg.setFillColor(sf::Color(5, 10, 30));
             window.draw(bg);
         }
         
 
-        //  TITLE SNOW BROS 
+        //  Snow bros tittle at the bellow are ll adjustments for it
         sf::Text title;
         title.setFont(font);
         title.setString("SNOW BROS");
@@ -163,13 +205,13 @@ public:
         title.setPosition(135.f, 60.f);
         window.draw(title);
 
-        //  TITLE UNDERLINE 
+        // lineee just for shashkey and looks...........
         sf::RectangleShape underline(sf::Vector2f(400.f, 3.f));
         underline.setFillColor(sf::Color(188, 109, 199));
         underline.setPosition(110.f, 130.f);
         window.draw(underline);
 
-        //  WELCOME TEXT 
+        //  welcome line ke attributes below
         sf::Text welcome;
         welcome.setFont(texts);
         welcome.setString("WELCOME,  " + playerName);
@@ -178,13 +220,13 @@ public:
         welcome.setPosition(230.0f, 170.0f);
         window.draw(welcome);
 
-        //  PLAY BUTTON 
+        // Play button
         drawMenuButton(window, "PLAY", 200.f, 250.f, playHovered);
 
-        //  LEADERboard BUTTON 
+        //  leaderboard BUTTON 
         drawMenuButton(window, "LEADERBOARD", 200.f, 330.f, leaderboardHovered);
 
-        //  EXIT BUTN 
+        //  exit BUTN 
         drawMenuButton(window, "EXIT", 200.f, 410.f, exitHovered);
 
         //  verision text
@@ -197,41 +239,5 @@ public:
         window.draw(version);
     }
 
-private:
-
-    void drawMenuButton(sf::RenderWindow& window, std::string text,
-        float x, float y, bool hovered)
-    {
-        // Button background
-        sf::RectangleShape button(sf::Vector2f(200.f, 45.f));
-
-        if (hovered)
-        {
-            button.setFillColor(sf::Color(46, 17, 51));    // Brighter when hovered
-            button.setOutlineColor(sf::Color(218, 152, 227));
-            button.setOutlineThickness(2.f);
-        }
-        else
-        {
-            button.setFillColor(sf::Color(41, 14, 46));     // Normal color
-            button.setOutlineColor(sf::Color(102, 54, 112));
-            button.setOutlineThickness(1.f);
-        }
-
-        button.setPosition(x, y);
-        window.draw(button);
- 
-        // Button text
-        sf::Text buttonText;
-        buttonText.setFont(texts);
-        buttonText.setString(text);
-        buttonText.setCharacterSize(18);
-        buttonText.setFillColor(sf::Color(218, 152, 227));
-
-        // Center text in button
-        float textWidth = text.length() * 10.f;
-        float textX = x + (200.f - textWidth) / 2.f;
-        buttonText.setPosition(textX, y + 12.f);
-        window.draw(buttonText);
-    }
+    
 };
